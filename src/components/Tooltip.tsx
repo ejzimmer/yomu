@@ -1,3 +1,4 @@
+import './Tooltip.css'
 import { useState, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react'
 
 export interface TooltipTriggerProps {

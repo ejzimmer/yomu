@@ -1,3 +1,4 @@
+import './ShakeInput.css'
 import { useEffect, useId, useRef, type ComponentProps } from 'react'
 
 type Props = Omit<ComponentProps<'input'>, 'ref'> & {

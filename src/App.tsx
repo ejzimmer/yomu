@@ -1,3 +1,4 @@
+import './App.css'
 import { useEffect, useState } from 'react'
 import { WaniKaniClient, ApiError } from './api/client'
 import type { User } from './api/types'
