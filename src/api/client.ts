@@ -37,8 +37,8 @@ export class WaniKaniClient {
   private readonly makeHttpRequest: typeof fetch
   private readonly getNow: () => number
   private readonly sleep: (ms: number) => Promise<void>
-  private readonly sent: number[] = []
-  private resetAt = 0
+  private readonly recentRequestTimes: number[] = []
+  private rateLimitResetsAt = 0
   private readonly cache = new Map<string, Cached>()
 
   constructor(token: string, options: ClientOptions = {}) {
@@ -81,13 +81,13 @@ export class WaniKaniClient {
     if (cached?.etag) headers['If-None-Match'] = cached.etag
     if (cached?.lastModified) headers['If-Modified-Since'] = cached.lastModified
 
-    this.sent.push(this.getNow())
+    this.recentRequestTimes.push(this.getNow())
     const response = await this.makeHttpRequest(url, { headers })
     this.readRateLimit(response)
 
     if (response.status === 304 && cached) return cached.body
     if (response.status === 429 && attempt < 3) {
-      await this.sleep(Math.max(this.resetAt - this.getNow(), 1000))
+      await this.sleep(Math.max(this.rateLimitResetsAt - this.getNow(), 1000))
       return this.getWithRetry(url, attempt + 1)
     }
     if (!response.ok) {
@@ -104,11 +104,11 @@ export class WaniKaniClient {
 
   private async waitForSlot() {
     const now = this.getNow()
-    while (this.sent.length && now - this.sent[0] >= MINUTE_MS) this.sent.shift()
+    while (this.recentRequestTimes.length && now - this.recentRequestTimes[0] >= MINUTE_MS) this.recentRequestTimes.shift()
 
     let waitUntil = 0
-    if (this.sent.length >= LIMIT_PER_MINUTE) waitUntil = this.sent[0] + MINUTE_MS
-    if (this.resetAt > now) waitUntil = Math.max(waitUntil, this.resetAt)
+    if (this.recentRequestTimes.length >= LIMIT_PER_MINUTE) waitUntil = this.recentRequestTimes[0] + MINUTE_MS
+    if (this.rateLimitResetsAt > now) waitUntil = Math.max(waitUntil, this.rateLimitResetsAt)
     if (waitUntil > now) await this.sleep(waitUntil - now)
   }
 
@@ -116,7 +116,7 @@ export class WaniKaniClient {
     const remaining = response.headers.get('RateLimit-Remaining')
     const reset = response.headers.get('RateLimit-Reset')
     if (reset && (remaining === '0' || response.status === 429)) {
-      this.resetAt = Number(reset) * 1000
+      this.rateLimitResetsAt = Number(reset) * 1000
     }
   }
 }
