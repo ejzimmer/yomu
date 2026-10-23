@@ -4,9 +4,9 @@ import { ApiError, WaniKaniClient } from './client'
 type Reply = { status?: number; body?: unknown; headers?: Record<string, string> }
 
 function makeFakeFetch(replies: Reply[]) {
-  const calls: { url: string; headers: Record<string, string>; at: number }[] = []
+  const calls: { url: string; headers: Record<string, string>; at: Temporal.Instant }[] = []
   const fetch = async (url: string | URL | Request, init?: RequestInit) => {
-    calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string>, at: Temporal.Now.instant().epochMilliseconds })
+    calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string>, at: Temporal.Now.instant() })
     const r = replies.shift() ?? { status: 500 }
     return new Response(r.status === 304 ? null : JSON.stringify(r.body ?? {}), {
       status: r.status ?? 200,
@@ -67,7 +67,8 @@ describe('WaniKaniClient', () => {
   })
 
   it('waits for the reset time after a 429 and retries', async () => {
-    const reset = String((Temporal.Now.instant().epochMilliseconds + 5000) / 1000)
+    // RateLimit-Reset is in epoch seconds
+    const reset = String(Temporal.Now.instant().add({ seconds: 5 }).epochMilliseconds / 1000)
     const f = makeFakeFetch([
       { status: 429, headers: { 'RateLimit-Remaining': '0', 'RateLimit-Reset': reset } },
       { body: { data: { level: 2 } } },
@@ -75,7 +76,7 @@ describe('WaniKaniClient', () => {
     const pending = new WaniKaniClient('t', { fetch: f.fetch }).getUser()
     await vi.runAllTimersAsync()
     expect((await pending).data.level).toBe(2)
-    expect(f.calls[1].at - f.calls[0].at).toBe(5000)
+    expect(f.calls[0].at.until(f.calls[1].at).total('seconds')).toBe(5)
   })
 
   it('never sends more than 60 requests in a minute', async () => {
@@ -88,6 +89,6 @@ describe('WaniKaniClient', () => {
     const pending = client.get('/user')
     await vi.runAllTimersAsync()
     await pending
-    expect(f.calls[60].at - f.calls[0].at).toBe(60_000)
+    expect(f.calls[0].at.until(f.calls[60].at).total('minutes')).toBe(1)
   })
 })

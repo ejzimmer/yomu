@@ -3,7 +3,8 @@ import type { Collection, Resource, User } from './types'
 const BASE_URL = 'https://api.wanikani.com/v2'
 const REVISION = '20170710'
 const LIMIT_PER_MINUTE = 60
-const MINUTE_MS = Temporal.Duration.from({ minutes: 1 }).total('milliseconds')
+const ONE_MINUTE = Temporal.Duration.from({ minutes: 1 })
+const MIN_RETRY_WAIT = Temporal.Duration.from({ seconds: 1 })
 
 export class ApiError extends Error {
   readonly status: number
@@ -25,7 +26,12 @@ interface Cached {
   body: unknown
 }
 
-const sleepFor = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+const getLater = (a: Temporal.Instant, b: Temporal.Instant) => (Temporal.Instant.compare(a, b) >= 0 ? a : b)
+
+function sleepUntil(instant: Temporal.Instant) {
+  const ms = Temporal.Now.instant().until(instant).total('milliseconds')
+  return new Promise<void>((resolve) => setTimeout(resolve, Math.max(ms, 0)))
+}
 
 // Thin WaniKani API v2 client: bearer auth, revision header, pagination,
 // a 60/min rate limiter that also honours RateLimit-* headers and 429s,
@@ -33,8 +39,8 @@ const sleepFor = (ms: number) => new Promise<void>((resolve) => setTimeout(resol
 export class WaniKaniClient {
   private readonly token: string
   private readonly makeHttpRequest: typeof fetch
-  private readonly recentRequestTimes: number[] = []
-  private rateLimitResetsAt = 0
+  private readonly recentRequestTimes: Temporal.Instant[] = []
+  private rateLimitResetsAt: Temporal.Instant | null = null
   private readonly cache = new Map<string, Cached>()
 
   constructor(token: string, options: ClientOptions = {}) {
@@ -75,13 +81,14 @@ export class WaniKaniClient {
     if (cached?.etag) headers['If-None-Match'] = cached.etag
     if (cached?.lastModified) headers['If-Modified-Since'] = cached.lastModified
 
-    this.recentRequestTimes.push(Temporal.Now.instant().epochMilliseconds)
+    this.recentRequestTimes.push(Temporal.Now.instant())
     const response = await this.makeHttpRequest(url, { headers })
     this.readRateLimit(response)
 
     if (response.status === 304 && cached) return cached.body
     if (response.status === 429 && attempt < 3) {
-      await sleepFor(Math.max(this.rateLimitResetsAt - Temporal.Now.instant().epochMilliseconds, 1000))
+      const earliestRetry = Temporal.Now.instant().add(MIN_RETRY_WAIT)
+      await sleepUntil(this.rateLimitResetsAt ? getLater(this.rateLimitResetsAt, earliestRetry) : earliestRetry)
       return this.getWithRetry(url, attempt + 1)
     }
     if (!response.ok) {
@@ -97,20 +104,25 @@ export class WaniKaniClient {
   }
 
   private async waitForSlot() {
-    const now = Temporal.Now.instant().epochMilliseconds
-    while (this.recentRequestTimes.length && now - this.recentRequestTimes[0] >= MINUTE_MS) this.recentRequestTimes.shift()
+    const windowStart = Temporal.Now.instant().subtract(ONE_MINUTE)
+    while (this.recentRequestTimes.length && Temporal.Instant.compare(this.recentRequestTimes[0], windowStart) <= 0) {
+      this.recentRequestTimes.shift()
+    }
 
-    let waitUntil = 0
-    if (this.recentRequestTimes.length >= LIMIT_PER_MINUTE) waitUntil = this.recentRequestTimes[0] + MINUTE_MS
-    if (this.rateLimitResetsAt > now) waitUntil = Math.max(waitUntil, this.rateLimitResetsAt)
-    if (waitUntil > now) await sleepFor(waitUntil - now)
+    let waitUntil = this.rateLimitResetsAt
+    if (this.recentRequestTimes.length >= LIMIT_PER_MINUTE) {
+      const slotFreesAt = this.recentRequestTimes[0].add(ONE_MINUTE)
+      waitUntil = waitUntil ? getLater(waitUntil, slotFreesAt) : slotFreesAt
+    }
+    if (waitUntil && Temporal.Instant.compare(waitUntil, Temporal.Now.instant()) > 0) await sleepUntil(waitUntil)
   }
 
   private readRateLimit(response: Response) {
     const remaining = response.headers.get('RateLimit-Remaining')
     const reset = response.headers.get('RateLimit-Reset')
     if (reset && (remaining === '0' || response.status === 429)) {
-      this.rateLimitResetsAt = Number(reset) * 1000
+      // The header is in epoch seconds
+      this.rateLimitResetsAt = Temporal.Instant.fromEpochMilliseconds(Number(reset) * 1000)
     }
   }
 }
