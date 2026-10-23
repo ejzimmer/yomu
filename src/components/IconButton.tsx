@@ -18,7 +18,6 @@ export function IconButton({ label, tooltipAlign, isLoading = false, children, o
           {...buttonProps}
           {...tooltipProps}
           aria-label={label}
-          aria-busy={isLoading || undefined}
           aria-disabled={isLoading || undefined}
           onClick={(e) => {
             if (isLoading) {

@@ -37,7 +37,7 @@ header.bar {
   width: 56px; height: 56px; padding: 0; border: none; border-radius: 999px; cursor: pointer;
   background: color-mix(in srgb, var(--ink) 75%, transparent); color: var(--paper);
 }
-.submit[aria-busy] { cursor: progress; }
+[aria-disabled] { cursor: progress; }
 .spinner { animation: spin .8s linear infinite; }
 @keyframes spin { to { rotate: 360deg; } }
 
