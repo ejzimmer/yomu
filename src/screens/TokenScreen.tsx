@@ -36,22 +36,23 @@ export function TokenScreen({ onSignedIn }: Props) {
 
   return (
     <>
-      <form className="row" onSubmit={submit}>
-        <ShakeInput
-          id="token"
-          aria-label="API token"
-          error={error}
-          type="password"
-          autoComplete="off"
-          spellCheck={false}
-          placeholder="API token"
-          value={token}
-          onChange={(e) => setToken(e.target.value)}
-          autoFocus
-        />
-        <button className="submit" type="submit" disabled={isLoading} title="Sign in" aria-label="Sign in">
-          <ArrowIcon />
-        </button>
+      <form className="field" onSubmit={submit}>
+        <label htmlFor="token">API token</label>
+        <div className="row">
+          <ShakeInput
+            id="token"
+            error={error}
+            type="password"
+            autoComplete="off"
+            spellCheck={false}
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            autoFocus
+          />
+          <button className="submit" type="submit" disabled={isLoading} title="Sign in" aria-label="Sign in">
+            <ArrowIcon />
+          </button>
+        </div>
       </form>
       <p role="alert" className="message">{error}</p>
     </>

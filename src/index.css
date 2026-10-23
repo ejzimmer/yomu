@@ -41,6 +41,8 @@ header.bar {
 
 .centre { min-height: calc(100% - 56px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 24px 16px; }
 
+.field { display: flex; flex-direction: column; gap: 8px; width: min(560px, 100%); }
+label { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); }
 .row { display: flex; align-items: center; gap: 16px; width: min(560px, 100%); }
 input {
   flex: 1; min-width: 0; width: 100%; font: inherit; font-size: 22px; padding: 8px 0; text-align: center;
