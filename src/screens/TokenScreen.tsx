@@ -50,7 +50,7 @@ export function TokenScreen({ onSignedIn }: Props) {
             onChange={(e) => setToken(e.target.value)}
             autoFocus
           />
-          <IconButton className="submit" type="submit" disabled={isLoading} label="Sign in">
+          <IconButton className="submit" type="submit" isLoading={isLoading} label="Sign in">
             <ArrowIcon />
           </IconButton>
         </div>
