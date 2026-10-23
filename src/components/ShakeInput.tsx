@@ -5,19 +5,13 @@ type Props = Omit<ComponentProps<'input'>, 'ref'> & {
 }
 
 // A text input that shows an error by turning red, shaking and taking focus.
-// It shakes each time `error` changes to a new message, so clear it (null)
-// before each new attempt.
+// The shake is a CSS animation on the `error` class, so it replays each time
+// the class comes back: clear `error` (null) before each new attempt.
 export function ShakeInput({ error, className, title, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    const input = inputRef.current
-    if (!error || !input) return
-    input.focus()
-    input.animate(
-      [0, -8, 8, -8, 8, 0].map((x) => ({ transform: `translateX(${x}px)` })),
-      { duration: 350 },
-    )
+    if (error) inputRef.current?.focus()
   }, [error])
 
   return (
