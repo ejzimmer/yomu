@@ -34,10 +34,10 @@ export function TokenScreen({ onSignedIn }: Props) {
   return (
     <main className="centre">
       <form className="row" onSubmit={submit}>
-        <label htmlFor="token" className="visually-hidden">API token</label>
         <ShakeInput
           ref={tokenInputRef}
           id="token"
+          aria-label="API token"
           className={'answer' + (error ? ' error' : '')}
           type="password"
           autoComplete="off"
