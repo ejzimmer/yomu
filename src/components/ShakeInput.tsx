@@ -7,7 +7,7 @@ type Props = Omit<ComponentProps<'input'>, 'ref'> & {
 // A text input that shows an error by turning red, shaking and taking focus.
 // It shakes each time `error` changes to a message, so set it to null before
 // each new attempt (with flushSync if the next error follows synchronously).
-export function ShakeInput({ error, className, title, ...inputProps }: Props) {
+export function ShakeInput({ error, className, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export function ShakeInput({ error, className, title, ...inputProps }: Props) {
     <input
       ref={inputRef}
       className={`${className ?? ''} ${error ? 'error' : ''}`}
-      title={error ?? title}
       aria-invalid={error ? true : undefined}
       {...inputProps}
     />

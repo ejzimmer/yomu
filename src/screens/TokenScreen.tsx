@@ -46,7 +46,6 @@ export function TokenScreen({ onSignedIn }: Props) {
           autoComplete="off"
           spellCheck={false}
           placeholder="API token"
-          title="WaniKani API token (needs assignments:start and reviews:create)"
           value={token}
           onChange={(e) => setToken(e.target.value)}
           autoFocus
