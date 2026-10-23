@@ -62,7 +62,8 @@ input {
   border: none; border-bottom: 2px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink);
 }
 input.error { border-bottom-color: var(--red); color: var(--red); animation: shake .35s; }
-.message { margin: 0; min-height: 1.5em; font-size: 14px; color: var(--red); text-align: center; }
+.shake-input { position: relative; flex: 1; min-width: 0; }
+.message { position: absolute; top: 100%; left: 0; right: 0; margin: 8px 0 0; font-size: 14px; color: var(--red); text-align: center; }
 @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
 
 

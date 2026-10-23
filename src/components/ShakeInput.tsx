@@ -1,14 +1,16 @@
-import { useEffect, useRef, type ComponentProps } from 'react'
+import { useEffect, useId, useRef, type ComponentProps } from 'react'
 
 type Props = Omit<ComponentProps<'input'>, 'ref'> & {
   error?: string | null
 }
 
-// A text input that shows an error by turning red, shaking and taking focus.
+// A text input that shows an error message under itself, turns red, shakes
+// and takes focus.
 // It shakes each time `error` changes to a message, so set it to null before
 // each new attempt (with flushSync if the next error follows synchronously).
 export function ShakeInput({ error, className, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const messageId = useId()
 
   useEffect(() => {
     const input = inputRef.current
@@ -21,11 +23,15 @@ export function ShakeInput({ error, className, ...inputProps }: Props) {
   }, [error])
 
   return (
-    <input
-      ref={inputRef}
-      className={`${className ?? ''} ${error ? 'error' : ''}`}
-      aria-invalid={error ? true : undefined}
-      {...inputProps}
-    />
+    <div className="shake-input">
+      <input
+        ref={inputRef}
+        className={`${className ?? ''} ${error ? 'error' : ''}`}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={messageId}
+        {...inputProps}
+      />
+      <p id={messageId} role="alert" className="message">{error}</p>
+    </div>
   )
 }
