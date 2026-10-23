@@ -14,7 +14,6 @@ export function TokenScreen({ onSignedIn }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
 
   function shakeForm() {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
     formRef.current?.animate(
       [0, -8, 8, -8, 8, 0].map((x) => ({ transform: `translateX(${x}px)` })),
       { duration: 350 },
