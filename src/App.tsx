@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { WaniKaniClient, ApiError } from './api/client'
 import type { User } from './api/types'
+import { IconButton } from './components/IconButton'
 import { SignOutIcon } from './icons'
 import { TokenScreen } from './screens/TokenScreen'
 import { clearToken, loadToken, saveToken } from './token'
@@ -37,9 +38,9 @@ export default function App() {
       <header className="bar">
         <div className="name">読む</div>
         {token && (
-          <button className="icon-btn" onClick={signOut} title="Sign out" aria-label="Sign out">
+          <IconButton className="icon-btn" onClick={signOut} label="Sign out" tooltipAlign="end">
             <SignOutIcon />
-          </button>
+          </IconButton>
         )}
       </header>
       <main className="centre">

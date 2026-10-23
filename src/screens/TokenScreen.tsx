@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { ApiError, WaniKaniClient } from '../api/client'
 import type { User } from '../api/types'
+import { IconButton } from '../components/IconButton'
 import { ShakeInput } from '../components/ShakeInput'
 import { ArrowIcon } from '../icons'
 
@@ -49,9 +50,9 @@ export function TokenScreen({ onSignedIn }: Props) {
             onChange={(e) => setToken(e.target.value)}
             autoFocus
           />
-          <button className="submit" type="submit" disabled={isLoading} title="Sign in" aria-label="Sign in">
+          <IconButton className="submit" type="submit" disabled={isLoading} label="Sign in">
             <ArrowIcon />
-          </button>
+          </IconButton>
         </div>
       </form>
       <p role="alert" className="message">{error}</p>
