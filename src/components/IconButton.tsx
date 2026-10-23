@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { SpinnerIcon } from '../icons'
+import { LoadingKanji } from './LoadingKanji'
 import { Tooltip } from './Tooltip'
 
 type Props = Omit<ComponentProps<'button'>, 'aria-label' | 'title' | 'onKeyDown' | 'onBlur' | 'onMouseLeave'> & {
@@ -9,7 +9,7 @@ type Props = Omit<ComponentProps<'button'>, 'aria-label' | 'title' | 'onKeyDown'
 }
 
 // An icon-only button whose label shows as a tooltip.
-// While isLoading, the icon becomes a spinner and clicks are ignored.
+// While isLoading, the icon becomes a self-writing kanji and clicks are ignored.
 export function IconButton({ label, tooltipAlign, isLoading = false, children, onClick, ...buttonProps }: Props) {
   return (
     <Tooltip text={label} align={tooltipAlign}>
@@ -27,7 +27,7 @@ export function IconButton({ label, tooltipAlign, isLoading = false, children, o
             onClick?.(e)
           }}
         >
-          {isLoading ? <SpinnerIcon /> : children}
+          {isLoading ? <LoadingKanji /> : children}
         </button>
       )}
     </Tooltip>

@@ -10,7 +10,3 @@ export const ArrowIcon = () => (
 export const SignOutIcon = () => (
   <svg {...common}><path d="M15 4h4v16h-4" /><path d="M10 17l-5-5 5-5" /><path d="M5 12h11" /></svg>
 )
-
-export const SpinnerIcon = () => (
-  <svg {...common} className="spinner"><path d="M12 3a9 9 0 1 1-9 9" /></svg>
-)

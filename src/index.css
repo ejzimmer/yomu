@@ -38,8 +38,6 @@ header.bar {
   background: color-mix(in srgb, var(--ink) 75%, transparent); color: var(--paper);
 }
 [aria-disabled] { cursor: progress; }
-.spinner { animation: spin .8s linear infinite; }
-@keyframes spin { to { rotate: 360deg; } }
 
 .has-tooltip { position: relative; display: inline-flex; }
 .tooltip {
