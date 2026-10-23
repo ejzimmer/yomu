@@ -17,7 +17,7 @@ export class ApiError extends Error {
 
 export interface ClientOptions {
   fetch?: typeof fetch
-  now?: () => number
+  getNow?: () => number
   sleep?: (ms: number) => Promise<void>
 }
 
@@ -27,15 +27,15 @@ interface Cached {
   body: unknown
 }
 
-const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+const sleepFor = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 // Thin WaniKani API v2 client: bearer auth, revision header, pagination,
 // a 60/min rate limiter that also honours RateLimit-* headers and 429s,
 // and conditional GETs (ETag / Last-Modified) served from an in-memory cache.
 export class WaniKaniClient {
   private readonly token: string
-  private readonly fetchImpl: typeof fetch
-  private readonly now: () => number
+  private readonly makeHttpRequest: typeof fetch
+  private readonly getNow: () => number
   private readonly sleep: (ms: number) => Promise<void>
   private readonly sent: number[] = []
   private resetAt = 0
@@ -43,19 +43,19 @@ export class WaniKaniClient {
 
   constructor(token: string, options: ClientOptions = {}) {
     this.token = token
-    this.fetchImpl = options.fetch ?? fetch.bind(globalThis)
-    this.now = options.now ?? Date.now
-    this.sleep = options.sleep ?? defaultSleep
+    this.makeHttpRequest = options.fetch ?? fetch.bind(globalThis)
+    this.getNow = options.getNow ?? Date.now
+    this.sleep = options.sleep ?? sleepFor
   }
 
-  user(): Promise<Resource<User>> {
+  getUser(): Promise<Resource<User>> {
     return this.get<Resource<User>>('/user')
   }
 
   async get<T>(pathOrUrl: string, params: Record<string, string> = {}): Promise<T> {
     const url = new URL(pathOrUrl.startsWith('http') ? pathOrUrl : BASE_URL + pathOrUrl)
     for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value)
-    return (await this.request(url.toString())) as T
+    return (await this.getWithRetry(url.toString())) as T
   }
 
   // Follows pages.next_url until the collection is exhausted.
@@ -70,7 +70,7 @@ export class WaniKaniClient {
     return items
   }
 
-  private async request(url: string, attempt = 0): Promise<unknown> {
+  private async getWithRetry(url: string, attempt = 0): Promise<unknown> {
     await this.waitForSlot()
 
     const headers: Record<string, string> = {
@@ -81,14 +81,14 @@ export class WaniKaniClient {
     if (cached?.etag) headers['If-None-Match'] = cached.etag
     if (cached?.lastModified) headers['If-Modified-Since'] = cached.lastModified
 
-    this.sent.push(this.now())
-    const response = await this.fetchImpl(url, { headers })
+    this.sent.push(this.getNow())
+    const response = await this.makeHttpRequest(url, { headers })
     this.readRateLimit(response)
 
     if (response.status === 304 && cached) return cached.body
     if (response.status === 429 && attempt < 3) {
-      await this.sleep(Math.max(this.resetAt - this.now(), 1000))
-      return this.request(url, attempt + 1)
+      await this.sleep(Math.max(this.resetAt - this.getNow(), 1000))
+      return this.getWithRetry(url, attempt + 1)
     }
     if (!response.ok) {
       const body = (await response.json().catch(() => null)) as { error?: string } | null
@@ -103,7 +103,7 @@ export class WaniKaniClient {
   }
 
   private async waitForSlot() {
-    const now = this.now()
+    const now = this.getNow()
     while (this.sent.length && now - this.sent[0] >= MINUTE_MS) this.sent.shift()
 
     let waitUntil = 0

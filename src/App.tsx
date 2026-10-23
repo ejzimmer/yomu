@@ -13,7 +13,7 @@ export default function App() {
   useEffect(() => {
     if (!token || user) return
     new WaniKaniClient(token)
-      .user()
+      .getUser()
       .then((res) => setUser(res.data))
       .catch((e) => {
         if (e instanceof ApiError && e.status === 401) signOut()

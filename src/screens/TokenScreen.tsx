@@ -20,7 +20,7 @@ export function TokenScreen({ onSignedIn }: Props) {
     setBusy(true)
     setError(null)
     try {
-      const user = await new WaniKaniClient(value).user()
+      const user = await new WaniKaniClient(value).getUser()
       onSignedIn(value, user.data)
     } catch (e) {
       setError(e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani')
