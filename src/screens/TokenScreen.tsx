@@ -35,7 +35,7 @@ export function TokenScreen({ onSignedIn }: Props) {
   }
 
   return (
-    <main className="centre">
+    <>
       <form className="row" onSubmit={submit}>
         <ShakeInput
           id="token"
@@ -54,6 +54,6 @@ export function TokenScreen({ onSignedIn }: Props) {
         </button>
       </form>
       <p role="alert" className="message">{error}</p>
-    </main>
+    </>
   )
 }

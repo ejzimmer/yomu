@@ -42,16 +42,18 @@ export default function App() {
           </button>
         )}
       </header>
-      {!token ? (
-        <TokenScreen onSignedIn={signIn} />
-      ) : user ? (
-        <main className="centre">
-          <div className="level" title="Level">{user.level}</div>
-          <div className="meta" title="Subscription">
-            {user.subscription.active ? user.subscription.type : 'free'} · max {user.subscription.max_level_granted}
-          </div>
-        </main>
-      ) : null}
+      <main className="centre">
+        {!token ? (
+          <TokenScreen onSignedIn={signIn} />
+        ) : user ? (
+          <>
+            <div className="level" title="Level">{user.level}</div>
+            <div className="meta" title="Subscription">
+              {user.subscription.active ? user.subscription.type : 'free'} · max {user.subscription.max_level_granted}
+            </div>
+          </>
+        ) : null}
+      </main>
     </>
   )
 }
