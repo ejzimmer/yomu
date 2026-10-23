@@ -3,7 +3,7 @@ import type { Collection, Resource, User } from './types'
 const BASE_URL = 'https://api.wanikani.com/v2'
 const REVISION = '20170710'
 const LIMIT_PER_MINUTE = 60
-const MINUTE_MS = 60_000
+const MINUTE_MS = Temporal.Duration.from({ minutes: 1 }).total('milliseconds')
 
 export class ApiError extends Error {
   readonly status: number
@@ -75,13 +75,13 @@ export class WaniKaniClient {
     if (cached?.etag) headers['If-None-Match'] = cached.etag
     if (cached?.lastModified) headers['If-Modified-Since'] = cached.lastModified
 
-    this.recentRequestTimes.push(Date.now())
+    this.recentRequestTimes.push(Temporal.Now.instant().epochMilliseconds)
     const response = await this.makeHttpRequest(url, { headers })
     this.readRateLimit(response)
 
     if (response.status === 304 && cached) return cached.body
     if (response.status === 429 && attempt < 3) {
-      await sleepFor(Math.max(this.rateLimitResetsAt - Date.now(), 1000))
+      await sleepFor(Math.max(this.rateLimitResetsAt - Temporal.Now.instant().epochMilliseconds, 1000))
       return this.getWithRetry(url, attempt + 1)
     }
     if (!response.ok) {
@@ -97,7 +97,7 @@ export class WaniKaniClient {
   }
 
   private async waitForSlot() {
-    const now = Date.now()
+    const now = Temporal.Now.instant().epochMilliseconds
     while (this.recentRequestTimes.length && now - this.recentRequestTimes[0] >= MINUTE_MS) this.recentRequestTimes.shift()
 
     let waitUntil = 0

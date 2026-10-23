@@ -6,7 +6,7 @@ type Reply = { status?: number; body?: unknown; headers?: Record<string, string>
 function makeFakeFetch(replies: Reply[]) {
   const calls: { url: string; headers: Record<string, string>; at: number }[] = []
   const fetch = async (url: string | URL | Request, init?: RequestInit) => {
-    calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string>, at: Date.now() })
+    calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string>, at: Temporal.Now.instant().epochMilliseconds })
     const r = replies.shift() ?? { status: 500 }
     return new Response(r.status === 304 ? null : JSON.stringify(r.body ?? {}), {
       status: r.status ?? 200,
@@ -67,7 +67,7 @@ describe('WaniKaniClient', () => {
   })
 
   it('waits for the reset time after a 429 and retries', async () => {
-    const reset = String((Date.now() + 5000) / 1000)
+    const reset = String((Temporal.Now.instant().epochMilliseconds + 5000) / 1000)
     const f = makeFakeFetch([
       { status: 429, headers: { 'RateLimit-Remaining': '0', 'RateLimit-Reset': reset } },
       { body: { data: { level: 2 } } },
