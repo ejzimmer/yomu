@@ -1,6 +1,6 @@
 const KEY = 'yomu.token'
 
-export function loadToken(): string | null {
+export function getToken(): string | null {
   try {
     return localStorage.getItem(KEY)
   } catch {

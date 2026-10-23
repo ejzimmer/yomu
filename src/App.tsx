@@ -5,10 +5,10 @@ import type { User } from './api/types'
 import { IconButton } from './components/IconButton'
 import { SignOutIcon } from './icons'
 import { TokenScreen } from './screens/TokenScreen'
-import { clearToken, loadToken, saveToken } from './token'
+import { clearToken, getToken, saveToken } from './token'
 
 export default function App() {
-  const [token, setToken] = useState(loadToken)
+  const [token, setToken] = useState(getToken)
   const [user, setUser] = useState<User | null>(null)
 
   // Refresh the user on start when a token is already stored.
