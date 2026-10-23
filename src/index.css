@@ -49,11 +49,8 @@ header.bar {
 }
 .answer.error { border-bottom-color: var(--red); color: var(--red); }
 
-.shake { animation: shake .35s; }
-@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
 
 .level { font-family: var(--serif); font-weight: 700; font-size: 120px; line-height: 1; }
 .meta { color: var(--ink-soft); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
 
-@media (prefers-reduced-motion: reduce) { .shake { animation: none; } }
 .answer:focus-visible { outline: none; border-bottom-width: 3px; }

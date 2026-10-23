@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { ApiError, WaniKaniClient } from '../api/client'
 import type { User } from '../api/types'
 import { ArrowIcon } from '../icons'
@@ -11,7 +11,15 @@ export function TokenScreen({ onSignedIn }: Props) {
   const [token, setToken] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [shakeKey, setShakeKey] = useState(0)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  function shakeForm() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    formRef.current?.animate(
+      [0, -8, 8, -8, 8, 0].map((x) => ({ transform: `translateX(${x}px)` })),
+      { duration: 350 },
+    )
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -24,7 +32,7 @@ export function TokenScreen({ onSignedIn }: Props) {
       onSignedIn(value, user.data)
     } catch (e) {
       setError(e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani')
-      setShakeKey((k) => k + 1)
+      shakeForm()
     } finally {
       setBusy(false)
     }
@@ -32,7 +40,7 @@ export function TokenScreen({ onSignedIn }: Props) {
 
   return (
     <main className="centre">
-      <form className={'row' + (shakeKey ? ' shake' : '')} key={shakeKey} onSubmit={submit}>
+      <form className="row" ref={formRef} onSubmit={submit}>
         <label htmlFor="token" className="visually-hidden">API token</label>
         <input
           id="token"
