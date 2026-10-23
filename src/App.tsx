@@ -36,7 +36,9 @@ export default function App() {
   return (
     <>
       <header className="bar">
-        <div className="name">読む</div>
+        <div className="name">
+          読む <span className="tagline">Unofficial WaniKani client</span>
+        </div>
         {token && (
           <IconButton className="icon-btn" onClick={signOut} label="Sign out" tooltipAlign="end">
             <SignOutIcon />
