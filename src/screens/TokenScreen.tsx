@@ -1,7 +1,7 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { ApiError, WaniKaniClient } from '../api/client'
 import type { User } from '../api/types'
-import { ShakeInput, type ShakeInputHandle } from '../components/ShakeInput'
+import { ShakeInput } from '../components/ShakeInput'
 import { ArrowIcon } from '../icons'
 
 interface Props {
@@ -12,7 +12,6 @@ export function TokenScreen({ onSignedIn }: Props) {
   const [token, setToken] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const tokenInputRef = useRef<ShakeInputHandle>(null)
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -25,7 +24,6 @@ export function TokenScreen({ onSignedIn }: Props) {
       onSignedIn(value, user.data)
     } catch (e) {
       setError(e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani')
-      tokenInputRef.current?.shake()
     } finally {
       setIsLoading(false)
     }
@@ -35,16 +33,15 @@ export function TokenScreen({ onSignedIn }: Props) {
     <main className="centre">
       <form className="row" onSubmit={submit}>
         <ShakeInput
-          ref={tokenInputRef}
           id="token"
           aria-label="API token"
-          className={'answer' + (error ? ' error' : '')}
+          className="answer"
+          error={error}
           type="password"
           autoComplete="off"
           spellCheck={false}
           placeholder="API token"
-          title={error ?? 'WaniKani API token (needs assignments:start and reviews:create)'}
-          aria-invalid={error ? true : undefined}
+          title="WaniKani API token (needs assignments:start and reviews:create)"
           value={token}
           onChange={(e) => setToken(e.target.value)}
           autoFocus
