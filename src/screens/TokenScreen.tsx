@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { flushSync } from 'react-dom'
 import { ApiError, WaniKaniClient } from '../api/client'
 import type { User } from '../api/types'
 import { ShakeInput } from '../components/ShakeInput'
@@ -15,10 +16,14 @@ export function TokenScreen({ onSignedIn }: Props) {
 
   async function submit(event: FormEvent) {
     event.preventDefault()
+    if (isLoading) return
+    flushSync(() => setError(null))
     const value = token.trim()
-    if (!value || isLoading) return
+    if (!value) {
+      setError('Enter your API token')
+      return
+    }
     setIsLoading(true)
-    setError(null)
     try {
       const user = await new WaniKaniClient(value).getUser()
       onSignedIn(value, user.data)
@@ -46,11 +51,11 @@ export function TokenScreen({ onSignedIn }: Props) {
           onChange={(e) => setToken(e.target.value)}
           autoFocus
         />
-        <button className="submit" type="submit" disabled={isLoading || !token.trim()} title="Sign in" aria-label="Sign in">
+        <button className="submit" type="submit" disabled={isLoading} title="Sign in" aria-label="Sign in">
           <ArrowIcon />
         </button>
       </form>
-      <p role="alert" className="visually-hidden">{error}</p>
+      <p role="alert" className="message">{error}</p>
     </main>
   )
 }
