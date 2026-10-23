@@ -9,7 +9,7 @@ interface Props {
 
 export function TokenScreen({ onSignedIn }: Props) {
   const [token, setToken] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -23,8 +23,8 @@ export function TokenScreen({ onSignedIn }: Props) {
   async function submit(event: FormEvent) {
     event.preventDefault()
     const value = token.trim()
-    if (!value || busy) return
-    setBusy(true)
+    if (!value || isLoading) return
+    setIsLoading(true)
     setError(null)
     try {
       const user = await new WaniKaniClient(value).getUser()
@@ -33,7 +33,7 @@ export function TokenScreen({ onSignedIn }: Props) {
       setError(e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani')
       shakeForm()
     } finally {
-      setBusy(false)
+      setIsLoading(false)
     }
   }
 
@@ -54,7 +54,7 @@ export function TokenScreen({ onSignedIn }: Props) {
           onChange={(e) => setToken(e.target.value)}
           autoFocus
         />
-        <button className="submit" type="submit" disabled={busy || !token.trim()} title="Sign in" aria-label="Sign in">
+        <button className="submit" type="submit" disabled={isLoading || !token.trim()} title="Sign in" aria-label="Sign in">
           <ArrowIcon />
         </button>
       </form>
