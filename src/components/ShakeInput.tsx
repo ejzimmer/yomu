@@ -17,7 +17,7 @@ export function ShakeInput({ error, className, title, ...inputProps }: Props) {
   return (
     <input
       ref={inputRef}
-      className={[className, error && 'error'].filter(Boolean).join(' ')}
+      className={`${className ?? ''} ${error ? 'error' : ''}`}
       title={error ?? title}
       aria-invalid={error ? true : undefined}
       {...inputProps}
