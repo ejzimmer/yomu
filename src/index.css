@@ -1,0 +1,46 @@
+/* Design tokens and element defaults. Component styles live next to their components. */
+
+:root {
+  --paper: #E6DECD;
+  --track: #CFC3AA;
+  --ink: #1B1A17;
+  --ink-soft: #4A463F;
+  --red: #B5452B;
+  --green: #36A152;
+  --radical: #1E7FC4;
+  --kanji: #D0307F;
+  --vocab: #8034C4;
+  --serif: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --sans: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+[aria-disabled] {
+  cursor: progress;
+}

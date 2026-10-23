@@ -4,6 +4,8 @@ An unofficial WaniKani client for lessons and reviews. One responsive PWA for de
 
 ## Develop
 
+Needs Node 26 or later (for `Temporal`); `.nvmrc` pins it for nvm and Netlify.
+
 ```sh
 npm install
 npm run dev     # local dev server
