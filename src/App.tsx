@@ -35,7 +35,7 @@ export default function App() {
   return (
     <>
       <header className="bar">
-        <div className="name" title="読む, unofficial WaniKani client">読む</div>
+        <div className="name">読む</div>
         {token && (
           <button className="icon-btn" onClick={signOut} title="Sign out" aria-label="Sign out">
             <SignOutIcon />
@@ -47,8 +47,8 @@ export default function App() {
           <TokenScreen onSignedIn={signIn} />
         ) : user ? (
           <>
-            <div className="level" title="Level">{user.level}</div>
-            <div className="meta" title="Subscription">
+            <div className="level">{user.level}</div>
+            <div className="meta">
               {user.subscription.active ? user.subscription.type : 'free'} · max {user.subscription.max_level_granted}
             </div>
           </>
