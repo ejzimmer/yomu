@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 import { SpinnerIcon } from '../icons'
 import { Tooltip } from './Tooltip'
 
-type Props = Omit<ComponentProps<'button'>, 'aria-label' | 'title'> & {
+type Props = Omit<ComponentProps<'button'>, 'aria-label' | 'title' | 'onKeyDown' | 'onBlur' | 'onMouseLeave'> & {
   label: string
   tooltipAlign?: 'center' | 'end'
   isLoading?: boolean
@@ -13,21 +13,24 @@ type Props = Omit<ComponentProps<'button'>, 'aria-label' | 'title'> & {
 export function IconButton({ label, tooltipAlign, isLoading = false, children, onClick, ...buttonProps }: Props) {
   return (
     <Tooltip text={label} align={tooltipAlign}>
-      <button
-        aria-label={label}
-        aria-busy={isLoading || undefined}
-        aria-disabled={isLoading || undefined}
-        onClick={(e) => {
-          if (isLoading) {
-            e.preventDefault()
-            return
-          }
-          onClick?.(e)
-        }}
-        {...buttonProps}
-      >
-        {isLoading ? <SpinnerIcon /> : children}
-      </button>
+      {({ label, ...tooltipProps }) => (
+        <button
+          {...buttonProps}
+          {...tooltipProps}
+          aria-label={label}
+          aria-busy={isLoading || undefined}
+          aria-disabled={isLoading || undefined}
+          onClick={(e) => {
+            if (isLoading) {
+              e.preventDefault()
+              return
+            }
+            onClick?.(e)
+          }}
+        >
+          {isLoading ? <SpinnerIcon /> : children}
+        </button>
+      )}
     </Tooltip>
   )
 }
