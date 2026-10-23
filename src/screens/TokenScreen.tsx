@@ -40,7 +40,6 @@ export function TokenScreen({ onSignedIn }: Props) {
         <ShakeInput
           id="token"
           aria-label="API token"
-          className="answer"
           error={error}
           type="password"
           autoComplete="off"

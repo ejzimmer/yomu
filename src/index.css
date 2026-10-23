@@ -42,13 +42,11 @@ header.bar {
 .centre { min-height: calc(100% - 56px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 24px 16px; }
 
 .row { display: flex; align-items: center; gap: 16px; width: min(560px, 100%); }
-.answer {
+input {
   flex: 1; min-width: 0; width: 100%; font: inherit; font-size: 22px; padding: 8px 0; text-align: center;
   border: none; border-bottom: 2px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink);
 }
-.answer.error { border-bottom-color: var(--red); color: var(--red); }
-
-input.error { animation: shake .35s; }
+input.error { border-bottom-color: var(--red); color: var(--red); animation: shake .35s; }
 .message { margin: 0; min-height: 1.5em; font-size: 14px; color: var(--red); text-align: center; }
 @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
 
@@ -56,4 +54,4 @@ input.error { animation: shake .35s; }
 .level { font-family: var(--serif); font-weight: 700; font-size: 120px; line-height: 1; }
 .meta { color: var(--ink-soft); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
 
-.answer:focus-visible { outline: none; border-bottom-width: 3px; }
+input:focus-visible { outline: none; border-bottom-width: 3px; }
