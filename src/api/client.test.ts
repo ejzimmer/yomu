@@ -1,12 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError, WaniKaniClient } from './client'
 
 type Reply = { status?: number; body?: unknown; headers?: Record<string, string> }
 
 function makeFakeFetch(replies: Reply[]) {
-  const calls: { url: string; headers: Record<string, string> }[] = []
+  const calls: { url: string; headers: Record<string, string>; at: number }[] = []
   const fetch = async (url: string | URL | Request, init?: RequestInit) => {
-    calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string> })
+    calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string>, at: Date.now() })
     const r = replies.shift() ?? { status: 500 }
     return new Response(r.status === 304 ? null : JSON.stringify(r.body ?? {}), {
       status: r.status ?? 200,
@@ -16,17 +16,6 @@ function makeFakeFetch(replies: Reply[]) {
   return { fetch: fetch as typeof globalThis.fetch, calls }
 }
 
-function makeFakeClock() {
-  let t = 1_000_000
-  const sleeps: number[] = []
-  return {
-    getNow: () => t,
-    sleep: async (ms: number) => { sleeps.push(ms); t += ms },
-    advance: (ms: number) => { t += ms },
-    sleeps,
-  }
-}
-
 const makePage = (ids: number[], next: string | null) => ({
   object: 'collection', url: '', total_count: 3, data_updated_at: null,
   pages: { next_url: next, previous_url: null, per_page: 2 },
@@ -34,6 +23,9 @@ const makePage = (ids: number[], next: string | null) => ({
 })
 
 describe('WaniKaniClient', () => {
+  beforeEach(() => { vi.useFakeTimers() })
+  afterEach(() => { vi.useRealTimers() })
+
   it('sends auth and revision headers', async () => {
     const f = makeFakeFetch([{ body: { data: { level: 5 } } }])
     const res = await new WaniKaniClient('tok', { fetch: f.fetch }).getUser()
@@ -75,24 +67,27 @@ describe('WaniKaniClient', () => {
   })
 
   it('waits for the reset time after a 429 and retries', async () => {
-    const c = makeFakeClock()
-    const reset = String((c.getNow() + 5000) / 1000)
+    const reset = String((Date.now() + 5000) / 1000)
     const f = makeFakeFetch([
       { status: 429, headers: { 'RateLimit-Remaining': '0', 'RateLimit-Reset': reset } },
       { body: { data: { level: 2 } } },
     ])
-    const res = await new WaniKaniClient('t', { fetch: f.fetch, getNow: c.getNow, sleep: c.sleep }).getUser()
-    expect(res.data.level).toBe(2)
-    expect(c.sleeps).toEqual([5000])
+    const pending = new WaniKaniClient('t', { fetch: f.fetch }).getUser()
+    await vi.runAllTimersAsync()
+    expect((await pending).data.level).toBe(2)
+    expect(f.calls[1].at - f.calls[0].at).toBe(5000)
   })
 
   it('never sends more than 60 requests in a minute', async () => {
-    const c = makeFakeClock()
     const f = makeFakeFetch(Array.from({ length: 61 }, () => ({ body: {} })))
-    const client = new WaniKaniClient('t', { fetch: f.fetch, getNow: c.getNow, sleep: c.sleep })
-    for (let i = 0; i < 60; i++) { await client.get('/user'); c.advance(100) }
-    expect(c.sleeps).toEqual([])
-    await client.get('/user')
-    expect(c.sleeps).toEqual([60_000 - 6000])
+    const client = new WaniKaniClient('t', { fetch: f.fetch })
+    for (let i = 0; i < 60; i++) {
+      await client.get('/user')
+      vi.advanceTimersByTime(100)
+    }
+    const pending = client.get('/user')
+    await vi.runAllTimersAsync()
+    await pending
+    expect(f.calls[60].at - f.calls[0].at).toBe(60_000)
   })
 })

@@ -17,8 +17,6 @@ export class ApiError extends Error {
 
 export interface ClientOptions {
   fetch?: typeof fetch
-  getNow?: () => number
-  sleep?: (ms: number) => Promise<void>
 }
 
 interface Cached {
@@ -35,8 +33,6 @@ const sleepFor = (ms: number) => new Promise<void>((resolve) => setTimeout(resol
 export class WaniKaniClient {
   private readonly token: string
   private readonly makeHttpRequest: typeof fetch
-  private readonly getNow: () => number
-  private readonly sleep: (ms: number) => Promise<void>
   private readonly recentRequestTimes: number[] = []
   private rateLimitResetsAt = 0
   private readonly cache = new Map<string, Cached>()
@@ -44,8 +40,6 @@ export class WaniKaniClient {
   constructor(token: string, options: ClientOptions = {}) {
     this.token = token
     this.makeHttpRequest = options.fetch ?? fetch.bind(globalThis)
-    this.getNow = options.getNow ?? Date.now
-    this.sleep = options.sleep ?? sleepFor
   }
 
   getUser(): Promise<Resource<User>> {
@@ -81,13 +75,13 @@ export class WaniKaniClient {
     if (cached?.etag) headers['If-None-Match'] = cached.etag
     if (cached?.lastModified) headers['If-Modified-Since'] = cached.lastModified
 
-    this.recentRequestTimes.push(this.getNow())
+    this.recentRequestTimes.push(Date.now())
     const response = await this.makeHttpRequest(url, { headers })
     this.readRateLimit(response)
 
     if (response.status === 304 && cached) return cached.body
     if (response.status === 429 && attempt < 3) {
-      await this.sleep(Math.max(this.rateLimitResetsAt - this.getNow(), 1000))
+      await sleepFor(Math.max(this.rateLimitResetsAt - Date.now(), 1000))
       return this.getWithRetry(url, attempt + 1)
     }
     if (!response.ok) {
@@ -103,13 +97,13 @@ export class WaniKaniClient {
   }
 
   private async waitForSlot() {
-    const now = this.getNow()
+    const now = Date.now()
     while (this.recentRequestTimes.length && now - this.recentRequestTimes[0] >= MINUTE_MS) this.recentRequestTimes.shift()
 
     let waitUntil = 0
     if (this.recentRequestTimes.length >= LIMIT_PER_MINUTE) waitUntil = this.recentRequestTimes[0] + MINUTE_MS
     if (this.rateLimitResetsAt > now) waitUntil = Math.max(waitUntil, this.rateLimitResetsAt)
-    if (waitUntil > now) await this.sleep(waitUntil - now)
+    if (waitUntil > now) await sleepFor(waitUntil - now)
   }
 
   private readRateLimit(response: Response) {
