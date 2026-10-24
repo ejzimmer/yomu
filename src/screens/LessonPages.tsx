@@ -26,11 +26,7 @@ export function LessonPages({ data, onStartQuiz, onExit }: Props) {
         </IconButton>
       </div>
 
-      <LessonPage
-        subject={currentItem.subject.data}
-        subjectsById={data.subjectsById}
-        voiceActorId={data.voiceActorId}
-      />
+      <LessonPage subject={currentItem.subject.data} subjectsById={data.subjectsById} />
 
       <nav className="lesson-nav">
         <IconButton className="back" disabled={currentIndex === 0} onClick={() => setCurrentIndex(currentIndex - 1)} label="Previous">

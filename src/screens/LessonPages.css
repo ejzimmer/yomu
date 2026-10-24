@@ -70,12 +70,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
     min-height: 200px;
     color: var(--type-colour);
-  }
-
-  .characters {
     font-family: var(--serif);
     font-size: clamp(64px, 18vw, 140px);
     font-weight: 700;

@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react'
 import type { ContextSentence, Reading, Resource, Subject } from '../api/types'
 import { MarkedUpText } from '../components/MarkedUpText'
-import { PlayAudioButton } from '../components/PlayAudioButton'
 import { getCharacters } from '../data/getCharacters'
 
 interface Props {
   subject: Subject
   subjectsById: ReadonlyMap<number, Resource<Subject>>
-  voiceActorId: number | null
 }
 
 const READING_TYPES = [
@@ -17,16 +15,13 @@ const READING_TYPES = [
   { type: undefined, name: 'Readings', isNameShown: false },
 ] as const
 
-export function LessonPage({ subject, subjectsById, voiceActorId }: Props) {
+export function LessonPage({ subject, subjectsById }: Props) {
   const componentSubjects = (subject.component_subject_ids ?? []).flatMap((id) => subjectsById.get(id) ?? [])
 
   return (
     <article className="lesson-page">
-      <div className="lesson-item">
-        <span className="characters" lang="ja">
-          {getCharacters(subject)}
-        </span>
-        <PlayAudioButton audios={subject.pronunciation_audios ?? []} voiceActorId={voiceActorId} />
+      <div className="lesson-item" lang="ja">
+        {getCharacters(subject)}
       </div>
 
       <LessonSection title="Meaning">

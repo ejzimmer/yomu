@@ -10,7 +10,6 @@ export interface LessonData {
   batch: StudyItem[]
   subjectsById: Map<number, Resource<Subject>>
   synonymsBySubject: Map<number, string[]>
-  voiceActorId: number | null
 }
 
 export async function loadLessonData(): Promise<LessonData> {
@@ -23,7 +22,6 @@ export async function loadLessonData(): Promise<LessonData> {
     batch: user ? getLessonBatch(queue, user.preferences.lessons_batch_size, startedToday) : [],
     subjectsById,
     synonymsBySubject: getSynonymsBySubject(studyMaterials),
-    voiceActorId: user?.preferences.default_voice_actor_id ?? null,
   }
 }
 

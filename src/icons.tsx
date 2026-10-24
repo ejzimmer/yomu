@@ -30,7 +30,3 @@ export const StageUpIcon = () => (
 export const BackIcon = () => (
   <svg {...common}><path d="M19 12H5" /><path d="M11 6l-6 6 6 6" /></svg>
 )
-
-export const SpeakerIcon = () => (
-  <svg {...common}><path d="M4 9v6h4l5 4V5L8 9z" /><path d="M16.5 8.5a5 5 0 0 1 0 7" /><path d="M19 6a8.5 8.5 0 0 1 0 12" /></svg>
-)
