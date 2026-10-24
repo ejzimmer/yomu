@@ -1,18 +1,17 @@
-import { isKana, isKanji, toHiragana } from 'wanakana'
+import { isKana, isKanji, toHiragana, toKana } from 'wanakana'
 import type { Subject } from '../api/types'
 
-// "retry" is a real reading that isn't the one wanted (an on'yomi when the kun'yomi is asked for).
-// "invalid" means the answer can't be judged, so the input should shake and wait.
-export type ReadingResult = 'correct' | 'retry' | 'incorrect' | 'invalid'
+export type ReadingResult = 'correct' | 'incorrect' | 'not-kana' | 'kana-mismatch' | 'onyomi-wanted' | 'kunyomi-wanted'
 
 export function checkReading(answer: string, subject: Subject): ReadingResult {
-  const given = toHiragana(answer.trim(), { passRomaji: true })
-  if (!given || !isKana(given)) return 'invalid'
-  if (subject.characters && !matchesKanaInQuestion(given, subject.characters)) return 'invalid'
+  const given = toHiragana(toKana(answer.trim()))
+  if (!isKana(given)) return 'not-kana'
+  if (subject.characters && !matchesKanaInQuestion(given, subject.characters)) return 'kana-mismatch'
 
   const reading = subject.readings?.find((r) => toHiragana(r.reading) === given)
   if (!reading) return 'incorrect'
-  return reading.accepted_answer ? 'correct' : 'retry'
+  if (reading.accepted_answer) return 'correct'
+  return getWantedReadingType(subject) ?? 'incorrect'
 }
 
 // Kana shown in the question must appear in the same place in the answer:
@@ -27,4 +26,11 @@ function matchesKanaInQuestion(answer: string, characters: string) {
 
 function escape(text: string) {
   return text.replaceAll(/[.*+?^${}()|[\]\\]/gu, String.raw`\$&`)
+}
+
+function getWantedReadingType(subject: Subject) {
+  const wanted = subject.readings?.find((reading) => reading.accepted_answer)?.type
+  if (wanted === 'onyomi') return 'onyomi-wanted'
+  if (wanted === 'kunyomi') return 'kunyomi-wanted'
+  return null
 }

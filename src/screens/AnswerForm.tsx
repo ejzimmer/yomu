@@ -14,7 +14,6 @@ const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
   'kana-mismatch': 'Keep the kana from the question',
   'onyomi-wanted': 'On’yomi wanted',
   'kunyomi-wanted': 'Kun’yomi wanted',
-  'other-reading-wanted': 'Another reading wanted',
 }
 
 interface Props {
@@ -26,14 +25,12 @@ interface Props {
   onNext: () => void
 }
 
-// The answer box for one question. Remount it (with a new key) for each new question.
 export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRedo, onNext }: Props) {
   const [answer, setAnswer] = useState('')
   const [error, setError] = useState<string | null>(null)
   const inputId = useId()
   const { type, item } = question
 
-  // Keeps typing in the answer box, so Enter and Backspace work without reaching for the mouse.
   const focusInput = useCallback(() => {
     document.querySelector<HTMLInputElement>(`[id="${inputId}"]`)?.focus()
   }, [inputId])

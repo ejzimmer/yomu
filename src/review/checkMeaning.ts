@@ -1,14 +1,12 @@
 import { isJapanese } from 'wanakana'
 import type { Subject } from '../api/types'
 
-export type MeaningResult = 'correct' | 'close' | 'incorrect' | 'invalid'
+export type MeaningResult = 'correct' | 'incorrect' | 'not-english'
 
-// Checks a typed meaning against the subject's accepted meanings, its
-// whitelisted auxiliary meanings and the user's own synonyms.
-// "invalid" means the answer can't be judged (typed in Japanese), so the input should shake and wait.
 export function checkMeaning(answer: string, subject: Subject, synonyms: readonly string[] = []): MeaningResult {
+  if (isJapanese(answer.replaceAll(/\s/gu, ''))) return 'not-english'
+
   const given = normalise(answer)
-  if (!given || isJapanese(answer.replaceAll(/\s/gu, ''))) return 'invalid'
 
   const blacklisted = subject.auxiliary_meanings.filter((m) => m.type === 'blacklist').map((m) => normalise(m.meaning))
   if (blacklisted.includes(given)) return 'incorrect'
@@ -19,9 +17,8 @@ export function checkMeaning(answer: string, subject: Subject, synonyms: readonl
     ...synonyms,
   ].map((meaning) => normalise(meaning))
 
-  if (accepted.includes(given)) return 'correct'
-  if (accepted.some((meaning) => getEditDistance(given, meaning) <= getAllowedTypos(meaning))) return 'close'
-  return 'incorrect'
+  const isCloseEnough = (meaning: string) => getEditDistance(given, meaning) <= getAllowedTypos(meaning)
+  return accepted.some((meaning) => isCloseEnough(meaning)) ? 'correct' : 'incorrect'
 }
 
 function normalise(text: string) {

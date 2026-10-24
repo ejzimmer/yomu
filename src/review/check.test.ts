@@ -63,7 +63,7 @@ describe('checkMeaning', () => {
   })
 
   it('allows small typos in longer answers', () => {
-    expect(checkMeaning('persimon', persimmon)).toBe('close')
+    expect(checkMeaning('persimon', persimmon)).toBe('correct')
   })
 
   it('allows no typos in short answers', () => {
@@ -75,9 +75,8 @@ describe('checkMeaning', () => {
     expect(checkMeaning('peach', persimmon)).toBe('incorrect')
   })
 
-  it('treats an empty answer or one typed in Japanese as invalid', () => {
-    expect(checkMeaning('  ', persimmon)).toBe('invalid')
-    expect(checkMeaning('かき', persimmon)).toBe('invalid')
+  it('says an answer typed in Japanese isn’t English', () => {
+    expect(checkMeaning('かき', persimmon)).toBe('not-english')
   })
 })
 
@@ -88,22 +87,22 @@ describe('checkReading', () => {
   })
 
   it('asks again for a real reading that isn’t the one wanted', () => {
-    expect(checkReading('ひと', person)).toBe('retry')
+    expect(checkReading('ひと', person)).toBe('onyomi-wanted')
   })
 
   it('marks other kana wrong', () => {
     expect(checkReading('じつ', person)).toBe('incorrect')
   })
 
-  it('treats leftover romaji as invalid', () => {
-    expect(checkReading('じn', person)).toBe('invalid')
-    expect(checkReading('', person)).toBe('invalid')
+  it('converts romaji, and says an answer that won’t convert isn’t kana', () => {
+    expect(checkReading('jin', person)).toBe('correct')
+    expect(checkReading('じq', person)).toBe('not-kana')
   })
 
-  it('treats an answer that changes the kana shown in the question as invalid', () => {
+  it('treats an answer that changes the kana shown in the question as a mismatch', () => {
     expect(checkReading('たべる', toEat)).toBe('correct')
-    expect(checkReading('たべれ', toEat)).toBe('invalid')
+    expect(checkReading('たべれ', toEat)).toBe('kana-mismatch')
     expect(checkReading('おちゃ', tea)).toBe('correct')
-    expect(checkReading('ちゃ', tea)).toBe('invalid')
+    expect(checkReading('ちゃ', tea)).toBe('kana-mismatch')
   })
 })
