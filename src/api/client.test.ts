@@ -5,9 +5,9 @@ import { ApiError } from './errors'
 type Reply = { status?: number; body?: unknown; headers?: Record<string, string> }
 
 function makeFakeFetch(replies: Reply[]) {
-  const calls: { url: string; headers: Record<string, string>; at: Temporal.Instant }[] = []
+  const calls: { url: string; method: string; body: unknown; headers: Record<string, string>; at: Temporal.Instant }[] = []
   const fetch = (url: string | URL | Request, init?: RequestInit) => {
-    calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string>, at: Temporal.Now.instant() })
+    calls.push({ url: String(url), method: init?.method ?? 'GET', body: init?.body, headers: (init?.headers ?? {}) as Record<string, string>, at: Temporal.Now.instant() })
     const r = replies.shift() ?? { status: 500 }
     return Promise.resolve(
       new Response(r.status === 304 ? null : JSON.stringify(r.body ?? {}), {
@@ -36,6 +36,16 @@ describe('WaniKaniClient', () => {
     expect(f.calls[0].url).toBe('https://api.wanikani.com/v2/user')
     expect(f.calls[0].headers.Authorization).toBe('Bearer tok')
     expect(f.calls[0].headers['Wanikani-Revision']).toBe('20170710')
+  })
+
+  it('posts JSON with the same headers', async () => {
+    const f = makeFakeFetch([{ status: 201, body: { id: 0 } }])
+    const res = await new WaniKaniClient('tok', { fetch: f.fetch }).post('/reviews', { review: { assignment_id: 5 } })
+    expect(res).toEqual({ id: 0 })
+    expect(f.calls[0].method).toBe('POST')
+    expect(f.calls[0].body).toBe('{"review":{"assignment_id":5}}')
+    expect(f.calls[0].headers.Authorization).toBe('Bearer tok')
+    expect(f.calls[0].headers['Content-Type']).toBe('application/json')
   })
 
   it('follows pagination', async () => {

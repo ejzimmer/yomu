@@ -22,6 +22,14 @@ export interface StoredUser {
   syncedAt: string
 }
 
+export interface PendingReview {
+  id?: number
+  assignmentId: number
+  incorrectMeaningAnswers: number
+  incorrectReadingAnswers: number
+  createdAt: string
+}
+
 export type CollectionName = 'subjects' | 'assignments' | 'reviewStatistics' | 'studyMaterials' | 'spacedRepetitionSystems'
 
 // A local copy of everything we read from WaniKani. Rows are stored exactly as
@@ -34,6 +42,7 @@ export const db = new Dexie('yomu') as Dexie & {
   spacedRepetitionSystems: EntityTable<Resource<SpacedRepetitionSystem>, 'id'>
   syncState: EntityTable<SyncState, 'collection'>
   user: EntityTable<StoredUser, 'id'>
+  pendingReviews: EntityTable<PendingReview, 'id'>
 }
 
 db.version(1).stores({
@@ -44,6 +53,10 @@ db.version(1).stores({
   spacedRepetitionSystems: 'id',
   syncState: 'collection',
   user: 'id',
+})
+
+db.version(2).stores({
+  pendingReviews: '++id',
 })
 
 export function clearDatabase() {

@@ -132,3 +132,10 @@ export interface SpacedRepetitionSystem {
   burning_stage_position: number
   stages: SrsStage[]
 }
+
+export interface CreatedReview {
+  resources_updated: {
+    assignment: Resource<Assignment>
+    review_statistic: Resource<ReviewStatistic>
+  }
+}

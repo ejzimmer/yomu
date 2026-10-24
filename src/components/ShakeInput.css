@@ -14,7 +14,7 @@
     background: transparent;
     color: var(--ink);
     font: inherit;
-    font-size: 22px;
+    font-size: var(--input-font-size, 22px);
     text-align: center;
   }
 

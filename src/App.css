@@ -25,4 +25,9 @@
     gap: 24px;
     padding: 24px 16px;
   }
+
+  :scope:has(.review:not(.summary)) {
+    justify-content: flex-start;
+    padding-top: 0;
+  }
 }

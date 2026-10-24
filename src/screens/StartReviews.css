@@ -1,0 +1,37 @@
+@scope (.start-reviews) to (.has-tooltip) {
+  :scope {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .count {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  .label {
+    color: var(--ink-soft);
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
+
+@scope (.start-reviews) {
+  .submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 75%, transparent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+}

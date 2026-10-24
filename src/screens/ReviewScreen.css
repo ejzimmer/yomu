@@ -1,0 +1,279 @@
+@scope (.review) to (.shake-input) {
+  :scope {
+    --type-colour: var(--vocab);
+    --input-font-size: 30px;
+
+    container-type: inline-size;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  :scope[data-type='radical'] {
+    --type-colour: var(--radical);
+  }
+
+  :scope[data-type='kanji'] {
+    --type-colour: var(--kanji);
+  }
+
+  .status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .progress {
+    position: relative;
+    height: 22px;
+    margin-bottom: 8px;
+    color: color-mix(in srgb, var(--track) 70%, transparent);
+  }
+
+  .progress svg {
+    display: block;
+  }
+
+  .progress-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    color: var(--ink);
+    transition: width 0.3s;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 760px) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 40px;
+  }
+
+  .item {
+    grid-column: 2;
+    height: 330px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    container-type: inline-size;
+    color: var(--type-colour);
+  }
+
+  .item span {
+    font-family: var(--serif);
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .answer {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0 32px 24px;
+  }
+
+  label {
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .answer-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--type-colour) 75%, transparent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+
+  /* Two classes, to beat IconButton's own colour */
+  .answer-row .typo {
+    color: var(--red);
+  }
+
+  .reveal {
+    display: flex;
+    gap: 32px;
+    align-items: baseline;
+    margin-top: 16px;
+  }
+
+  .correct {
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 700;
+  }
+
+  .mnemonic {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+
+  .feed {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 200px;
+    margin: 0;
+    padding: 32px 0 0;
+    list-style: none;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .feed li {
+    white-space: nowrap;
+    animation: fade 8s linear forwards;
+  }
+
+  .characters {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--ink);
+  }
+
+  .up,
+  .down {
+    display: inline-block;
+    margin: 0 5px 0 4px;
+    vertical-align: -1px;
+  }
+
+  .up {
+    color: var(--green);
+  }
+
+  .down {
+    color: var(--down);
+    rotate: 180deg;
+  }
+
+  /* Phones: the feed becomes a single row under the character, never on top of it. */
+  @container (max-width: 700px) {
+    :scope {
+      --input-font-size: 26px;
+    }
+
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .item,
+    .answer,
+    .feed {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .item {
+      height: 250px;
+    }
+
+    .feed {
+      order: -1;
+      grid-row: 2;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 14px;
+      max-width: none;
+      height: 28px;
+      overflow: hidden;
+      padding: 4px 0 0;
+      font-size: 12px;
+    }
+
+    .characters {
+      font-size: 15px;
+    }
+
+    .answer {
+      grid-row: 3;
+      padding: 18px 0;
+    }
+
+    .reveal {
+      flex-wrap: wrap;
+      gap: 8px 24px;
+    }
+  }
+}
+
+/* After a wrong answer the box turns red and stays put: it's showing a result, not an input error. */
+@scope (.answer-row) {
+  input[aria-invalid='true'] {
+    border-bottom-color: var(--red);
+    color: var(--red);
+  }
+}
+
+@scope (.summary) {
+  :scope {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .level {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 120px;
+    line-height: 1;
+  }
+
+  .meta {
+    color: var(--ink-soft);
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 75%, transparent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+}
+
+@keyframes fade {
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
