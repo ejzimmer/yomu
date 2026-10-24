@@ -4,9 +4,6 @@ import { checkMeaning } from './checkMeaning'
 import { checkReading } from './checkReading'
 import type { QuestionType } from './session'
 
-// Besides right and wrong, an answer can be one that shouldn't be marked at all
-// (blank, the wrong script, a different kind of reading). Those aren't counted;
-// the user is asked to try again.
 export type AnswerResult = 'correct' | 'incorrect' | UnmarkableAnswer
 
 export type UnmarkableAnswer =
