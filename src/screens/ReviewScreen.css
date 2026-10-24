@@ -27,7 +27,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* A calligraphy stroke: a blob at the start that tapers to a point. */
   .progress {
     position: relative;
     height: 22px;

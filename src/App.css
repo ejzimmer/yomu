@@ -26,7 +26,6 @@
     padding: 24px 16px;
   }
 
-  /* A review fills the screen from the top rather than floating in the middle. */
   :scope:has(.review:not(.summary)) {
     justify-content: flex-start;
     padding-top: 0;
