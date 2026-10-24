@@ -27,9 +27,7 @@ export interface ReviewSession {
   totalAnswers: number
 }
 
-type Random = () => number
-
-export function createSession(queue: readonly ReviewItem[], random: Random = Math.random): ReviewSession {
+export function createSession(queue: readonly ReviewItem[], getRandomNumber: () => number = Math.random): ReviewSession {
   const items = queue.map((item) => ({
     ...item,
     isMeaningDone: false,
@@ -47,10 +45,10 @@ export function createSession(queue: readonly ReviewItem[], random: Random = Mat
     correctAnswers: 0,
     totalAnswers: 0,
   }
-  return { ...session, question: pickQuestion(session.active, null, random) }
+  return { ...session, question: pickQuestion(session.active, null, getRandomNumber) }
 }
 
-export function answerCorrectly(session: ReviewSession, random: Random = Math.random): ReviewSession {
+export function answerCorrectly(session: ReviewSession, getRandomNumber: () => number = Math.random): ReviewSession {
   const { question } = session
   if (!question || session.isShowingAnswer) return session
 
@@ -64,7 +62,7 @@ export function answerCorrectly(session: ReviewSession, random: Random = Math.ra
     active,
     waiting: isComplete ? session.waiting.slice(1) : session.waiting,
     completed: isComplete ? [...session.completed, item] : session.completed,
-    question: pickQuestion(active, question, random),
+    question: pickQuestion(active, question, getRandomNumber),
     questionNumber: session.questionNumber + 1,
     correctAnswers: session.correctAnswers + 1,
     totalAnswers: session.totalAnswers + 1,
@@ -109,12 +107,12 @@ export function undoWrongAnswer(session: ReviewSession): ReviewSession {
   }
 }
 
-export function moveOn(session: ReviewSession, random: Random = Math.random): ReviewSession {
+export function moveOn(session: ReviewSession, getRandomNumber: () => number = Math.random): ReviewSession {
   if (!session.isShowingAnswer) return session
   return {
     ...session,
     isShowingAnswer: false,
-    question: pickQuestion(session.active, session.question, random),
+    question: pickQuestion(session.active, session.question, getRandomNumber),
     questionNumber: session.questionNumber + 1,
   }
 }
@@ -123,7 +121,7 @@ function hasReading({ subject }: ReviewItem) {
   return (subject.data.readings?.length ?? 0) > 0
 }
 
-function pickQuestion(active: readonly SessionItem[], previous: Question | null, random: Random): Question | null {
+function pickQuestion(active: readonly SessionItem[], previous: Question | null, getRandomNumber: () => number): Question | null {
   const questions = active.flatMap((item) => [
     ...(item.isMeaningDone ? [] : [{ item, type: 'meaning' as const }]),
     ...(item.isReadingDone ? [] : [{ item, type: 'reading' as const }]),
@@ -131,5 +129,5 @@ function pickQuestion(active: readonly SessionItem[], previous: Question | null,
   const isPrevious = (q: Question) =>
     previous !== null && q.item.assignment.id === previous.item.assignment.id && q.type === previous.type
   const choices = questions.length > 1 ? questions.filter((q) => !isPrevious(q)) : questions
-  return choices[Math.floor(random() * choices.length)] ?? null
+  return choices[Math.floor(getRandomNumber() * choices.length)] ?? null
 }
