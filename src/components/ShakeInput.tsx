@@ -6,7 +6,7 @@ type Props = Omit<ComponentProps<'input'>, 'ref'> & {
 }
 
 // A text input that shows an error message under itself, turns red, shakes
-// and takes focus.
+// and takes focus. Pass aria-invalid to turn it red without a message or shake.
 // It shakes each time `error` changes to a message, so set it to null before
 // each new attempt (with flushSync if the next error follows synchronously).
 export function ShakeInput({ error, className, ...inputProps }: Props) {

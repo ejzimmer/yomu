@@ -11,6 +11,12 @@ export interface ClientOptions {
   fetch?: typeof fetch
 }
 
+interface RequestOptions {
+  method?: 'POST'
+  body?: string
+  headers?: Record<string, string>
+}
+
 interface Cached {
   etag: string | null
   lastModified: string | null
@@ -48,7 +54,13 @@ export class WaniKaniClient {
   async get<T>(pathOrUrl: string, params: Record<string, string> = {}): Promise<T> {
     const url = new URL(pathOrUrl.startsWith('http') ? pathOrUrl : BASE_URL + pathOrUrl)
     for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value)
-    return (await this.getWithRetry(url.toString())) as T
+    return (await this.sendWithRetry(url.toString())) as T
+  }
+
+  // Writes aren't cached, but share the rate limiter and 429 handling with reads.
+  async post<T>(path: string, body: unknown): Promise<T> {
+    const init: RequestOptions = { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }
+    return (await this.sendWithRetry(BASE_URL + path, init)) as T
   }
 
   // Follows pages.next_url until the collection is exhausted.
@@ -65,26 +77,28 @@ export class WaniKaniClient {
     return items
   }
 
-  private async getWithRetry(url: string, attempt = 0): Promise<unknown> {
+  private async sendWithRetry(url: string, init: RequestOptions = {}, attempt = 0): Promise<unknown> {
     await this.waitForSlot()
 
+    const isRead = !init.method
     const headers: Record<string, string> = {
+      ...init.headers,
       Authorization: `Bearer ${this.token}`,
       'Wanikani-Revision': REVISION,
     }
-    const cached = this.cache.get(url)
+    const cached = isRead ? this.cache.get(url) : undefined
     if (cached?.etag) headers['If-None-Match'] = cached.etag
     if (cached?.lastModified) headers['If-Modified-Since'] = cached.lastModified
 
     this.recentRequestTimes.push(Temporal.Now.instant())
-    const response = await this.makeHttpRequest(url, { headers })
+    const response = await this.makeHttpRequest(url, { ...init, headers })
     this.readRateLimit(response)
 
     if (response.status === 304 && cached) return cached.body
     if (response.status === 429 && attempt < 3) {
       const earliestRetry = Temporal.Now.instant().add(MIN_RETRY_WAIT)
       await sleepUntil(this.rateLimitResetsAt ? getLater(this.rateLimitResetsAt, earliestRetry) : earliestRetry)
-      return this.getWithRetry(url, attempt + 1)
+      return this.sendWithRetry(url, init, attempt + 1)
     }
     if (!response.ok) {
       const body = (await response.json().catch(() => null)) as { error?: string } | null
@@ -94,7 +108,7 @@ export class WaniKaniClient {
     const body: unknown = await response.json()
     const etag = response.headers.get('ETag')
     const lastModified = response.headers.get('Last-Modified')
-    if (etag || lastModified) this.cache.set(url, { etag, lastModified, body })
+    if (isRead && (etag || lastModified)) this.cache.set(url, { etag, lastModified, body })
     return body
   }
 

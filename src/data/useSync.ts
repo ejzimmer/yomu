@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { WaniKaniClient } from '../api/client'
 import { ApiError } from '../api/errors'
+import { sendPendingReviews } from '../review/sendReviews'
 import { sync } from './sync'
 
 // Syncs once when mounted, and again whenever syncNow is called.
@@ -10,7 +11,9 @@ export function useSync(client: WaniKaniClient, onUnauthorized: () => void) {
 
   const runSync = useCallback(
     () =>
-      sync(client)
+      // Send any reviews left over from last time before fetching, so the sync sees their results.
+      sendPendingReviews(client)
+        .then(() => sync(client))
         .then(() => setSyncError(null))
         .catch((error: unknown) => {
           if (error instanceof ApiError && error.status === 401) onUnauthorized()
