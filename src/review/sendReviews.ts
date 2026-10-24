@@ -17,7 +17,7 @@ export function sendPendingReviews(client: WaniKaniClient): Promise<void> {
 }
 
 async function sendAll(client: WaniKaniClient) {
-  for (;;) {
+  while (true) {
     // Each review is sent only after the one before it, so a failure leaves the rest queued in order.
     // oxlint-disable-next-line no-await-in-loop
     const review = await db.pendingReviews.orderBy('id').first()
