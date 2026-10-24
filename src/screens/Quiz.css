@@ -1,4 +1,4 @@
-@scope (.review) to (.shake-input) {
+@scope (.quiz) to (.shake-input) {
   :scope {
     --type-colour: var(--vocab);
     --input-font-size: 30px;

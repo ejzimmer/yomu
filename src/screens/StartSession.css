@@ -1,4 +1,4 @@
-@scope (.start-reviews) to (.has-tooltip) {
+@scope (.start-session) to (.has-tooltip) {
   :scope {
     display: flex;
     align-items: center;
@@ -20,7 +20,7 @@
   }
 }
 
-@scope (.start-reviews) {
+@scope (.start-session) {
   .submit {
     display: inline-flex;
     align-items: center;

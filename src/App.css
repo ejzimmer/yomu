@@ -26,7 +26,7 @@
     padding: 24px 16px;
   }
 
-  :scope:has(.review:not(.summary)) {
+  :scope:has(.quiz:not(.summary), .lesson) {
     justify-content: flex-start;
     padding-top: 0;
   }

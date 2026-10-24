@@ -1,10 +1,10 @@
-import type { ReviewItem } from './buildReviewQueue'
+import type { StudyItem } from '../data/studyItem'
 
 const ACTIVE_ITEMS = 10
 
 export type QuestionType = 'meaning' | 'reading'
 
-export interface SessionItem extends ReviewItem {
+export interface SessionItem extends StudyItem {
   isMeaningDone: boolean
   isReadingDone: boolean
   incorrectMeaningAnswers: number
@@ -16,7 +16,7 @@ export interface Question {
   type: QuestionType
 }
 
-export interface ReviewSession {
+export interface QuizSession {
   active: SessionItem[]
   waiting: SessionItem[]
   completed: SessionItem[]
@@ -27,7 +27,7 @@ export interface ReviewSession {
   totalAnswers: number
 }
 
-export function createSession(queue: readonly ReviewItem[]): ReviewSession {
+export function createSession(queue: readonly StudyItem[]): QuizSession {
   const items = queue.map((item) => ({
     ...item,
     isMeaningDone: false,
@@ -48,7 +48,7 @@ export function createSession(queue: readonly ReviewItem[]): ReviewSession {
   return { ...session, question: pickQuestion(session.active, null) }
 }
 
-export function answerCorrectly(session: ReviewSession): ReviewSession {
+export function answerCorrectly(session: QuizSession): QuizSession {
   const { question } = session
   if (!question || session.isShowingAnswer) return session
 
@@ -65,7 +65,7 @@ export function answerCorrectly(session: ReviewSession): ReviewSession {
   }
 }
 
-export function answerWrongly(session: ReviewSession): ReviewSession {
+export function answerWrongly(session: QuizSession): QuizSession {
   const { question } = session
   if (!question || session.isShowingAnswer) return session
 
@@ -79,7 +79,7 @@ export function answerWrongly(session: ReviewSession): ReviewSession {
   }
 }
 
-export function undoWrongAnswer(session: ReviewSession): ReviewSession {
+export function undoWrongAnswer(session: QuizSession): QuizSession {
   const { question } = session
   if (!question || !session.isShowingAnswer) return session
 
@@ -93,7 +93,7 @@ export function undoWrongAnswer(session: ReviewSession): ReviewSession {
   }
 }
 
-export function moveOn(session: ReviewSession): ReviewSession {
+export function moveOn(session: QuizSession): QuizSession {
   if (!session.isShowingAnswer) return session
   return {
     ...session,
@@ -113,11 +113,11 @@ function changeWrongAnswerCount({ item, type }: Question, change: number): Sessi
     : { ...item, incorrectReadingAnswers: item.incorrectReadingAnswers + change }
 }
 
-function replaceItem(session: ReviewSession, oldItem: SessionItem, newItem: SessionItem): ReviewSession {
+function replaceItem(session: QuizSession, oldItem: SessionItem, newItem: SessionItem): QuizSession {
   return { ...session, active: session.active.map((item) => (item === oldItem ? newItem : item)) }
 }
 
-function completeItem(session: ReviewSession, oldItem: SessionItem, completedItem: SessionItem): ReviewSession {
+function completeItem(session: QuizSession, oldItem: SessionItem, completedItem: SessionItem): QuizSession {
   const [nextItem, ...waiting] = session.waiting
   const otherItems = session.active.filter((item) => item !== oldItem)
 
@@ -129,7 +129,7 @@ function completeItem(session: ReviewSession, oldItem: SessionItem, completedIte
   }
 }
 
-function hasReading({ subject }: ReviewItem) {
+function hasReading({ subject }: StudyItem) {
   return (subject.data.readings?.length ?? 0) > 0
 }
 

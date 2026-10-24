@@ -3,8 +3,8 @@ import { flushSync } from 'react-dom'
 import { IconButton } from '../components/IconButton'
 import { ShakeInput } from '../components/ShakeInput'
 import { ArrowIcon, UndoIcon } from '../icons'
-import { checkAnswer, convertTypedKana, type UnmarkableAnswer } from '../review/checkAnswer'
-import type { Question } from '../review/session'
+import { checkAnswer, convertTypedKana, type UnmarkableAnswer } from '../quiz/checkAnswer'
+import type { Question } from '../quiz/session'
 import { CorrectAnswer } from './CorrectAnswer'
 
 const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
