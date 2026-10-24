@@ -1,0 +1,54 @@
+import { isJapanese } from 'wanakana'
+import type { Subject } from '../api/types'
+
+export type MeaningResult = 'correct' | 'close' | 'incorrect' | 'invalid'
+
+// Checks a typed meaning against the subject's accepted meanings, its
+// whitelisted auxiliary meanings and the user's own synonyms.
+// "invalid" means the answer can't be judged (typed in Japanese), so the input should shake and wait.
+export function checkMeaning(answer: string, subject: Subject, synonyms: readonly string[] = []): MeaningResult {
+  const given = normalise(answer)
+  if (!given || isJapanese(answer.replaceAll(/\s/gu, ''))) return 'invalid'
+
+  const blacklisted = subject.auxiliary_meanings.filter((m) => m.type === 'blacklist').map((m) => normalise(m.meaning))
+  if (blacklisted.includes(given)) return 'incorrect'
+
+  const accepted = [
+    ...subject.meanings.filter((m) => m.accepted_answer).map((m) => m.meaning),
+    ...subject.auxiliary_meanings.filter((m) => m.type === 'whitelist').map((m) => m.meaning),
+    ...synonyms,
+  ].map((meaning) => normalise(meaning))
+
+  if (accepted.includes(given)) return 'correct'
+  if (accepted.some((meaning) => getEditDistance(given, meaning) <= getAllowedTypos(meaning))) return 'close'
+  return 'incorrect'
+}
+
+function normalise(text: string) {
+  return text
+    .toLowerCase()
+    .replaceAll(/[-.'’!?,/]/gu, ' ')
+    .replaceAll(/\s+/gu, ' ')
+    .trim()
+}
+
+// Roughly the official app's tolerance: none for short answers, growing with length.
+function getAllowedTypos(meaning: string) {
+  if (meaning.length <= 3) return 0
+  if (meaning.length <= 5) return 1
+  if (meaning.length <= 7) return 2
+  return 2 + Math.floor(meaning.length / 7)
+}
+
+function getEditDistance(a: string, b: string) {
+  let previousRow = Array.from({ length: b.length + 1 }, (_, i) => i)
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i]
+    for (let j = 1; j <= b.length; j++) {
+      const substitution = previousRow[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      row.push(Math.min(previousRow[j] + 1, row[j - 1] + 1, substitution))
+    }
+    previousRow = row
+  }
+  return previousRow[b.length]
+}

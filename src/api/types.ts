@@ -22,10 +22,10 @@ export interface Preferences {
   extra_study_autoplay_audio: boolean
   lessons_autoplay_audio: boolean
   lessons_batch_size: number
-  lessons_presentation_order: string
+  lessons_presentation_order: 'ascending_level_then_subject' | 'shuffled' | 'ascending_level_then_shuffled'
   reviews_autoplay_audio: boolean
   reviews_display_srs_indicator: boolean
-  reviews_presentation_order: string
+  reviews_presentation_order: 'shuffled' | 'lower_levels_first'
 }
 
 export interface User {
