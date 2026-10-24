@@ -26,12 +26,18 @@ export function HomeScreen({ token, onUnauthorized }: Props) {
   }
 
   if (!user) return null
-  if (activity === 'lessons') return <LessonScreen client={client} onExit={returnToMenu} />
-  if (activity === 'reviews') return <ReviewScreen client={client} onExit={returnToMenu} />
-  return (
-    <>
-      <StudyMenu onStartLessons={() => setActivity('lessons')} onStartReviews={() => setActivity('reviews')} />
-      <DebugScreen user={user} isSyncing={isSyncing} syncError={syncError} onSync={syncNow} />
-    </>
-  )
+
+  switch (activity) {
+    case 'lessons':
+      return <LessonScreen client={client} onExit={returnToMenu} />
+    case 'reviews':
+      return <ReviewScreen client={client} onExit={returnToMenu} />
+    case 'menu':
+      return (
+        <>
+          <StudyMenu onStartLessons={() => setActivity('lessons')} onStartReviews={() => setActivity('reviews')} />
+          <DebugScreen user={user} isSyncing={isSyncing} syncError={syncError} onSync={syncNow} />
+        </>
+      )
+  }
 }
