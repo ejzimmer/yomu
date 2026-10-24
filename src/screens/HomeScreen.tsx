@@ -13,7 +13,6 @@ interface Props {
   onUnauthorized: () => void
 }
 
-// Everything behind sign-in. Mounted once per token, so it syncs on app open and after sign-in.
 export function HomeScreen({ token, onUnauthorized }: Props) {
   // One client per token, so every request shares the same rate limiter.
   const client = useMemo(() => new WaniKaniClient(token), [token])

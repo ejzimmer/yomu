@@ -10,8 +10,6 @@ const COLLECTION_PATHS: Record<CollectionName, string> = {
   spacedRepetitionSystems: '/spaced_repetition_systems',
 }
 
-// Brings the local database up to date with WaniKani. The first run downloads
-// everything; later runs ask only for what changed since the newest record we hold.
 export async function sync(client: WaniKaniClient) {
   const collections = Object.keys(COLLECTION_PATHS) as CollectionName[]
   await Promise.all([syncUser(client), ...collections.map((name) => syncCollection(client, name))])

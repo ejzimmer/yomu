@@ -5,7 +5,6 @@ import { sync } from './sync'
 
 type Item = { id: number; updatedAt: string; data?: Record<string, unknown> }
 
-// Serves each collection path from `server`, honouring updated_after like WaniKani does.
 function makeFakeWaniKani(server: Record<string, Item[]>) {
   const requestedUrls: string[] = []
   const fetch = (input: string | URL | Request) => {

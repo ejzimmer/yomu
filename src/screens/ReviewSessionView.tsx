@@ -17,13 +17,15 @@ interface Props {
 export function ReviewSessionView({ data, client, onExit }: Props) {
   const [feed, setFeed] = useState<FeedEntry[]>([])
 
-  function recordReview(item: SessionItem) {
+  function submitReview(item: SessionItem) {
     void queueReview({
       assignmentId: item.assignment.id,
       incorrectMeaningAnswers: item.incorrectMeaningAnswers,
       incorrectReadingAnswers: item.incorrectReadingAnswers,
     }).then(() => sendPendingReviews(client))
+  }
 
+  function addToFeed(item: SessionItem) {
     const entry = getFeedEntry(item, data.srsSystems)
     if (entry) setFeed((entries) => [entry, ...entries])
   }
@@ -35,7 +37,10 @@ export function ReviewSessionView({ data, client, onExit }: Props) {
       aside={
         <SrsFeed entries={feed} onFaded={(id) => setFeed((entries) => entries.filter((entry) => entry.id !== id))} />
       }
-      onItemComplete={recordReview}
+      onItemComplete={(item) => {
+        submitReview(item)
+        addToFeed(item)
+      }}
       renderSummary={(completed, accuracy) => (
         <SessionSummary
           count={completed}

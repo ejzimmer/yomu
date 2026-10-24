@@ -1,28 +1,32 @@
 import './ShakeInput.css'
-import { useEffect, useId, useImperativeHandle, useRef, type ComponentProps } from 'react'
+import { useId, useImperativeHandle, useRef, type ComponentProps, type Ref } from 'react'
 
-type Props = ComponentProps<'input'> & {
+export interface ShakeInputHandle {
+  focus: () => void
+  shake: () => void
+}
+
+type Props = Omit<ComponentProps<'input'>, 'ref'> & {
+  ref?: Ref<ShakeInputHandle>
   error?: string | null
 }
 
-// A text input that shows an error message under itself, turns red, shakes
-// and takes focus.
-// It shakes each time `error` changes to a message, so set it to null before
-// each new attempt (with flushSync if the next error follows synchronously).
 export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
-  useImperativeHandle(ref, () => inputRef.current!, [])
   const messageId = useId()
 
-  useEffect(() => {
-    const input = inputRef.current
-    if (!error || !input) return
-    input.focus()
-    // Restart the CSS shake even if the class was only off for an instant
-    input.style.animation = 'none'
-    void input.offsetWidth
-    input.style.animation = ''
-  }, [error])
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    shake: () => {
+      const input = inputRef.current
+      if (!input) return
+      input.focus()
+      // Reading offsetWidth forces a reflow, so clearing and restoring the animation restarts it
+      input.style.animation = 'none'
+      void input.offsetWidth
+      input.style.animation = ''
+    },
+  }), [])
 
   return (
     <div className="shake-input">

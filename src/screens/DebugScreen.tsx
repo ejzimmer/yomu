@@ -13,7 +13,7 @@ interface Props {
   onSync: () => void
 }
 
-const LABELS: Record<CollectionName, string> = {
+const COLLECTION_LABELS: Record<CollectionName, string> = {
   subjects: 'Subjects',
   assignments: 'Assignments',
   reviewStatistics: 'Review statistics',
@@ -21,9 +21,8 @@ const LABELS: Record<CollectionName, string> = {
   spacedRepetitionSystems: 'SRS systems',
 }
 
-// What's in the local database. A stand-in home screen until reviews exist.
 export function DebugScreen({ user, isSyncing, syncError, onSync }: Props) {
-  const rows = useLiveQuery(() => countRows(user), [user])
+  const rows = useLiveQuery(() => countStoredAndUsableRows(user), [user])
   const syncStates = useLiveQuery(() => db.syncState.toArray())
   const lastSyncedAt = syncStates
     ?.map((state) => Temporal.Instant.from(state.lastSyncedAt))
@@ -55,7 +54,7 @@ export function DebugScreen({ user, isSyncing, syncError, onSync }: Props) {
           <tbody>
             {rows?.map(({ name, stored, usable }) => (
               <tr key={name}>
-                <th>{LABELS[name]}</th>
+                <th>{COLLECTION_LABELS[name]}</th>
                 <td>{stored}</td>
                 <td>{usable}</td>
               </tr>
@@ -75,9 +74,7 @@ export function DebugScreen({ user, isSyncing, syncError, onSync }: Props) {
   )
 }
 
-// "Usable" leaves out hidden subjects, levels above the subscription, and
-// anything attached to those subjects.
-async function countRows(user: User) {
+async function countStoredAndUsableRows(user: User) {
   const subjects = await db.subjects.toArray()
   const availableIds = new Set(subjects.filter((s) => isSubjectAvailable(s, user)).map((s) => s.id))
   const [assignments, reviewStatistics, studyMaterials, srsCount] = await Promise.all([
