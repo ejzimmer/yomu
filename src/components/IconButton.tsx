@@ -1,3 +1,4 @@
+import './IconButton.css'
 import type { ComponentProps } from 'react'
 import { LoadingKanji } from './LoadingKanji'
 import { Tooltip } from './Tooltip'

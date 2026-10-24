@@ -10,3 +10,7 @@ export const ArrowIcon = () => (
 export const SignOutIcon = () => (
   <svg {...common}><path d="M15 4h4v16h-4" /><path d="M10 17l-5-5 5-5" /><path d="M5 12h11" /></svg>
 )
+
+export const SyncIcon = () => (
+  <svg {...common}><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8" /><path d="M4 4v4h4" /><path d="M4 13a8 8 0 0 0 14.5 4.5L20 16" /><path d="M20 20v-4h-4" /></svg>
+)

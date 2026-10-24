@@ -42,3 +42,93 @@ export interface User {
   }
   preferences: Preferences
 }
+
+export type SubjectType = 'radical' | 'kanji' | 'vocabulary' | 'kana_vocabulary'
+
+export interface Meaning {
+  meaning: string
+  primary: boolean
+  accepted_answer: boolean
+}
+
+export interface Reading {
+  reading: string
+  primary: boolean
+  accepted_answer: boolean
+  type?: 'onyomi' | 'kunyomi' | 'nanori'
+}
+
+export interface AuxiliaryMeaning {
+  meaning: string
+  type: 'whitelist' | 'blacklist'
+}
+
+export interface Subject {
+  level: number
+  slug: string
+  characters: string | null
+  meanings: Meaning[]
+  auxiliary_meanings: AuxiliaryMeaning[]
+  readings?: Reading[]
+  component_subject_ids?: number[]
+  amalgamation_subject_ids?: number[]
+  meaning_mnemonic: string
+  reading_mnemonic?: string
+  lesson_position: number
+  spaced_repetition_system_id: number
+  hidden_at: string | null
+  document_url: string
+}
+
+export interface Assignment {
+  subject_id: number
+  subject_type: SubjectType
+  srs_stage: number
+  unlocked_at: string | null
+  started_at: string | null
+  passed_at: string | null
+  burned_at: string | null
+  available_at: string | null
+  resurrected_at: string | null
+  hidden: boolean
+}
+
+export interface ReviewStatistic {
+  subject_id: number
+  subject_type: SubjectType
+  meaning_correct: number
+  meaning_incorrect: number
+  meaning_max_streak: number
+  meaning_current_streak: number
+  reading_correct: number
+  reading_incorrect: number
+  reading_max_streak: number
+  reading_current_streak: number
+  percentage_correct: number
+  hidden: boolean
+}
+
+export interface StudyMaterial {
+  subject_id: number
+  subject_type: SubjectType
+  meaning_note: string | null
+  reading_note: string | null
+  meaning_synonyms: string[]
+  hidden: boolean
+}
+
+export interface SrsStage {
+  position: number
+  interval: number | null
+  interval_unit: 'milliseconds' | 'seconds' | 'minutes' | 'hours' | 'days' | 'weeks' | null
+}
+
+export interface SpacedRepetitionSystem {
+  name: string
+  description: string
+  unlocking_stage_position: number
+  starting_stage_position: number
+  passing_stage_position: number
+  burning_stage_position: number
+  stages: SrsStage[]
+}

@@ -13,22 +13,9 @@
     font-weight: 700;
     font-size: 18px;
   }
-
-  .icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: var(--ink);
-    cursor: pointer;
-  }
 }
 
-@scope (main.centre) to (.field) {
+@scope (main.centre) {
   :scope {
     min-height: calc(100% - 56px);
     display: flex;
@@ -37,19 +24,5 @@
     justify-content: center;
     gap: 24px;
     padding: 24px 16px;
-  }
-
-  .level {
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: 120px;
-    line-height: 1;
-  }
-
-  .meta {
-    color: var(--ink-soft);
-    font-size: 14px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
   }
 }
