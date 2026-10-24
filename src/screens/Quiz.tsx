@@ -2,7 +2,7 @@ import './Quiz.css'
 import { useState, type ReactNode } from 'react'
 import { getCharacters } from '../data/getCharacters'
 import type { StudyItem } from '../data/studyItem'
-import { answerCorrectly, answerWrongly, createSession, moveOn, undoWrongAnswer, type SessionItem } from '../quiz/session'
+import { answerCorrectly, answerWrongly, askNextQuestion, createSession, undoWrongAnswer, type SessionItem } from '../quiz/session'
 import { AnswerForm } from './AnswerForm'
 import { SessionStatus } from './SessionStatus'
 import { SessionSummary } from './SessionSummary'
@@ -36,9 +36,9 @@ export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, complete
       return
     }
 
-    const next = answerCorrectly(session)
-    if (next.completed.length > session.completed.length) onItemComplete(next.completed.at(-1)!)
-    setSession(next)
+    const answered = answerCorrectly(session)
+    if (answered.completed.length > session.completed.length) onItemComplete(answered.completed.at(-1)!)
+    setSession(askNextQuestion(answered))
   }
 
   return (
@@ -63,7 +63,7 @@ export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, complete
           isShowingAnswer={session.isShowingAnswer}
           onAnswer={answer}
           onRedo={() => setSession(undoWrongAnswer(session))}
-          onNext={() => setSession(moveOn(session))}
+          onNext={() => setSession(askNextQuestion(session))}
         />
         {aside}
       </div>
