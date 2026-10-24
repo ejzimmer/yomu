@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { IconButton } from '../components/IconButton'
 import { ShakeInput } from '../components/ShakeInput'
@@ -31,11 +31,13 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
   const inputId = useId()
   const { type, item } = question
 
-  const focusInput = useCallback(() => {
-    document.querySelector<HTMLInputElement>(`[id="${inputId}"]`)?.focus()
-  }, [inputId])
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(focusInput, [focusInput])
+  function focusInput() {
+    inputRef.current?.focus()
+  }
+
+  useEffect(() => inputRef.current?.focus(), [])
 
   function submit(event: FormEvent) {
     event.preventDefault()
@@ -70,6 +72,7 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
       <label htmlFor={inputId}>{type === 'meaning' ? 'Meaning' : 'Reading'}</label>
       <div className="answer-row">
         <ShakeInput
+          ref={inputRef}
           id={inputId}
           lang={type === 'reading' ? 'ja' : 'en'}
           error={error}

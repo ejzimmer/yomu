@@ -1,7 +1,7 @@
 import './ShakeInput.css'
-import { useEffect, useId, useRef, type ComponentProps } from 'react'
+import { useEffect, useId, useImperativeHandle, useRef, type ComponentProps } from 'react'
 
-type Props = Omit<ComponentProps<'input'>, 'ref'> & {
+type Props = ComponentProps<'input'> & {
   error?: string | null
 }
 
@@ -9,8 +9,9 @@ type Props = Omit<ComponentProps<'input'>, 'ref'> & {
 // and takes focus.
 // It shakes each time `error` changes to a message, so set it to null before
 // each new attempt (with flushSync if the next error follows synchronously).
-export function ShakeInput({ error, className, ...inputProps }: Props) {
+export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
+  useImperativeHandle(ref, () => inputRef.current!, [])
   const messageId = useId()
 
   useEffect(() => {
