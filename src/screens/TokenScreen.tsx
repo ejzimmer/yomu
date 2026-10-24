@@ -1,7 +1,8 @@
 import './TokenScreen.css'
 import { useState, type FormEvent } from 'react'
 import { flushSync } from 'react-dom'
-import { ApiError, WaniKaniClient } from '../api/client'
+import { WaniKaniClient } from '../api/client'
+import { ApiError } from '../api/errors'
 import type { User } from '../api/types'
 import { IconButton } from '../components/IconButton'
 import { ShakeInput } from '../components/ShakeInput'
@@ -48,7 +49,6 @@ export function TokenScreen({ onSignedIn }: Props) {
           spellCheck={false}
           value={token}
           onChange={(e) => setToken(e.target.value)}
-          autoFocus
         />
         <IconButton className="submit" type="submit" isLoading={isLoading} label="Sign in">
           <ArrowIcon />

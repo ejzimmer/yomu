@@ -10,7 +10,8 @@ const STROKES = [
   'M58 56 Q72 76 90 86',
 ]
 const CYCLE_MS = 2400
-const DRAWING_SHARE = 0.75 // the rest of each cycle holds, then fades
+// The rest of each cycle holds, then fades.
+const DRAWING_SHARE = 0.75
 
 // A loading indicator that writes 永 stroke by stroke, then starts again.
 export function LoadingKanji() {
