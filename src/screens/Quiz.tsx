@@ -13,18 +13,18 @@ interface Props {
   aside?: ReactNode
   onItemComplete: (item: SessionItem) => void
   completedLabel: string
-  isAccuracyShown?: boolean
   onExit: () => void
 }
 
-export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, completedLabel, isAccuracyShown = false, onExit }: Props) {
+export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, completedLabel, onExit }: Props) {
   const [session, setSession] = useState(() => createSession(queue))
   const accuracy = session.totalAnswers ? Math.round((session.correctAnswers / session.totalAnswers) * 100) : 100
   const { question } = session
 
   if (!question) {
-    const description = isAccuracyShown ? `${completedLabel} · ${accuracy}% correct` : completedLabel
-    return <SessionSummary count={session.completed.length} description={description} onExit={onExit} />
+    return (
+      <SessionSummary count={session.completed.length} description={`${completedLabel} · ${accuracy}% correct`} onExit={onExit} />
+    )
   }
 
   const { subject, assignment } = question.item
