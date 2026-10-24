@@ -5,7 +5,6 @@ import { getFeedEntry, type FeedEntry } from '../review/getFeedEntry'
 import type { ReviewData } from '../review/loadReviewData'
 import { queueReview, sendPendingReviews } from '../review/sendReviews'
 import { Quiz } from './Quiz'
-import { SessionSummary } from './SessionSummary'
 import { SrsFeed } from './SrsFeed'
 
 interface Props {
@@ -36,13 +35,8 @@ export function ReviewSessionView({ data, client, onExit }: Props) {
         <SrsFeed entries={feed} onFaded={(id) => setFeed((entries) => entries.filter((entry) => entry.id !== id))} />
       }
       onItemComplete={recordReview}
-      renderSummary={(completed, accuracy) => (
-        <SessionSummary
-          count={completed}
-          description={completed === 0 ? 'No reviews due' : `reviewed · ${accuracy}% correct`}
-          onExit={onExit}
-        />
-      )}
+      completedLabel="reviewed"
+      isAccuracyShown
       onExit={onExit}
     />
   )
