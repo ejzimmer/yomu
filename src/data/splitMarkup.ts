@@ -1,4 +1,6 @@
-export type MarkupTag = 'radical' | 'kanji' | 'vocabulary' | 'reading' | 'meaning' | 'ja'
+const MARKUP_TAGS = ['radical', 'kanji', 'vocabulary', 'reading', 'meaning', 'ja'] as const
+
+export type MarkupTag = (typeof MARKUP_TAGS)[number]
 
 export interface MarkupPart {
   start: number
@@ -6,18 +8,21 @@ export interface MarkupPart {
   tag: MarkupTag | null
 }
 
-const TAGGED = /<(radical|kanji|vocabulary|reading|meaning|ja)>(.*?)<\/\1>/gu
+const TAGGED = new RegExp(String.raw`<(${MARKUP_TAGS.join('|')})>(.*?)</\1>`, 'gu')
 
 // WaniKani marks up mnemonics and hints with tags like <kanji>…</kanji>.
 export function splitMarkup(text: string): MarkupPart[] {
   const parts: MarkupPart[] = []
   let end = 0
+
   for (const match of text.matchAll(TAGGED)) {
     if (match.index > end) parts.push(makePlainPart(end, text.slice(end, match.index)))
     parts.push({ start: match.index, text: stripTags(match[2]), tag: match[1] as MarkupTag })
     end = match.index + match[0].length
   }
+
   if (end < text.length) parts.push(makePlainPart(end, text.slice(end)))
+
   return parts
 }
 

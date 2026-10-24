@@ -10,7 +10,7 @@ interface Props {
 export function SessionSummary({ count, description, onExit }: Props) {
   return (
     <div className="quiz summary">
-      <div className="level">{count}</div>
+      <div className="count">{count}</div>
       <div className="meta">{description}</div>
       <IconButton className="submit" onClick={onExit} label="Done">
         <ArrowIcon />

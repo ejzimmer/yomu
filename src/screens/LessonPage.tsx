@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import type { ContextSentence, Reading, Resource, Subject } from '../api/types'
-import { Mnemonic } from '../components/Mnemonic'
+import { MarkedUpText } from '../components/MarkedUpText'
 import { PlayAudioButton } from '../components/PlayAudioButton'
+import { getCharacters } from '../data/getCharacters'
 
 interface Props {
   subject: Subject
@@ -10,47 +11,47 @@ interface Props {
 }
 
 const READING_TYPES = [
-  { type: 'onyomi', name: 'On’yomi' },
-  { type: 'kunyomi', name: 'Kun’yomi' },
-  { type: 'nanori', name: 'Nanori' },
-  { type: undefined, name: 'Readings' },
+  { type: 'onyomi', name: 'On’yomi', isNameShown: true },
+  { type: 'kunyomi', name: 'Kun’yomi', isNameShown: true },
+  { type: 'nanori', name: 'Nanori', isNameShown: true },
+  { type: undefined, name: 'Readings', isNameShown: false },
 ] as const
 
 export function LessonPage({ subject, subjectsById, voiceActorId }: Props) {
-  const components = (subject.component_subject_ids ?? []).flatMap((id) => subjectsById.get(id) ?? [])
+  const componentSubjects = (subject.component_subject_ids ?? []).flatMap((id) => subjectsById.get(id) ?? [])
 
   return (
     <article className="lesson-page">
       <div className="lesson-item">
         <span className="characters" lang="ja">
-          {subject.characters ?? subject.slug}
+          {getCharacters(subject)}
         </span>
         <PlayAudioButton audios={subject.pronunciation_audios ?? []} voiceActorId={voiceActorId} />
       </div>
 
       <LessonSection title="Meaning">
-        <MeaningList subject={subject} />
-        <Mnemonic text={subject.meaning_mnemonic} />
-        {subject.meaning_hint && <Mnemonic text={subject.meaning_hint} />}
+        <Meanings subject={subject} />
+        <MarkedUpText text={subject.meaning_mnemonic} />
+        {subject.meaning_hint && <MarkedUpText text={subject.meaning_hint} />}
       </LessonSection>
 
       {subject.readings && subject.readings.length > 0 && (
         <LessonSection title="Reading">
-          <ReadingList readings={subject.readings} />
-          {subject.reading_mnemonic && <Mnemonic text={subject.reading_mnemonic} />}
-          {subject.reading_hint && <Mnemonic text={subject.reading_hint} />}
+          <Readings readings={subject.readings} />
+          {subject.reading_mnemonic && <MarkedUpText text={subject.reading_mnemonic} />}
+          {subject.reading_hint && <MarkedUpText text={subject.reading_hint} />}
         </LessonSection>
       )}
 
-      {components.length > 0 && (
+      {componentSubjects.length > 0 && (
         <LessonSection title="Made of">
-          <ComponentList components={components} />
+          <ComponentSubjects subjects={componentSubjects} />
         </LessonSection>
       )}
 
       {subject.context_sentences && subject.context_sentences.length > 0 && (
         <LessonSection title="In context">
-          <SentenceList sentences={subject.context_sentences} />
+          <ContextSentences sentences={subject.context_sentences} />
         </LessonSection>
       )}
     </article>
@@ -66,7 +67,7 @@ function LessonSection({ title, children }: { title: string; children: ReactNode
   )
 }
 
-function MeaningList({ subject }: { subject: Subject }) {
+function Meanings({ subject }: { subject: Subject }) {
   const [primary, ...others] = subject.meanings.filter((meaning) => meaning.accepted_answer)
 
   return (
@@ -77,9 +78,10 @@ function MeaningList({ subject }: { subject: Subject }) {
   )
 }
 
-function ReadingList({ readings }: { readings: readonly Reading[] }) {
-  const groups = READING_TYPES.map(({ type, name }) => ({
+function Readings({ readings }: { readings: readonly Reading[] }) {
+  const groups = READING_TYPES.map(({ type, name, isNameShown }) => ({
     name,
+    isNameShown,
     readings: readings.filter((reading) => reading.type === type),
   })).filter((group) => group.readings.length > 0)
 
@@ -87,7 +89,7 @@ function ReadingList({ readings }: { readings: readonly Reading[] }) {
     <dl className="readings">
       {groups.map((group) => (
         <div key={group.name}>
-          <dt className={group.name === 'Readings' ? 'visually-hidden' : undefined}>{group.name}</dt>
+          <dt className={group.isNameShown ? undefined : 'visually-hidden'}>{group.name}</dt>
           <dd lang="ja">
             {group.readings.map((reading) => (
               <span key={reading.reading} className={reading.accepted_answer ? 'accepted' : undefined}>
@@ -101,20 +103,20 @@ function ReadingList({ readings }: { readings: readonly Reading[] }) {
   )
 }
 
-function ComponentList({ components }: { components: readonly Resource<Subject>[] }) {
+function ComponentSubjects({ subjects }: { subjects: readonly Resource<Subject>[] }) {
   return (
-    <ul className="components">
-      {components.map((component) => (
-        <li key={component.id} data-type={component.object}>
-          <span lang="ja">{component.data.characters ?? component.data.slug}</span>
-          {component.data.meanings.find((meaning) => meaning.primary)?.meaning}
+    <ul className="component-subjects">
+      {subjects.map((subject) => (
+        <li key={subject.id} data-type={subject.object}>
+          <span lang="ja">{getCharacters(subject.data)}</span>
+          {subject.data.meanings.find((meaning) => meaning.primary)?.meaning}
         </li>
       ))}
     </ul>
   )
 }
 
-function SentenceList({ sentences }: { sentences: readonly ContextSentence[] }) {
+function ContextSentences({ sentences }: { sentences: readonly ContextSentence[] }) {
   return (
     <ul className="sentences">
       {sentences.map((sentence) => (

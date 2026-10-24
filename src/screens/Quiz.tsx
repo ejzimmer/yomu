@@ -1,5 +1,6 @@
 import './Quiz.css'
 import { useState, type ReactNode } from 'react'
+import { getCharacters } from '../data/getCharacters'
 import type { StudyItem } from '../data/studyItem'
 import { answerCorrectly, answerWrongly, createSession, moveOn, undoWrongAnswer, type SessionItem } from '../quiz/session'
 import { AnswerForm } from './AnswerForm'
@@ -22,7 +23,7 @@ export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, renderSu
   if (!question) return renderSummary(session.completed.length, accuracy)
 
   const { subject, assignment } = question.item
-  const characters = subject.data.characters ?? subject.data.slug
+  const characters = getCharacters(subject.data)
 
   function answer(isCorrect: boolean) {
     if (!isCorrect) {

@@ -24,9 +24,13 @@ function isReadyForLesson(assignment: Assignment) {
 function sortLessons(items: StudyItem[], order: Preferences['lessons_presentation_order']) {
   if (order === 'shuffled') return shuffle(items)
   if (order === 'ascending_level_then_shuffled') return shuffle(items).toSorted(compareLevels)
-  return items.toSorted((a, b) => compareLevels(a, b) || a.subject.data.lesson_position - b.subject.data.lesson_position)
+  return items.toSorted((a, b) => compareLevels(a, b) || compareLessonPositions(a, b))
 }
 
 function compareLevels(a: StudyItem, b: StudyItem) {
   return a.subject.data.level - b.subject.data.level
+}
+
+function compareLessonPositions(a: StudyItem, b: StudyItem) {
+  return a.subject.data.lesson_position - b.subject.data.lesson_position
 }

@@ -11,8 +11,10 @@ export interface ClientOptions {
   fetch?: typeof fetch
 }
 
+type WriteMethod = 'POST' | 'PUT'
+
 interface RequestOptions {
-  method?: 'POST' | 'PUT'
+  method?: WriteMethod
   body?: string
   headers?: Record<string, string>
 }
@@ -79,7 +81,7 @@ export class WaniKaniClient {
     return items
   }
 
-  private async sendJson<T>(method: 'POST' | 'PUT', path: string, body: unknown): Promise<T> {
+  private async sendJson<T>(method: WriteMethod, path: string, body: unknown): Promise<T> {
     const init: RequestOptions = { method, body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }
     return (await this.sendWithRetry(BASE_URL + path, init)) as T
   }

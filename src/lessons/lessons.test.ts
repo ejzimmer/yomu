@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Assignment, Preferences, Resource, Subject, User } from '../api/types'
 import { buildLessonQueue } from './buildLessonQueue'
-import { countLessonsStartedToday, getLessonBatch, MAX_LESSONS_PER_DAY } from './getLessonBatch'
+import { countLessonsStartedToday } from './countLessonsStartedToday'
+import { getLessonBatch, MAX_LESSONS_PER_DAY } from './getLessonBatch'
 
 const makeSubject = (id: number, level: number, lessonPosition: number, hiddenAt: string | null = null) =>
   ({ id, data: { level, lesson_position: lessonPosition, hidden_at: hiddenAt } }) as Resource<Subject>

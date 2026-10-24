@@ -1,5 +1,5 @@
 import type { Subject } from '../api/types'
-import { Mnemonic } from '../components/Mnemonic'
+import { MarkedUpText } from '../components/MarkedUpText'
 import type { QuestionType } from '../quiz/session'
 
 interface Props {
@@ -19,7 +19,7 @@ export function CorrectAnswer({ subject, type }: Props) {
       <div className="correct" lang={type === 'reading' ? 'ja' : 'en'}>
         {answers.join(', ')}
       </div>
-      {mnemonic && <Mnemonic text={mnemonic} />}
+      {mnemonic && <MarkedUpText text={mnemonic} />}
     </div>
   )
 }
