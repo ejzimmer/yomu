@@ -14,8 +14,9 @@ export function SrsFeed({ entries, onFaded }: Props) {
           <span className="characters" lang="ja">
             {entry.characters}
           </span>
-          <span className={entry.isUp ? 'up' : 'down'} aria-label={entry.isUp ? 'up to' : 'down to'}>
+          <span className={entry.isUp ? 'up' : 'down'}>
             <StageUpIcon />
+            <span className="visually-hidden">{entry.isUp ? 'up to' : 'down to'}</span>
           </span>
           {entry.stageName}
         </li>

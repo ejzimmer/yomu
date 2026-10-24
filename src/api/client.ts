@@ -5,6 +5,7 @@ const BASE_URL = 'https://api.wanikani.com/v2'
 const REVISION = '20170710'
 const LIMIT_PER_MINUTE = 60
 const ONE_MINUTE = Temporal.Duration.from({ minutes: 1 })
+const MAX_RETRIES = 3
 const MIN_RETRY_WAIT = Temporal.Duration.from({ seconds: 1 })
 
 export interface ClientOptions {
@@ -25,7 +26,9 @@ interface Cached {
   body: unknown
 }
 
-const getLater = (a: Temporal.Instant, b: Temporal.Instant) => (Temporal.Instant.compare(a, b) >= 0 ? a : b)
+function getLaterInstant(a: Temporal.Instant, b: Temporal.Instant) {
+  return Temporal.Instant.compare(a, b) >= 0 ? a : b
+}
 
 function sleepUntil(instant: Temporal.Instant) {
   const ms = Temporal.Now.instant().until(instant).total('milliseconds')
@@ -34,9 +37,11 @@ function sleepUntil(instant: Temporal.Instant) {
   })
 }
 
-// Thin WaniKani API v2 client: bearer auth, revision header, pagination,
-// a 60/min rate limiter that also honours RateLimit-* headers and 429s,
-// and conditional GETs (ETag / Last-Modified) served from an in-memory cache.
+async function createApiError(response: Response) {
+  const body = (await response.json().catch(() => null)) as { error?: string } | null
+  return new ApiError(response.status, body?.error ?? response.statusText)
+}
+
 export class WaniKaniClient {
   private readonly token: string
   private readonly makeHttpRequest: typeof fetch
@@ -67,7 +72,6 @@ export class WaniKaniClient {
     return this.sendJson<T>('PUT', path, body)
   }
 
-  // Follows pages.next_url until the collection is exhausted.
   async getAll<T>(path: string, params: Record<string, string> = {}): Promise<Resource<T>[]> {
     const items: Resource<T>[] = []
     let page = await this.get<Collection<T>>(path, params)
@@ -87,55 +91,70 @@ export class WaniKaniClient {
   }
 
   private async sendWithRetry(url: string, init: RequestOptions = {}, attempt = 0): Promise<unknown> {
-    await this.waitForSlot()
+    const cached = init.method ? undefined : this.cache.get(url)
+    const response = await this.send(url, init, cached)
 
-    const isRead = !init.method
+    if (response.status === 304 && cached) return cached.body
+    if (response.status === 429 && attempt < MAX_RETRIES) {
+      await this.waitToRetry()
+      return this.sendWithRetry(url, init, attempt + 1)
+    }
+    if (!response.ok) throw await createApiError(response)
+
+    const body: unknown = await response.json()
+    if (!init.method) this.cacheResponse(url, response, body)
+    return body
+  }
+
+  private async send(url: string, init: RequestOptions, cached: Cached | undefined) {
+    await this.waitForSlot()
+    this.recentRequestTimes.push(Temporal.Now.instant())
+    const response = await this.makeHttpRequest(url, { ...init, headers: this.buildHeaders(init, cached) })
+    this.recordRateLimit(response)
+    return response
+  }
+
+  private buildHeaders(init: RequestOptions, cached: Cached | undefined) {
     const headers: Record<string, string> = {
       ...init.headers,
       Authorization: `Bearer ${this.token}`,
       'Wanikani-Revision': REVISION,
     }
-    const cached = isRead ? this.cache.get(url) : undefined
     if (cached?.etag) headers['If-None-Match'] = cached.etag
     if (cached?.lastModified) headers['If-Modified-Since'] = cached.lastModified
+    return headers
+  }
 
-    this.recentRequestTimes.push(Temporal.Now.instant())
-    const response = await this.makeHttpRequest(url, { ...init, headers })
-    this.readRateLimit(response)
-
-    if (response.status === 304 && cached) return cached.body
-    if (response.status === 429 && attempt < 3) {
-      const earliestRetry = Temporal.Now.instant().add(MIN_RETRY_WAIT)
-      await sleepUntil(this.rateLimitResetsAt ? getLater(this.rateLimitResetsAt, earliestRetry) : earliestRetry)
-      return this.sendWithRetry(url, init, attempt + 1)
-    }
-    if (!response.ok) {
-      const body = (await response.json().catch(() => null)) as { error?: string } | null
-      throw new ApiError(response.status, body?.error ?? response.statusText)
-    }
-
-    const body: unknown = await response.json()
+  private cacheResponse(url: string, response: Response, body: unknown) {
     const etag = response.headers.get('ETag')
     const lastModified = response.headers.get('Last-Modified')
-    if (isRead && (etag || lastModified)) this.cache.set(url, { etag, lastModified, body })
-    return body
+    if (etag || lastModified) this.cache.set(url, { etag, lastModified, body })
   }
 
   private async waitForSlot() {
-    const windowStart = Temporal.Now.instant().subtract(ONE_MINUTE)
-    while (this.recentRequestTimes.length > 0 && Temporal.Instant.compare(this.recentRequestTimes[0], windowStart) <= 0) {
-      this.recentRequestTimes.shift()
-    }
+    this.forgetRequestsOlderThanAMinute()
 
     let waitUntil = this.rateLimitResetsAt
     if (this.recentRequestTimes.length >= LIMIT_PER_MINUTE) {
       const slotFreesAt = this.recentRequestTimes[0].add(ONE_MINUTE)
-      waitUntil = waitUntil ? getLater(waitUntil, slotFreesAt) : slotFreesAt
+      waitUntil = waitUntil ? getLaterInstant(waitUntil, slotFreesAt) : slotFreesAt
     }
     if (waitUntil && Temporal.Instant.compare(waitUntil, Temporal.Now.instant()) > 0) await sleepUntil(waitUntil)
   }
 
-  private readRateLimit(response: Response) {
+  private forgetRequestsOlderThanAMinute() {
+    const windowStart = Temporal.Now.instant().subtract(ONE_MINUTE)
+    while (this.recentRequestTimes.length > 0 && Temporal.Instant.compare(this.recentRequestTimes[0], windowStart) <= 0) {
+      this.recentRequestTimes.shift()
+    }
+  }
+
+  private async waitToRetry() {
+    const earliestRetry = Temporal.Now.instant().add(MIN_RETRY_WAIT)
+    await sleepUntil(this.rateLimitResetsAt ? getLaterInstant(this.rateLimitResetsAt, earliestRetry) : earliestRetry)
+  }
+
+  private recordRateLimit(response: Response) {
     const remaining = response.headers.get('RateLimit-Remaining')
     const reset = response.headers.get('RateLimit-Reset')
     if (reset && (remaining === '0' || response.status === 429)) {

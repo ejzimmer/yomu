@@ -4,7 +4,6 @@ import { ApiError } from '../api/errors'
 import { sendPendingReviews } from '../review/sendReviews'
 import { sync } from './sync'
 
-// Syncs once when mounted, and again whenever syncNow is called.
 export function useSync(client: WaniKaniClient, onUnauthorized: () => void) {
   const [isSyncing, setIsSyncing] = useState(true)
   const [syncError, setSyncError] = useState<string | null>(null)

@@ -1,7 +1,7 @@
 import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { IconButton } from '../components/IconButton'
-import { ShakeInput } from '../components/ShakeInput'
+import { ShakeInput, type ShakeInputHandle } from '../components/ShakeInput'
 import { ArrowIcon, UndoIcon } from '../icons'
 import { checkAnswer, convertTypedKana, type UnmarkableAnswer } from '../quiz/checkAnswer'
 import type { Question } from '../quiz/session'
@@ -27,9 +27,8 @@ interface Props {
 
 export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRedo, onNext }: Props) {
   const [answer, setAnswer] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const inputId = useId()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<ShakeInputHandle>(null)
   const { type, item } = question
 
   function focusInput() {
@@ -44,14 +43,14 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
       return
     }
 
-    flushSync(() => setError(null))
     const result = checkAnswer(answer, type, item.subject.data, synonyms)
 
     if (result !== 'correct' && result !== 'incorrect') {
-      setError(TRY_AGAIN_MESSAGES[result])
+      inputRef.current?.setError(TRY_AGAIN_MESSAGES[result])
       return
     }
 
+    inputRef.current?.setError(null)
     flushSync(() => onAnswer(result === 'correct'))
     focusInput()
   }
@@ -61,7 +60,7 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
     focusInput()
   }
 
-  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+  function redoOnBackspace(event: KeyboardEvent<HTMLInputElement>) {
     if (isShowingAnswer && event.key === 'Backspace') {
       event.preventDefault()
       redo()
@@ -79,7 +78,6 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
           // oxlint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
           lang={type === 'reading' ? 'ja' : 'en'}
-          error={error}
           aria-invalid={isShowingAnswer || undefined}
           readOnly={isShowingAnswer}
           autoComplete="off"
@@ -87,7 +85,7 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
           spellCheck={false}
           value={answer}
           onChange={(e) => setAnswer(type === 'reading' ? convertTypedKana(e.target.value) : e.target.value)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={redoOnBackspace}
         />
         {isShowingAnswer && (
           <IconButton className="icon-btn typo" type="button" onClick={redo} label="Typo, redo">

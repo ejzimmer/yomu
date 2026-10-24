@@ -52,7 +52,7 @@ export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, complete
 
       <div className="layout">
         <div className="item" lang="ja">
-          <span style={{ fontSize: `max(40px, min(150px, ${(86 / [...characters].length).toFixed(1)}cqw))` }}>
+          <span style={{ fontSize: getCharactersFontSize(characters) }}>
             {characters}
           </span>
         </div>
@@ -69,4 +69,9 @@ export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, complete
       </div>
     </div>
   )
+}
+
+function getCharactersFontSize(characters: string) {
+  const widthShare = (86 / [...characters].length).toFixed(1)
+  return `max(40px, min(150px, ${widthShare}cqw))`
 }

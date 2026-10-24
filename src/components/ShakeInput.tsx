@@ -1,28 +1,27 @@
 import './ShakeInput.css'
-import { useEffect, useId, useImperativeHandle, useRef, type ComponentProps } from 'react'
+import { useId, useImperativeHandle, useRef, useState, type ComponentProps, type Ref } from 'react'
 
-type Props = ComponentProps<'input'> & {
-  error?: string | null
+export interface ShakeInputHandle {
+  focus: () => void
+  setError: (message: string | null) => void
 }
 
-// A text input that shows an error message under itself, turns red, shakes
-// and takes focus.
-// It shakes each time `error` changes to a message, so set it to null before
-// each new attempt (with flushSync if the next error follows synchronously).
-export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
+type Props = Omit<ComponentProps<'input'>, 'ref'> & {
+  ref?: Ref<ShakeInputHandle>
+}
+
+export function ShakeInput({ className, ref, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
-  useImperativeHandle(ref, () => inputRef.current!, [])
+  const [error, setError] = useState<string | null>(null)
   const messageId = useId()
 
-  useEffect(() => {
-    const input = inputRef.current
-    if (!error || !input) return
-    input.focus()
-    // Restart the CSS shake even if the class was only off for an instant
-    input.style.animation = 'none'
-    void input.offsetWidth
-    input.style.animation = ''
-  }, [error])
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    setError: (message) => {
+      setError(message)
+      if (message) shake(inputRef.current)
+    },
+  }), [])
 
   return (
     <div className="shake-input">
@@ -36,4 +35,19 @@ export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
       <p id={messageId} role="alert" className="message">{error}</p>
     </div>
   )
+}
+
+const SHAKE_KEYFRAMES = [
+  { transform: 'translateX(0)' },
+  { transform: 'translateX(-8px)' },
+  { transform: 'translateX(8px)' },
+  { transform: 'translateX(-8px)' },
+  { transform: 'translateX(8px)' },
+  { transform: 'translateX(0)' },
+]
+
+function shake(input: HTMLInputElement | null) {
+  if (!input) return
+  input.focus()
+  input.animate(SHAKE_KEYFRAMES, { duration: 350 })
 }
