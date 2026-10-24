@@ -5,22 +5,27 @@ import type { StudyItem } from '../data/studyItem'
 import { answerCorrectly, answerWrongly, createSession, moveOn, undoWrongAnswer, type SessionItem } from '../quiz/session'
 import { AnswerForm } from './AnswerForm'
 import { SessionStatus } from './SessionStatus'
+import { SessionSummary } from './SessionSummary'
 
 interface Props {
   queue: readonly StudyItem[]
   synonymsBySubject: ReadonlyMap<number, string[]>
   aside?: ReactNode
   onItemComplete: (item: SessionItem) => void
-  renderSummary: (completed: number, accuracy: number) => ReactNode
+  completedLabel: string
+  isAccuracyShown?: boolean
   onExit: () => void
 }
 
-export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, renderSummary, onExit }: Props) {
+export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, completedLabel, isAccuracyShown = false, onExit }: Props) {
   const [session, setSession] = useState(() => createSession(queue))
   const accuracy = session.totalAnswers ? Math.round((session.correctAnswers / session.totalAnswers) * 100) : 100
   const { question } = session
 
-  if (!question) return renderSummary(session.completed.length, accuracy)
+  if (!question) {
+    const description = isAccuracyShown ? `${completedLabel} · ${accuracy}% correct` : completedLabel
+    return <SessionSummary count={session.completed.length} description={description} onExit={onExit} />
+  }
 
   const { subject, assignment } = question.item
   const characters = getCharacters(subject.data)
