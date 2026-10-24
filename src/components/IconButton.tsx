@@ -13,11 +13,11 @@ type Props = Omit<ComponentProps<'button'>, 'aria-label' | 'title' | 'onKeyDown'
 export function IconButton({ label, tooltipAlign, isLoading = false, children, onClick, ...buttonProps }: Props) {
   return (
     <Tooltip text={label} align={tooltipAlign}>
-      {({ label, ...tooltipProps }) => (
+      {({ label: tooltipLabel, ...tooltipProps }) => (
         <button
           {...buttonProps}
           {...tooltipProps}
-          aria-label={label}
+          aria-label={tooltipLabel}
           aria-disabled={isLoading || undefined}
           onClick={(e) => {
             if (isLoading) {

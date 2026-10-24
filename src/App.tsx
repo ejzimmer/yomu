@@ -1,6 +1,7 @@
 import './App.css'
 import { useEffect, useState } from 'react'
-import { WaniKaniClient, ApiError } from './api/client'
+import { WaniKaniClient } from './api/client'
+import { ApiError } from './api/errors'
 import type { User } from './api/types'
 import { IconButton } from './components/IconButton'
 import { SignOutIcon } from './icons'
@@ -45,7 +46,7 @@ export default function App() {
         )}
       </header>
       <main className="centre">
-        {!token ? (
+        {token === null ? (
           <TokenScreen onSignedIn={signIn} />
         ) : user ? (
           <>

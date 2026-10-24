@@ -1,17 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, WaniKaniClient } from './client'
+import { WaniKaniClient } from './client'
+import { ApiError } from './errors'
 
 type Reply = { status?: number; body?: unknown; headers?: Record<string, string> }
 
 function makeFakeFetch(replies: Reply[]) {
   const calls: { url: string; headers: Record<string, string>; at: Temporal.Instant }[] = []
-  const fetch = async (url: string | URL | Request, init?: RequestInit) => {
+  const fetch = (url: string | URL | Request, init?: RequestInit) => {
     calls.push({ url: String(url), headers: (init?.headers ?? {}) as Record<string, string>, at: Temporal.Now.instant() })
     const r = replies.shift() ?? { status: 500 }
-    return new Response(r.status === 304 ? null : JSON.stringify(r.body ?? {}), {
-      status: r.status ?? 200,
-      headers: r.headers,
-    })
+    return Promise.resolve(
+      new Response(r.status === 304 ? null : JSON.stringify(r.body ?? {}), {
+        status: r.status ?? 200,
+        headers: r.headers,
+      }),
+    )
   }
   return { fetch: fetch as typeof globalThis.fetch, calls }
 }
@@ -83,6 +86,8 @@ describe('WaniKaniClient', () => {
     const f = makeFakeFetch(Array.from({ length: 61 }, () => ({ body: {} })))
     const client = new WaniKaniClient('t', { fetch: f.fetch })
     for (let i = 0; i < 60; i++) {
+      // Sequential on purpose: each request has to land before the clock moves on.
+      // oxlint-disable-next-line no-await-in-loop
       await client.get('/user')
       vi.advanceTimersByTime(100)
     }

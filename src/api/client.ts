@@ -1,3 +1,4 @@
+import { ApiError } from './errors'
 import type { Collection, Resource, User } from './types'
 
 const BASE_URL = 'https://api.wanikani.com/v2'
@@ -5,16 +6,6 @@ const REVISION = '20170710'
 const LIMIT_PER_MINUTE = 60
 const ONE_MINUTE = Temporal.Duration.from({ minutes: 1 })
 const MIN_RETRY_WAIT = Temporal.Duration.from({ seconds: 1 })
-
-export class ApiError extends Error {
-  readonly status: number
-
-  constructor(status: number, message: string) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-  }
-}
 
 export interface ClientOptions {
   fetch?: typeof fetch
@@ -30,7 +21,9 @@ const getLater = (a: Temporal.Instant, b: Temporal.Instant) => (Temporal.Instant
 
 function sleepUntil(instant: Temporal.Instant) {
   const ms = Temporal.Now.instant().until(instant).total('milliseconds')
-  return new Promise<void>((resolve) => setTimeout(resolve, Math.max(ms, 0)))
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, Math.max(ms, 0))
+  })
 }
 
 // Thin WaniKani API v2 client: bearer auth, revision header, pagination,
@@ -64,6 +57,8 @@ export class WaniKaniClient {
     let page = await this.get<Collection<T>>(path, params)
     items.push(...page.data)
     while (page.pages.next_url) {
+      // Each page's URL comes from the previous page, so these can't run in parallel.
+      // oxlint-disable-next-line no-await-in-loop
       page = await this.get<Collection<T>>(page.pages.next_url)
       items.push(...page.data)
     }
@@ -105,7 +100,7 @@ export class WaniKaniClient {
 
   private async waitForSlot() {
     const windowStart = Temporal.Now.instant().subtract(ONE_MINUTE)
-    while (this.recentRequestTimes.length && Temporal.Instant.compare(this.recentRequestTimes[0], windowStart) <= 0) {
+    while (this.recentRequestTimes.length > 0 && Temporal.Instant.compare(this.recentRequestTimes[0], windowStart) <= 0) {
       this.recentRequestTimes.shift()
     }
 
