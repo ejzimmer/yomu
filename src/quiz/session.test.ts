@@ -8,11 +8,9 @@ const makeItem = (id: number, hasReading = true): StudyItem => ({
   subject: { id, data: { readings: hasReading ? [{ reading: 'a' }] : [] } } as unknown as Resource<Subject>,
 })
 
-const answerAndContinue = (session: QuizSession) => askNextQuestion(answerCorrectly(session))
-
 function answerEverything(session: QuizSession) {
   let current = session
-  while (current.question) current = answerAndContinue(current)
+  while (current.question) current = askNextQuestion(answerCorrectly(current))
   return current
 }
 
@@ -27,7 +25,7 @@ describe('review session', () => {
     let current = session
     while (current.question) {
       asked.push(`${current.question.item.assignment.id}:${current.question.type}`)
-      current = answerAndContinue(current)
+      current = askNextQuestion(answerCorrectly(current))
     }
     expect(asked.toSorted()).toEqual(['1:meaning', '1:reading', '2:meaning'])
     expect(current.completed.map((item) => item.assignment.id).toSorted()).toEqual([1, 2])
@@ -35,9 +33,9 @@ describe('review session', () => {
 
   it('completes an item only once both questions are right', () => {
     let session = createSession([makeItem(1)])
-    session = answerAndContinue(session)
+    session = askNextQuestion(answerCorrectly(session))
     expect(session.completed).toEqual([])
-    session = answerAndContinue(session)
+    session = askNextQuestion(answerCorrectly(session))
     expect(session.completed).toHaveLength(1)
     expect(session.question).toBeNull()
   })
@@ -81,7 +79,7 @@ describe('review session', () => {
     const session = createSession(Array.from({ length: 12 }, (_, i) => makeItem(i + 1, false)))
     expect(session.active).toHaveLength(10)
     expect(session.waiting).toHaveLength(2)
-    const next = answerAndContinue(session)
+    const next = askNextQuestion(answerCorrectly(session))
     expect(next.active).toHaveLength(10)
     expect(next.waiting).toHaveLength(1)
     expect(answerEverything(next).completed).toHaveLength(12)
