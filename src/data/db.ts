@@ -22,8 +22,6 @@ export interface StoredUser {
   syncedAt: string
 }
 
-// A finished review waiting to be sent. Kept in the database so closing the tab
-// or losing signal doesn't lose it.
 export interface PendingReview {
   id?: number
   assignmentId: number

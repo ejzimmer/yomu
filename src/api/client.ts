@@ -57,7 +57,6 @@ export class WaniKaniClient {
     return (await this.sendWithRetry(url.toString())) as T
   }
 
-  // Writes aren't cached, but share the rate limiter and 429 handling with reads.
   async post<T>(path: string, body: unknown): Promise<T> {
     const init: RequestOptions = { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }
     return (await this.sendWithRetry(BASE_URL + path, init)) as T

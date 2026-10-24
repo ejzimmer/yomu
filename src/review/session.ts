@@ -1,7 +1,5 @@
 import type { ReviewItem } from './buildReviewQueue'
 
-// How many items are in play at once. Questions are drawn at random from
-// these, so an item's meaning and reading aren't always asked back to back.
 const ACTIVE_ITEMS = 10
 
 export type QuestionType = 'meaning' | 'reading'
@@ -23,9 +21,7 @@ export interface ReviewSession {
   waiting: SessionItem[]
   completed: SessionItem[]
   question: Question | null
-  // True while the answer to `question` is shown after a wrong answer.
   isShowingAnswer: boolean
-  // Goes up each time a new question is asked, including the same question asked again.
   questionNumber: number
   correctAnswers: number
   totalAnswers: number
@@ -94,7 +90,6 @@ export function answerWrongly(session: ReviewSession): ReviewSession {
   }
 }
 
-// "That was a typo": forget the wrong answer just given and ask the same question again.
 export function undoWrongAnswer(session: ReviewSession): ReviewSession {
   const { question } = session
   if (!question || !session.isShowingAnswer) return session
@@ -114,7 +109,6 @@ export function undoWrongAnswer(session: ReviewSession): ReviewSession {
   }
 }
 
-// Moves on after a wrong answer has been shown. The question goes back in the pool.
 export function moveOn(session: ReviewSession, random: Random = Math.random): ReviewSession {
   if (!session.isShowingAnswer) return session
   return {
@@ -129,7 +123,6 @@ function hasReading({ subject }: ReviewItem) {
   return (subject.data.readings?.length ?? 0) > 0
 }
 
-// A random unanswered question, avoiding the one just asked when there's any other choice.
 function pickQuestion(active: readonly SessionItem[], previous: Question | null, random: Random): Question | null {
   const questions = active.flatMap((item) => [
     ...(item.isMeaningDone ? [] : [{ item, type: 'meaning' as const }]),

@@ -5,14 +5,10 @@ import { db, type PendingReview } from '../data/db'
 
 let sending: Promise<void> | null = null
 
-// Stores a finished item's result, then tries to send everything waiting.
-export async function queueReview(client: WaniKaniClient, review: Omit<PendingReview, 'id' | 'createdAt'>) {
+export async function queueReview(review: Omit<PendingReview, 'id' | 'createdAt'>) {
   await db.pendingReviews.add({ ...review, createdAt: Temporal.Now.instant().toString() })
-  await sendPendingReviews(client)
 }
 
-// Sends waiting reviews oldest first. Stops at the first network failure and
-// leaves the rest for next time; only one run happens at once.
 export function sendPendingReviews(client: WaniKaniClient): Promise<void> {
   sending ??= sendAll(client).finally(() => {
     sending = null

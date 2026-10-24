@@ -1,12 +1,11 @@
 import { StageUpIcon } from '../icons'
-import type { FeedEntry } from '../review/recordCompletedItem'
+import type { FeedEntry } from '../review/getFeedEntry'
 
 interface Props {
   entries: FeedEntry[]
   onFaded: (id: number) => void
 }
 
-// Each finished item's new SRS stage, newest first. Lines fade out on their own.
 export function SrsFeed({ entries, onFaded }: Props) {
   return (
     <ul className="feed" aria-label="Recent SRS changes" aria-live="polite">

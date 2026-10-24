@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import type { WaniKaniClient } from '../api/client'
-import { IconButton } from '../components/IconButton'
-import { CloseIcon } from '../icons'
 import type { ReviewData } from '../review/loadReviewData'
-import { recordCompletedItem, type FeedEntry } from '../review/recordCompletedItem'
+import { getFeedEntry, type FeedEntry } from '../review/getFeedEntry'
+import { queueReview, sendPendingReviews } from '../review/sendReviews'
 import { answerCorrectly, answerWrongly, moveOn, startSession, undoWrongAnswer } from '../review/session'
 import { AnswerForm } from './AnswerForm'
+import { SessionStatus } from './SessionStatus'
 import { SessionSummary } from './SessionSummary'
 import { SrsFeed } from './SrsFeed'
 
@@ -34,7 +34,13 @@ export function ReviewSessionView({ data, client, onExit }: Props) {
     }
     const next = answerCorrectly(session)
     if (next.completed.length > session.completed.length) {
-      const entry = recordCompletedItem(client, next.completed.at(-1)!, data.srsSystems)
+      const item = next.completed.at(-1)!
+      void queueReview({
+        assignmentId: item.assignment.id,
+        incorrectMeaningAnswers: item.incorrectMeaningAnswers,
+        incorrectReadingAnswers: item.incorrectReadingAnswers,
+      }).then(() => sendPendingReviews(client))
+      const entry = getFeedEntry(item, data.srsSystems)
       if (entry) setFeed((entries) => [entry, ...entries])
     }
     setSession(next)
@@ -42,18 +48,12 @@ export function ReviewSessionView({ data, client, onExit }: Props) {
 
   return (
     <div className="review" data-type={assignment.data.subject_type}>
-      <div className="status">
-        <span className="counts">
-          <span aria-label="Remaining">{session.active.length + session.waiting.length}</span>
-          <span aria-label="Correct">{accuracy}%</span>
-        </span>
-        <IconButton className="icon-btn" onClick={onExit} label="End session" tooltipAlign="end">
-          <CloseIcon />
-        </IconButton>
-      </div>
-      <div className="progress" aria-hidden="true">
-        <div style={{ width: `${(session.completed.length / total) * 100}%` }} />
-      </div>
+      <SessionStatus
+        remaining={session.active.length + session.waiting.length}
+        accuracy={accuracy}
+        progress={session.completed.length / total}
+        onExit={onExit}
+      />
 
       <div className="layout">
         <div className="item" lang="ja">

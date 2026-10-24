@@ -1,8 +1,6 @@
-import type { WaniKaniClient } from '../api/client'
 import type { SpacedRepetitionSystem } from '../api/types'
 import { getStageName } from './getStageName'
 import { predictNextStage } from './predictNextStage'
-import { queueReview } from './sendReviews'
 import type { SessionItem } from './session'
 
 export interface FeedEntry {
@@ -12,18 +10,7 @@ export interface FeedEntry {
   stageName: string
 }
 
-// Queues the finished item's review for WaniKani and returns its line for the SRS feed.
-export function recordCompletedItem(
-  client: WaniKaniClient,
-  item: SessionItem,
-  srsSystems: ReadonlyMap<number, SpacedRepetitionSystem>,
-): FeedEntry | null {
-  void queueReview(client, {
-    assignmentId: item.assignment.id,
-    incorrectMeaningAnswers: item.incorrectMeaningAnswers,
-    incorrectReadingAnswers: item.incorrectReadingAnswers,
-  })
-
+export function getFeedEntry(item: SessionItem, srsSystems: ReadonlyMap<number, SpacedRepetitionSystem>): FeedEntry | null {
   const system = srsSystems.get(item.subject.data.spaced_repetition_system_id)
   if (!system) return null
   const currentStage = item.assignment.data.srs_stage

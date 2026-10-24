@@ -6,7 +6,6 @@ interface Props {
   type: QuestionType
 }
 
-// Shown straight after a wrong answer: the accepted answers and the mnemonic.
 export function CorrectAnswer({ subject, type }: Props) {
   const answers =
     type === 'meaning'

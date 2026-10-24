@@ -8,8 +8,6 @@ export interface ReviewData {
   srsSystems: Map<number, SpacedRepetitionSystem>
 }
 
-// Everything a review session needs, read once at the start so the queue
-// doesn't reshuffle as finished reviews update the database.
 export async function loadReviewData(): Promise<ReviewData> {
   const [stored, assignments, subjects, studyMaterials, srsSystems] = await Promise.all([
     db.user.get('me'),

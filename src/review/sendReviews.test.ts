@@ -5,8 +5,7 @@ import { queueReview, sendPendingReviews } from './sendReviews'
 
 const review = { assignmentId: 7, incorrectMeaningAnswers: 1, incorrectReadingAnswers: 0 }
 
-// Each request gets the next response in the list.
-function makeClient(...responses: (() => Response | Promise<Response>)[]) {
+function makeClientRespondingWith(...responses: (() => Response | Promise<Response>)[]) {
   const sentBodies: unknown[] = []
   const fetch = (_url: string | URL | Request, init?: RequestInit) => {
     sentBodies.push(JSON.parse(String(init?.body)))
@@ -15,7 +14,7 @@ function makeClient(...responses: (() => Response | Promise<Response>)[]) {
   return { client: new WaniKaniClient('t', { fetch: fetch as typeof globalThis.fetch }), sentBodies }
 }
 
-const updatedResources = () =>
+const getUpdatedResources = () =>
   Response.json(
     {
       resources_updated: {
@@ -30,8 +29,9 @@ describe('sending reviews', () => {
   beforeEach(() => clearDatabase())
 
   it('sends a review and stores the updated assignment', async () => {
-    const { client, sentBodies } = makeClient(updatedResources)
-    await queueReview(client, review)
+    const { client, sentBodies } = makeClientRespondingWith(getUpdatedResources)
+    await queueReview(review)
+    await sendPendingReviews(client)
 
     expect(sentBodies).toEqual([{ review: { assignment_id: 7, incorrect_meaning_answers: 1, incorrect_reading_answers: 0 } }])
     expect((await db.assignments.get(7))?.data).toEqual({ srs_stage: 4 })
@@ -39,8 +39,9 @@ describe('sending reviews', () => {
   })
 
   it('keeps the review when WaniKani can’t be reached, and sends it later', async () => {
-    const { client } = makeClient(() => Promise.reject(new TypeError('offline')), updatedResources)
-    await queueReview(client, review)
+    const { client } = makeClientRespondingWith(() => Promise.reject(new TypeError('offline')), getUpdatedResources)
+    await queueReview(review)
+    await sendPendingReviews(client)
     expect(await db.pendingReviews.count()).toBe(1)
 
     await sendPendingReviews(client)
@@ -48,8 +49,9 @@ describe('sending reviews', () => {
   })
 
   it('drops a review WaniKani rejects for good', async () => {
-    const { client } = makeClient(() => Response.json({ error: 'not available' }, { status: 422 }))
-    await queueReview(client, review)
+    const { client } = makeClientRespondingWith(() => Response.json({ error: 'not available' }, { status: 422 }))
+    await queueReview(review)
+    await sendPendingReviews(client)
     expect(await db.pendingReviews.count()).toBe(0)
   })
 })
