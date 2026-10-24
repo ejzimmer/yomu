@@ -58,8 +58,7 @@ export function answerCorrectly(session: QuizSession): QuizSession {
 
   return {
     ...next,
-    question: pickQuestion(next.active, question),
-    questionNumber: session.questionNumber + 1,
+    question: { item, type: question.type },
     correctAnswers: session.correctAnswers + 1,
     totalAnswers: session.totalAnswers + 1,
   }
@@ -93,8 +92,7 @@ export function undoWrongAnswer(session: QuizSession): QuizSession {
   }
 }
 
-export function moveOn(session: QuizSession): QuizSession {
-  if (!session.isShowingAnswer) return session
+export function askNextQuestion(session: QuizSession): QuizSession {
   return {
     ...session,
     isShowingAnswer: false,
