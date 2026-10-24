@@ -26,12 +26,9 @@
     border-bottom-width: 3px;
   }
 
-  input[aria-invalid='true'] {
+  input.error {
     border-bottom-color: var(--red);
     color: var(--red);
-  }
-
-  input.error {
     animation: shake 0.35s;
   }
 

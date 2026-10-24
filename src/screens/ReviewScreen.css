@@ -229,6 +229,14 @@
   }
 }
 
+/* After a wrong answer the box turns red and stays put: it's showing a result, not an input error. */
+@scope (.answer-row) {
+  input[aria-invalid='true'] {
+    border-bottom-color: var(--red);
+    color: var(--red);
+  }
+}
+
 @scope (.summary) {
   :scope {
     display: flex;
