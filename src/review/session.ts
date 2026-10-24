@@ -55,6 +55,7 @@ export function answerCorrectly(session: ReviewSession): ReviewSession {
   const item = markQuestionDone(question)
   const isComplete = item.isMeaningDone && item.isReadingDone
   const next = isComplete ? completeItem(session, question.item, item) : replaceItem(session, question.item, item)
+
   return {
     ...next,
     question: pickQuestion(next.active, question),
@@ -69,6 +70,7 @@ export function answerWrongly(session: ReviewSession): ReviewSession {
   if (!question || session.isShowingAnswer) return session
 
   const item = changeWrongAnswerCount(question, 1)
+
   return {
     ...replaceItem(session, question.item, item),
     question: { item, type: question.type },
@@ -82,6 +84,7 @@ export function undoWrongAnswer(session: ReviewSession): ReviewSession {
   if (!question || !session.isShowingAnswer) return session
 
   const item = changeWrongAnswerCount(question, -1)
+
   return {
     ...replaceItem(session, question.item, item),
     question: { item, type: question.type },
@@ -117,6 +120,7 @@ function replaceItem(session: ReviewSession, oldItem: SessionItem, newItem: Sess
 function completeItem(session: ReviewSession, oldItem: SessionItem, completedItem: SessionItem): ReviewSession {
   const [nextItem, ...waiting] = session.waiting
   const otherItems = session.active.filter((item) => item !== oldItem)
+
   return {
     ...session,
     active: nextItem ? [...otherItems, nextItem] : otherItems,
@@ -134,8 +138,10 @@ function pickQuestion(active: readonly SessionItem[], previous: Question | null)
     ...(item.isMeaningDone ? [] : [{ item, type: 'meaning' as const }]),
     ...(item.isReadingDone ? [] : [{ item, type: 'reading' as const }]),
   ])
+
   const isPrevious = (q: Question) =>
     previous !== null && q.item.assignment.id === previous.item.assignment.id && q.type === previous.type
   const choices = questions.length > 1 ? questions.filter((q) => !isPrevious(q)) : questions
+
   return choices[Math.floor(Math.random() * choices.length)] ?? null
 }

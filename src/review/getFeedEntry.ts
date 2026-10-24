@@ -13,8 +13,10 @@ export interface FeedEntry {
 export function getFeedEntry(item: SessionItem, srsSystems: ReadonlyMap<number, SpacedRepetitionSystem>): FeedEntry | null {
   const system = srsSystems.get(item.subject.data.spaced_repetition_system_id)
   if (!system) return null
+
   const currentStage = item.assignment.data.srs_stage
   const nextStage = predictNextStage(currentStage, item.incorrectMeaningAnswers + item.incorrectReadingAnswers, system)
+
   return {
     id: item.assignment.id,
     characters: item.subject.data.characters ?? item.subject.data.slug,

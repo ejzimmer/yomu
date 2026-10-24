@@ -29,9 +29,8 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
   const [answer, setAnswer] = useState('')
   const [error, setError] = useState<string | null>(null)
   const inputId = useId()
-  const { type, item } = question
-
   const inputRef = useRef<HTMLInputElement>(null)
+  const { type, item } = question
 
   function focusInput() {
     inputRef.current?.focus()
@@ -39,16 +38,20 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
 
   function submit(event: FormEvent) {
     event.preventDefault()
+
     if (isShowingAnswer) {
       onNext()
       return
     }
+
     flushSync(() => setError(null))
     const result = checkAnswer(answer, type, item.subject.data, synonyms)
+
     if (result !== 'correct' && result !== 'incorrect') {
       setError(TRY_AGAIN_MESSAGES[result])
       return
     }
+
     flushSync(() => onAnswer(result === 'correct'))
     focusInput()
   }
