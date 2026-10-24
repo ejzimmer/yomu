@@ -20,7 +20,7 @@ const makeAssignment = (id: number, subjectId: number, fields: Partial<Assignmen
     },
   }) as Resource<Assignment>
 
-const makeUser = (order: string, maxLevel = 60) =>
+const makeUser = (order: 'shuffled' | 'lower_levels_first', maxLevel = 60) =>
   ({ subscription: { max_level_granted: maxLevel }, preferences: { reviews_presentation_order: order } }) as User
 
 const subjects = new Map(
