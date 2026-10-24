@@ -1,10 +1,10 @@
 import './TokenScreen.css'
-import { useRef, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { WaniKaniClient } from '../api/client'
 import { ApiError } from '../api/errors'
 import type { User } from '../api/types'
 import { IconButton } from '../components/IconButton'
-import { ShakeInput, type ShakeInputHandle } from '../components/ShakeInput'
+import { ShakeInput } from '../components/ShakeInput'
 import { ArrowIcon } from '../icons'
 
 interface Props {
@@ -15,12 +15,6 @@ export function TokenScreen({ onSignedIn }: Props) {
   const [token, setToken] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<ShakeInputHandle>(null)
-
-  function showError(message: string) {
-    setError(message)
-    inputRef.current?.shake()
-  }
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -28,7 +22,7 @@ export function TokenScreen({ onSignedIn }: Props) {
 
     const value = token.trim()
     if (!value) {
-      showError('Enter your API token')
+      setError('Enter your API token')
       return
     }
 
@@ -38,7 +32,7 @@ export function TokenScreen({ onSignedIn }: Props) {
       const user = await new WaniKaniClient(value).getUser()
       onSignedIn(value, user.data)
     } catch (e) {
-      showError(e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani')
+      setError(e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani')
     } finally {
       setIsLoading(false)
     }
@@ -49,7 +43,6 @@ export function TokenScreen({ onSignedIn }: Props) {
       <label htmlFor="token">API token</label>
       <div className="row">
         <ShakeInput
-          ref={inputRef}
           id="token"
           error={error}
           type="password"

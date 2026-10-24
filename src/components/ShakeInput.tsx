@@ -1,32 +1,38 @@
 import './ShakeInput.css'
-import { useId, useImperativeHandle, useRef, type ComponentProps, type Ref } from 'react'
+import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, type ComponentProps } from 'react'
 
-export interface ShakeInputHandle {
-  focus: () => void
-  shake: () => void
-}
-
-type Props = Omit<ComponentProps<'input'>, 'ref'> & {
-  ref?: Ref<ShakeInputHandle>
+type Props = ComponentProps<'input'> & {
   error?: string | null
 }
 
 export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
+  useImperativeHandle(ref, () => inputRef.current!, [])
   const messageId = useId()
+  const latestError = useRef(error)
 
-  useImperativeHandle(ref, () => ({
-    focus: () => inputRef.current?.focus(),
-    shake: () => {
-      const input = inputRef.current
-      if (!input) return
-      input.focus()
-      // Reading offsetWidth forces a reflow, so clearing and restoring the animation restarts it
-      input.style.animation = 'none'
-      void input.offsetWidth
-      input.style.animation = ''
-    },
-  }), [])
+  useLayoutEffect(() => {
+    latestError.current = error
+  }, [error])
+
+  useEffect(() => {
+    if (error) shake(inputRef.current)
+  }, [error])
+
+  useEffect(() => {
+    const form = inputRef.current?.form
+    if (!form) return
+
+    function shakeIfErrorRepeated() {
+      const errorAtSubmit = latestError.current
+      requestAnimationFrame(() => {
+        if (errorAtSubmit && latestError.current === errorAtSubmit) shake(inputRef.current)
+      })
+    }
+
+    form.addEventListener('submit', shakeIfErrorRepeated)
+    return () => form.removeEventListener('submit', shakeIfErrorRepeated)
+  }, [])
 
   return (
     <div className="shake-input">
@@ -40,4 +46,13 @@ export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
       <p id={messageId} role="alert" className="message">{error}</p>
     </div>
   )
+}
+
+function shake(input: HTMLInputElement | null) {
+  if (!input) return
+  input.focus()
+  // Reading offsetWidth forces a reflow, so clearing and restoring the animation restarts it
+  input.style.animation = 'none'
+  void input.offsetWidth
+  input.style.animation = ''
 }

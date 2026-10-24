@@ -1,7 +1,7 @@
 import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { IconButton } from '../components/IconButton'
-import { ShakeInput, type ShakeInputHandle } from '../components/ShakeInput'
+import { ShakeInput } from '../components/ShakeInput'
 import { ArrowIcon, UndoIcon } from '../icons'
 import { checkAnswer, convertTypedKana, type UnmarkableAnswer } from '../quiz/checkAnswer'
 import type { Question } from '../quiz/session'
@@ -29,7 +29,7 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
   const [answer, setAnswer] = useState('')
   const [error, setError] = useState<string | null>(null)
   const inputId = useId()
-  const inputRef = useRef<ShakeInputHandle>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const { type, item } = question
 
   function focusInput() {
@@ -48,7 +48,6 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
 
     if (result !== 'correct' && result !== 'incorrect') {
       setError(TRY_AGAIN_MESSAGES[result])
-      inputRef.current?.shake()
       return
     }
 
