@@ -3,9 +3,19 @@ import { flushSync } from 'react-dom'
 import { IconButton } from '../components/IconButton'
 import { ShakeInput } from '../components/ShakeInput'
 import { ArrowIcon, UndoIcon } from '../icons'
-import { checkAnswer, convertTypedKana } from '../review/checkAnswer'
+import { checkAnswer, convertTypedKana, type UnmarkableAnswer } from '../review/checkAnswer'
 import type { Question } from '../review/session'
 import { CorrectAnswer } from './CorrectAnswer'
+
+const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
+  blank: 'Type an answer',
+  'not-english': 'Answer in English',
+  'not-kana': 'Kana only',
+  'kana-mismatch': 'Keep the kana from the question',
+  'onyomi-wanted': 'On’yomi wanted',
+  'kunyomi-wanted': 'Kun’yomi wanted',
+  'other-reading-wanted': 'Another reading wanted',
+}
 
 interface Props {
   question: Question
@@ -38,11 +48,11 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
     }
     flushSync(() => setError(null))
     const result = checkAnswer(answer, type, item.subject.data, synonyms)
-    if ('error' in result) {
-      setError(result.error)
+    if (result !== 'correct' && result !== 'incorrect') {
+      setError(TRY_AGAIN_MESSAGES[result])
       return
     }
-    flushSync(() => onAnswer(result.isCorrect))
+    flushSync(() => onAnswer(result === 'correct'))
     focusInput()
   }
 
