@@ -29,7 +29,7 @@ export interface ReviewSession {
 
 type Random = () => number
 
-export function startSession(queue: readonly ReviewItem[], random: Random = Math.random): ReviewSession {
+export function createSession(queue: readonly ReviewItem[], random: Random = Math.random): ReviewSession {
   const items = queue.map((item) => ({
     ...item,
     isMeaningDone: false,

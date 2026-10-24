@@ -3,7 +3,7 @@ import type { WaniKaniClient } from '../api/client'
 import type { ReviewData } from '../review/loadReviewData'
 import { getFeedEntry, type FeedEntry } from '../review/getFeedEntry'
 import { queueReview, sendPendingReviews } from '../review/sendReviews'
-import { answerCorrectly, answerWrongly, moveOn, startSession, undoWrongAnswer } from '../review/session'
+import { answerCorrectly, answerWrongly, moveOn, createSession, undoWrongAnswer } from '../review/session'
 import { AnswerForm } from './AnswerForm'
 import { SessionStatus } from './SessionStatus'
 import { SessionSummary } from './SessionSummary'
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function ReviewSessionView({ data, client, onExit }: Props) {
-  const [session, setSession] = useState(() => startSession(data.queue))
+  const [session, setSession] = useState(() => createSession(data.queue))
   const [feed, setFeed] = useState<FeedEntry[]>([])
   const total = data.queue.length
   const accuracy = session.totalAnswers ? Math.round((session.correctAnswers / session.totalAnswers) * 100) : 100
