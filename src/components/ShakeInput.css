@@ -29,7 +29,6 @@
   input.error {
     border-bottom-color: var(--red);
     color: var(--red);
-    animation: shake 0.35s;
   }
 
   .message {
@@ -41,14 +40,5 @@
     font-size: 14px;
     color: var(--red);
     text-align: center;
-  }
-}
-
-@keyframes shake {
-  20%, 60% {
-    transform: translateX(-8px);
-  }
-  40%, 80% {
-    transform: translateX(8px);
   }
 }

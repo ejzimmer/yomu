@@ -37,11 +37,17 @@ export function ShakeInput({ className, ref, ...inputProps }: Props) {
   )
 }
 
+const SHAKE_KEYFRAMES = [
+  { transform: 'translateX(0)' },
+  { transform: 'translateX(-8px)' },
+  { transform: 'translateX(8px)' },
+  { transform: 'translateX(-8px)' },
+  { transform: 'translateX(8px)' },
+  { transform: 'translateX(0)' },
+]
+
 function shake(input: HTMLInputElement | null) {
   if (!input) return
   input.focus()
-  // Reading offsetWidth forces a reflow between clearing and restoring the CSS animation, so the shake animation starts again from the beginning
-  input.style.animation = 'none'
-  void input.offsetWidth
-  input.style.animation = ''
+  input.animate(SHAKE_KEYFRAMES, { duration: 350 })
 }
