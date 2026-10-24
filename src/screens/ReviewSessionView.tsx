@@ -36,7 +36,6 @@ export function ReviewSessionView({ data, client, onExit }: Props) {
       }
       onItemComplete={recordReview}
       completedLabel="reviewed"
-      isAccuracyShown
       onExit={onExit}
     />
   )
