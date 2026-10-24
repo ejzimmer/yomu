@@ -27,7 +27,7 @@ export interface ReviewSession {
   totalAnswers: number
 }
 
-export function createSession(queue: readonly ReviewItem[], getRandomNumber: () => number = Math.random): ReviewSession {
+export function createSession(queue: readonly ReviewItem[]): ReviewSession {
   const items = queue.map((item) => ({
     ...item,
     isMeaningDone: false,
@@ -45,10 +45,10 @@ export function createSession(queue: readonly ReviewItem[], getRandomNumber: () 
     correctAnswers: 0,
     totalAnswers: 0,
   }
-  return { ...session, question: pickQuestion(session.active, null, getRandomNumber) }
+  return { ...session, question: pickQuestion(session.active, null) }
 }
 
-export function answerCorrectly(session: ReviewSession, getRandomNumber: () => number = Math.random): ReviewSession {
+export function answerCorrectly(session: ReviewSession): ReviewSession {
   const { question } = session
   if (!question || session.isShowingAnswer) return session
 
@@ -57,7 +57,7 @@ export function answerCorrectly(session: ReviewSession, getRandomNumber: () => n
   const next = isComplete ? completeItem(session, question.item, item) : replaceItem(session, question.item, item)
   return {
     ...next,
-    question: pickQuestion(next.active, question, getRandomNumber),
+    question: pickQuestion(next.active, question),
     questionNumber: session.questionNumber + 1,
     correctAnswers: session.correctAnswers + 1,
     totalAnswers: session.totalAnswers + 1,
@@ -90,12 +90,12 @@ export function undoWrongAnswer(session: ReviewSession): ReviewSession {
   }
 }
 
-export function moveOn(session: ReviewSession, getRandomNumber: () => number = Math.random): ReviewSession {
+export function moveOn(session: ReviewSession): ReviewSession {
   if (!session.isShowingAnswer) return session
   return {
     ...session,
     isShowingAnswer: false,
-    question: pickQuestion(session.active, session.question, getRandomNumber),
+    question: pickQuestion(session.active, session.question),
     questionNumber: session.questionNumber + 1,
   }
 }
@@ -129,7 +129,7 @@ function hasReading({ subject }: ReviewItem) {
   return (subject.data.readings?.length ?? 0) > 0
 }
 
-function pickQuestion(active: readonly SessionItem[], previous: Question | null, getRandomNumber: () => number): Question | null {
+function pickQuestion(active: readonly SessionItem[], previous: Question | null): Question | null {
   const questions = active.flatMap((item) => [
     ...(item.isMeaningDone ? [] : [{ item, type: 'meaning' as const }]),
     ...(item.isReadingDone ? [] : [{ item, type: 'reading' as const }]),
@@ -137,5 +137,5 @@ function pickQuestion(active: readonly SessionItem[], previous: Question | null,
   const isPrevious = (q: Question) =>
     previous !== null && q.item.assignment.id === previous.item.assignment.id && q.type === previous.type
   const choices = questions.length > 1 ? questions.filter((q) => !isPrevious(q)) : questions
-  return choices[Math.floor(getRandomNumber() * choices.length)] ?? null
+  return choices[Math.floor(Math.random() * choices.length)] ?? null
 }
