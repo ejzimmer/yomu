@@ -2,16 +2,16 @@ import { IconButton } from '../components/IconButton'
 import { ArrowIcon } from '../icons'
 
 interface Props {
-  reviewed: number
-  accuracy: number
+  count: number
+  description: string
   onExit: () => void
 }
 
-export function SessionSummary({ reviewed, accuracy, onExit }: Props) {
+export function SessionSummary({ count, description, onExit }: Props) {
   return (
-    <div className="review summary">
-      <div className="level">{reviewed}</div>
-      <div className="meta">{reviewed === 0 ? 'No reviews due' : `reviewed · ${accuracy}% correct`}</div>
+    <div className="quiz summary">
+      <div className="count">{count}</div>
+      <div className="meta">{description}</div>
       <IconButton className="submit" onClick={onExit} label="Done">
         <ArrowIcon />
       </IconButton>

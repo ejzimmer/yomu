@@ -3,10 +3,10 @@ import { useMemo, useState } from 'react'
 import { WaniKaniClient } from '../api/client'
 import { db } from '../data/db'
 import { useSync } from '../data/useSync'
-import { countDueReviews } from '../review/loadReviewData'
 import { DebugScreen } from './DebugScreen'
+import { LessonScreen } from './LessonScreen'
 import { ReviewScreen } from './ReviewScreen'
-import { StartReviews } from './StartReviews'
+import { StudyMenu } from './StudyMenu'
 
 interface Props {
   token: string
@@ -18,21 +18,27 @@ export function HomeScreen({ token, onUnauthorized }: Props) {
   // One client per token, so every request shares the same rate limiter.
   const client = useMemo(() => new WaniKaniClient(token), [token])
   const { isSyncing, syncError, syncNow } = useSync(client, onUnauthorized)
-  const [isReviewing, setIsReviewing] = useState(false)
+  const [activity, setActivity] = useState<'menu' | 'lessons' | 'reviews'>('menu')
   const user = useLiveQuery(() => db.user.get('me'))?.user
-  const dueReviews = useLiveQuery(countDueReviews)
 
-  function finishReviews() {
-    setIsReviewing(false)
+  function returnToMenu() {
+    setActivity('menu')
     syncNow()
   }
 
   if (!user) return null
-  if (isReviewing) return <ReviewScreen client={client} onExit={finishReviews} />
-  return (
-    <>
-      <StartReviews count={dueReviews ?? 0} onStart={() => setIsReviewing(true)} />
-      <DebugScreen user={user} isSyncing={isSyncing} syncError={syncError} onSync={syncNow} />
-    </>
-  )
+
+  switch (activity) {
+    case 'lessons':
+      return <LessonScreen client={client} onExit={returnToMenu} />
+    case 'reviews':
+      return <ReviewScreen client={client} onExit={returnToMenu} />
+    case 'menu':
+      return (
+        <>
+          <StudyMenu onStartLessons={() => setActivity('lessons')} onStartReviews={() => setActivity('reviews')} />
+          <DebugScreen user={user} isSyncing={isSyncing} syncError={syncError} onSync={syncNow} />
+        </>
+      )
+  }
 }

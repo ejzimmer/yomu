@@ -26,3 +26,7 @@ export const UndoIcon = () => (
 export const StageUpIcon = () => (
   <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 21V4" /><path d="M3 12l9-9 9 9" /></svg>
 )
+
+export const BackIcon = () => (
+  <svg {...common}><path d="M19 12H5" /><path d="M11 6l-6 6 6 6" /></svg>
+)
