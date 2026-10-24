@@ -52,17 +52,12 @@ export function answerCorrectly(session: ReviewSession, getRandomNumber: () => n
   const { question } = session
   if (!question || session.isShowingAnswer) return session
 
-  const item = { ...question.item, ...(question.type === 'meaning' ? { isMeaningDone: true } : { isReadingDone: true }) }
+  const item = markQuestionDone(question)
   const isComplete = item.isMeaningDone && item.isReadingDone
-  const otherActive = session.active.filter((other) => other !== question.item)
-  const active = isComplete ? [...otherActive, ...session.waiting.slice(0, 1)] : [...otherActive, item]
-
+  const next = isComplete ? completeItem(session, question.item, item) : replaceItem(session, question.item, item)
   return {
-    ...session,
-    active,
-    waiting: isComplete ? session.waiting.slice(1) : session.waiting,
-    completed: isComplete ? [...session.completed, item] : session.completed,
-    question: pickQuestion(active, question, getRandomNumber),
+    ...next,
+    question: pickQuestion(next.active, question, getRandomNumber),
     questionNumber: session.questionNumber + 1,
     correctAnswers: session.correctAnswers + 1,
     totalAnswers: session.totalAnswers + 1,
@@ -73,15 +68,9 @@ export function answerWrongly(session: ReviewSession): ReviewSession {
   const { question } = session
   if (!question || session.isShowingAnswer) return session
 
-  const item = {
-    ...question.item,
-    ...(question.type === 'meaning'
-      ? { incorrectMeaningAnswers: question.item.incorrectMeaningAnswers + 1 }
-      : { incorrectReadingAnswers: question.item.incorrectReadingAnswers + 1 }),
-  }
+  const item = changeWrongAnswerCount(question, 1)
   return {
-    ...session,
-    active: session.active.map((other) => (other === question.item ? item : other)),
+    ...replaceItem(session, question.item, item),
     question: { item, type: question.type },
     isShowingAnswer: true,
     totalAnswers: session.totalAnswers + 1,
@@ -92,15 +81,9 @@ export function undoWrongAnswer(session: ReviewSession): ReviewSession {
   const { question } = session
   if (!question || !session.isShowingAnswer) return session
 
-  const item = {
-    ...question.item,
-    ...(question.type === 'meaning'
-      ? { incorrectMeaningAnswers: question.item.incorrectMeaningAnswers - 1 }
-      : { incorrectReadingAnswers: question.item.incorrectReadingAnswers - 1 }),
-  }
+  const item = changeWrongAnswerCount(question, -1)
   return {
-    ...session,
-    active: session.active.map((other) => (other === question.item ? item : other)),
+    ...replaceItem(session, question.item, item),
     question: { item, type: question.type },
     isShowingAnswer: false,
     totalAnswers: session.totalAnswers - 1,
@@ -114,6 +97,31 @@ export function moveOn(session: ReviewSession, getRandomNumber: () => number = M
     isShowingAnswer: false,
     question: pickQuestion(session.active, session.question, getRandomNumber),
     questionNumber: session.questionNumber + 1,
+  }
+}
+
+function markQuestionDone({ item, type }: Question): SessionItem {
+  return type === 'meaning' ? { ...item, isMeaningDone: true } : { ...item, isReadingDone: true }
+}
+
+function changeWrongAnswerCount({ item, type }: Question, change: number): SessionItem {
+  return type === 'meaning'
+    ? { ...item, incorrectMeaningAnswers: item.incorrectMeaningAnswers + change }
+    : { ...item, incorrectReadingAnswers: item.incorrectReadingAnswers + change }
+}
+
+function replaceItem(session: ReviewSession, oldItem: SessionItem, newItem: SessionItem): ReviewSession {
+  return { ...session, active: session.active.map((item) => (item === oldItem ? newItem : item)) }
+}
+
+function completeItem(session: ReviewSession, oldItem: SessionItem, completedItem: SessionItem): ReviewSession {
+  const [nextItem, ...waiting] = session.waiting
+  const otherItems = session.active.filter((item) => item !== oldItem)
+  return {
+    ...session,
+    active: nextItem ? [...otherItems, nextItem] : otherItems,
+    waiting,
+    completed: [...session.completed, completedItem],
   }
 }
 
