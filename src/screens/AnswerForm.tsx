@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { IconButton } from '../components/IconButton'
 import { ShakeInput } from '../components/ShakeInput'
@@ -37,8 +37,6 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
     inputRef.current?.focus()
   }
 
-  useEffect(() => inputRef.current?.focus(), [])
-
   function submit(event: FormEvent) {
     event.preventDefault()
     if (isShowingAnswer) {
@@ -74,6 +72,9 @@ export function AnswerForm({ question, synonyms, isShowingAnswer, onAnswer, onRe
         <ShakeInput
           ref={inputRef}
           id={inputId}
+          // The user is answering a question they just asked for, so jumping straight to the box is expected here.
+          // oxlint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
           lang={type === 'reading' ? 'ja' : 'en'}
           error={error}
           aria-invalid={isShowingAnswer || undefined}
