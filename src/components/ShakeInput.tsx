@@ -1,38 +1,27 @@
 import './ShakeInput.css'
-import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, type ComponentProps } from 'react'
+import { useId, useImperativeHandle, useRef, useState, type ComponentProps, type Ref } from 'react'
 
-type Props = ComponentProps<'input'> & {
-  error?: string | null
+export interface ShakeInputHandle {
+  focus: () => void
+  setError: (message: string | null) => void
 }
 
-export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
+type Props = Omit<ComponentProps<'input'>, 'ref'> & {
+  ref?: Ref<ShakeInputHandle>
+}
+
+export function ShakeInput({ className, ref, ...inputProps }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
-  useImperativeHandle(ref, () => inputRef.current!, [])
+  const [error, setError] = useState<string | null>(null)
   const messageId = useId()
-  const latestError = useRef(error)
 
-  useLayoutEffect(() => {
-    latestError.current = error
-  }, [error])
-
-  useEffect(() => {
-    if (error) shake(inputRef.current)
-  }, [error])
-
-  useEffect(() => {
-    const form = inputRef.current?.form
-    if (!form) return
-
-    function shakeIfErrorRepeated() {
-      const errorAtSubmit = latestError.current
-      requestAnimationFrame(() => {
-        if (errorAtSubmit && latestError.current === errorAtSubmit) shake(inputRef.current)
-      })
-    }
-
-    form.addEventListener('submit', shakeIfErrorRepeated)
-    return () => form.removeEventListener('submit', shakeIfErrorRepeated)
-  }, [])
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    setError: (message) => {
+      setError(message)
+      if (message) shake(inputRef.current)
+    },
+  }), [])
 
   return (
     <div className="shake-input">
@@ -51,7 +40,7 @@ export function ShakeInput({ error, className, ref, ...inputProps }: Props) {
 function shake(input: HTMLInputElement | null) {
   if (!input) return
   input.focus()
-  // Reading offsetWidth forces a reflow, so clearing and restoring the animation restarts it
+  // Reading offsetWidth forces a reflow between clearing and restoring the CSS animation, so the shake animation starts again from the beginning
   input.style.animation = 'none'
   void input.offsetWidth
   input.style.animation = ''
