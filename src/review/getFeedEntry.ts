@@ -1,7 +1,7 @@
 import type { SpacedRepetitionSystem } from '../api/types'
 import { getStageName } from './getStageName'
 import { predictNextStage } from './predictNextStage'
-import type { SessionItem } from './session'
+import type { SessionItem } from '../quiz/session'
 
 export interface FeedEntry {
   id: number

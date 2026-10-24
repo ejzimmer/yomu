@@ -63,6 +63,17 @@ export interface AuxiliaryMeaning {
   type: 'whitelist' | 'blacklist'
 }
 
+export interface ContextSentence {
+  en: string
+  ja: string
+}
+
+export interface PronunciationAudio {
+  url: string
+  content_type: 'audio/mpeg' | 'audio/ogg' | 'audio/webm'
+  metadata: { voice_actor_id: number }
+}
+
 export interface Subject {
   level: number
   slug: string
@@ -73,7 +84,11 @@ export interface Subject {
   component_subject_ids?: number[]
   amalgamation_subject_ids?: number[]
   meaning_mnemonic: string
+  meaning_hint?: string | null
   reading_mnemonic?: string
+  reading_hint?: string | null
+  context_sentences?: ContextSentence[]
+  pronunciation_audios?: PronunciationAudio[]
   lesson_position: number
   spaced_repetition_system_id: number
   hidden_at: string | null

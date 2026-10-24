@@ -1,4 +1,3 @@
-import './ReviewScreen.css'
 import { useEffect, useState } from 'react'
 import type { WaniKaniClient } from '../api/client'
 import { LoadingKanji } from '../components/LoadingKanji'

@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Assignment, Resource, Subject } from '../api/types'
-import type { ReviewItem } from './buildReviewQueue'
-import { answerCorrectly, answerWrongly, moveOn, createSession, undoWrongAnswer, type ReviewSession } from './session'
+import type { StudyItem } from '../data/studyItem'
+import { answerCorrectly, answerWrongly, moveOn, createSession, undoWrongAnswer, type QuizSession } from './session'
 
-const makeItem = (id: number, hasReading = true): ReviewItem => ({
+const makeItem = (id: number, hasReading = true): StudyItem => ({
   assignment: { id, data: { subject_id: id } } as Resource<Assignment>,
   subject: { id, data: { readings: hasReading ? [{ reading: 'a' }] : [] } } as unknown as Resource<Subject>,
 })
 
-function answerEverything(session: ReviewSession) {
+function answerEverything(session: QuizSession) {
   let current = session
   while (current.question) current = answerCorrectly(current)
   return current

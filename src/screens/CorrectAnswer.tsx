@@ -1,5 +1,6 @@
 import type { Subject } from '../api/types'
-import type { QuestionType } from '../review/session'
+import { Mnemonic } from '../components/Mnemonic'
+import type { QuestionType } from '../quiz/session'
 
 interface Props {
   subject: Subject
@@ -18,12 +19,7 @@ export function CorrectAnswer({ subject, type }: Props) {
       <div className="correct" lang={type === 'reading' ? 'ja' : 'en'}>
         {answers.join(', ')}
       </div>
-      {mnemonic && <p className="mnemonic">{stripMarkup(mnemonic)}</p>}
+      {mnemonic && <Mnemonic text={mnemonic} />}
     </div>
   )
-}
-
-// WaniKani marks up mnemonics with tags like <kanji>…</kanji>.
-function stripMarkup(text: string) {
-  return text.replaceAll(/<[^>]+>/gu, '')
 }

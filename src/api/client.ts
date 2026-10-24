@@ -12,7 +12,7 @@ export interface ClientOptions {
 }
 
 interface RequestOptions {
-  method?: 'POST'
+  method?: 'POST' | 'PUT'
   body?: string
   headers?: Record<string, string>
 }
@@ -57,9 +57,12 @@ export class WaniKaniClient {
     return (await this.sendWithRetry(url.toString())) as T
   }
 
-  async post<T>(path: string, body: unknown): Promise<T> {
-    const init: RequestOptions = { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }
-    return (await this.sendWithRetry(BASE_URL + path, init)) as T
+  post<T>(path: string, body: unknown): Promise<T> {
+    return this.sendJson<T>('POST', path, body)
+  }
+
+  put<T>(path: string, body: unknown): Promise<T> {
+    return this.sendJson<T>('PUT', path, body)
   }
 
   // Follows pages.next_url until the collection is exhausted.
@@ -74,6 +77,11 @@ export class WaniKaniClient {
       items.push(...page.data)
     }
     return items
+  }
+
+  private async sendJson<T>(method: 'POST' | 'PUT', path: string, body: unknown): Promise<T> {
+    const init: RequestOptions = { method, body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }
+    return (await this.sendWithRetry(BASE_URL + path, init)) as T
   }
 
   private async sendWithRetry(url: string, init: RequestOptions = {}, attempt = 0): Promise<unknown> {
