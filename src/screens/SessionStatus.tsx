@@ -1,3 +1,4 @@
+import { BrushStroke } from '../components/BrushStroke'
 import { IconButton } from '../components/IconButton'
 import { CloseIcon } from '../icons'
 
@@ -12,16 +13,23 @@ export function SessionStatus({ remaining, accuracy, progress, onExit }: Props) 
   return (
     <>
       <div className="status">
-        <span className="counts">
-          <span aria-label="Remaining">{remaining}</span>
-          <span aria-label="Correct">{accuracy}%</span>
+        <span>
+          <span className="visually-hidden">Remaining </span>
+          {remaining}
+        </span>
+        <span>
+          <span className="visually-hidden">Correct </span>
+          {accuracy}%
         </span>
         <IconButton className="icon-btn" onClick={onExit} label="End session" tooltipAlign="end">
           <CloseIcon />
         </IconButton>
       </div>
-      <div className="progress" aria-hidden="true">
-        <div style={{ width: `${progress * 100}%` }} />
+      <div className="progress">
+        <BrushStroke />
+        <div className="progress-fill" style={{ width: `${progress * 100}%` }}>
+          <BrushStroke />
+        </div>
       </div>
     </>
   )

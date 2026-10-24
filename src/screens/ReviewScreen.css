@@ -2,9 +2,6 @@
   :scope {
     --type-colour: var(--vocab);
     --input-font-size: 30px;
-    --brush-head: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2060%2040%22%3E%3Cdefs%3E%3Cfilter%20id%3D%22r%22%20x%3D%22-5%25%22%20y%3D%22-20%25%22%20width%3D%22110%25%22%20height%3D%22140%25%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.08%22%20numOctaves%3D%222%22%20seed%3D%224%22%20result%3D%22t%22/%3E%3CfeDisplacementMap%20in%3D%22SourceGraphic%22%20in2%3D%22t%22%20scale%3D%221.6%22%20xChannelSelector%3D%22R%22%20yChannelSelector%3D%22G%22/%3E%3C/filter%3E%3C/defs%3E%3Cpath%20filter%3D%22url%28%23r%29%22%20fill%3D%22%23fff%22%20d%3D%22M60%2C11%20L60%2C31%20C46%2C31.5%2032%2C37%2017%2C36%20C6%2C35%201%2C27%203%2C18%20C5%2C9%2013%2C3%2025%2C4%20C37%2C5%2046%2C10.5%2060%2C11%20Z%22/%3E%3C/svg%3E");
-    --brush-tail: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201000%2040%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20fill%3D%22%23fff%22%20d%3D%22M0%2C11%20C250%2C11%20520%2C13%20760%2C17%20C880%2C19%20960%2C21%201000%2C22%20C960%2C23%20880%2C25%20760%2C27%20C520%2C30%20250%2C31%200%2C31%20Z%22/%3E%3C/svg%3E");
-    --brush-mask: var(--brush-head) 0 50% / auto 100% no-repeat, var(--brush-tail) right 0 top 0 / calc(100% - 30px) 100% no-repeat;
 
     container-type: inline-size;
     align-self: stretch;
@@ -25,11 +22,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 16px;
-  }
-
-  .counts {
-    display: flex;
     gap: 24px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -37,17 +29,21 @@
 
   /* A calligraphy stroke: a blob at the start that tapers to a point. */
   .progress {
+    position: relative;
     height: 22px;
     margin-bottom: 8px;
-    background: color-mix(in srgb, var(--track) 70%, transparent);
-    mask: var(--brush-mask);
+    color: color-mix(in srgb, var(--track) 70%, transparent);
   }
 
-  .progress > div {
-    height: 100%;
-    background: var(--ink);
+  .progress svg {
+    display: block;
+  }
+
+  .progress-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    color: var(--ink);
     transition: width 0.3s;
-    mask: var(--brush-mask);
   }
 
   .layout {
