@@ -27,14 +27,12 @@ export function LessonPage({ subject, subjectsById }: Props) {
       <LessonSection title="Meaning">
         <Meanings subject={subject} />
         <MarkedUpText text={subject.meaning_mnemonic} />
-        {subject.meaning_hint && <MarkedUpText text={subject.meaning_hint} />}
       </LessonSection>
 
       {subject.readings && subject.readings.length > 0 && (
         <LessonSection title="Reading">
           <Readings readings={subject.readings} />
           {subject.reading_mnemonic && <MarkedUpText text={subject.reading_mnemonic} />}
-          {subject.reading_hint && <MarkedUpText text={subject.reading_hint} />}
         </LessonSection>
       )}
 
