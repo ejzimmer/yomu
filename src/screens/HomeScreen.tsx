@@ -6,7 +6,7 @@ import { useSync } from '../data/useSync'
 import { DebugScreen } from './DebugScreen'
 import { LessonScreen } from './LessonScreen'
 import { ReviewScreen } from './ReviewScreen'
-import { StudyMenu } from './StudyMenu'
+import { MenuScreen } from './MenuScreen'
 
 interface Props {
   token: string
@@ -35,7 +35,7 @@ export function HomeScreen({ token, onUnauthorized }: Props) {
     case 'menu':
       return (
         <>
-          <StudyMenu onStartLessons={() => setActivity('lessons')} onStartReviews={() => setActivity('reviews')} />
+          <MenuScreen user={user} onStartLessons={() => setActivity('lessons')} onStartReviews={() => setActivity('reviews')} />
           <DebugScreen user={user} isSyncing={isSyncing} syncError={syncError} onSync={syncNow} />
         </>
       )
