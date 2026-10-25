@@ -33,11 +33,9 @@ export function HomeScreen({ token, onUnauthorized }: Props) {
     case 'reviews':
       return <ReviewScreen client={client} onExit={returnToMenu} />
     case 'menu':
-      return (
-        <>
-          <StudyMenu onStartLessons={() => setActivity('lessons')} onStartReviews={() => setActivity('reviews')} />
-          <DebugScreen user={user} isSyncing={isSyncing} syncError={syncError} onSync={syncNow} />
-        </>
-      )
+      if (location.pathname === '/debug') {
+        return <DebugScreen user={user} isSyncing={isSyncing} syncError={syncError} onSync={syncNow} />
+      }
+      return <StudyMenu onStartLessons={() => setActivity('lessons')} onStartReviews={() => setActivity('reviews')} />
   }
 }
