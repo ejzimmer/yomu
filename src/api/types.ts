@@ -78,9 +78,7 @@ export interface Subject {
   component_subject_ids?: number[]
   amalgamation_subject_ids?: number[]
   meaning_mnemonic: string
-  meaning_hint?: string | null
   reading_mnemonic?: string
-  reading_hint?: string | null
   context_sentences?: ContextSentence[]
   lesson_position: number
   spaced_repetition_system_id: number

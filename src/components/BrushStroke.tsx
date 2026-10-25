@@ -18,7 +18,7 @@ export function BrushStroke() {
         <path
           filter={`url(#${filterId})`}
           fill="currentColor"
-          d="M60,11 L60,31 C46,31.5 32,37 17,36 C6,35 1,27 3,18 C5,9 13,3 25,4 C37,5 46,10.5 60,11 Z"
+          d="M60,21 C46,28 32,37 17,36 C6,35 1,27 3,18 C5,9 13,3 25,4 C37,5 46,14 60,21 Z"
         />
       </svg>
     </svg>
