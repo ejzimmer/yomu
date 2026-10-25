@@ -1,6 +1,7 @@
 import './LessonPages.css'
 import { useState } from 'react'
 import { IconButton } from '../components/IconButton'
+import { useKeyboardShortcut } from '../components/useKeyboardShortcut'
 import { ArrowIcon, BackIcon, CloseIcon } from '../icons'
 import type { LessonData } from '../lessons/loadLessonData'
 import { LessonPage } from './LessonPage'
@@ -17,6 +18,18 @@ export function LessonPages({ data, onStartQuiz, onExit }: Props) {
   const currentItem = data.batch[currentIndex]
   const isLastPage = currentIndex === data.batch.length - 1
 
+  function goBack() {
+    setCurrentIndex(currentIndex - 1)
+  }
+
+  function goForward() {
+    if (isLastPage) onStartQuiz()
+    else setCurrentIndex(currentIndex + 1)
+  }
+
+  useKeyboardShortcut('ArrowLeft', goBack, currentIndex > 0)
+  useKeyboardShortcut('ArrowRight', goForward)
+
   return (
     <div className="lesson" data-type={currentItem.assignment.data.subject_type}>
       <div className="lesson-bar">
@@ -29,13 +42,20 @@ export function LessonPages({ data, onStartQuiz, onExit }: Props) {
       <LessonPage subject={currentItem.subject.data} subjectsById={data.subjectsById} />
 
       <nav className="lesson-nav">
-        <IconButton className="back" disabled={currentIndex === 0} onClick={() => setCurrentIndex(currentIndex - 1)} label="Previous">
+        <IconButton
+          className="back"
+          disabled={currentIndex === 0}
+          onClick={goBack}
+          label="Previous"
+          aria-keyshortcuts="ArrowLeft"
+        >
           <BackIcon />
         </IconButton>
         <IconButton
           className="next"
-          onClick={isLastPage ? onStartQuiz : () => setCurrentIndex(currentIndex + 1)}
+          onClick={goForward}
           label={isLastPage ? 'Start quiz' : 'Next'}
+          aria-keyshortcuts="ArrowRight"
         >
           <ArrowIcon />
         </IconButton>

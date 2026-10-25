@@ -1,6 +1,7 @@
 import './LevelUpScreen.css'
 import { BrushStroke } from '../components/BrushStroke'
 import { IconButton } from '../components/IconButton'
+import { useKeyboardShortcut } from '../components/useKeyboardShortcut'
 import { ArrowIcon } from '../icons'
 
 interface Props {
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export function LevelUpScreen({ level, onDismiss }: Props) {
+  useKeyboardShortcut('Enter', onDismiss)
+
   return (
     <div className="level-up">
       <p className="congratulations" lang="ja">
@@ -21,7 +24,7 @@ export function LevelUpScreen({ level, onDismiss }: Props) {
       <div className="stroke">
         <BrushStroke />
       </div>
-      <IconButton className="submit" onClick={onDismiss} label="Done">
+      <IconButton className="submit" onClick={onDismiss} label="Done" aria-keyshortcuts="Enter">
         <ArrowIcon />
       </IconButton>
     </div>
