@@ -15,6 +15,7 @@
     color: var(--ink);
     font: inherit;
     font-size: var(--input-font-size, 22px);
+    line-height: 1.2;
     text-align: center;
   }
 
