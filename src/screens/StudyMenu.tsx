@@ -15,8 +15,8 @@ export function StudyMenu({ onStartLessons, onStartReviews }: Props) {
 
   return (
     <div className="study-menu">
-      <StartSession count={lessons ?? 0} noun="lessons" onStart={onStartLessons} />
-      <StartSession count={reviews ?? 0} noun="reviews" onStart={onStartReviews} />
+      <StartSession count={lessons ?? 0} noun="lessons" shortcutKey="l" onStart={onStartLessons} />
+      <StartSession count={reviews ?? 0} noun="reviews" shortcutKey="r" onStart={onStartReviews} />
     </div>
   )
 }
