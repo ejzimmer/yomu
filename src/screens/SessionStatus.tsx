@@ -27,9 +27,11 @@ export function SessionStatus({ remaining, accuracy, progress, onExit }: Props) 
       </div>
       <div className="progress">
         <BrushStroke />
-        <div className="progress-fill" style={{ width: `${progress * 100}%` }}>
-          <BrushStroke />
-        </div>
+        {progress > 0 && (
+          <div className="progress-fill" style={{ width: `${progress * 100}%` }}>
+            <BrushStroke />
+          </div>
+        )}
       </div>
     </>
   )

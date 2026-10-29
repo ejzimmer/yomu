@@ -31,11 +31,7 @@
     position: relative;
     height: 22px;
     margin-bottom: 8px;
-    color: color-mix(in srgb, var(--track) 70%, transparent);
-  }
-
-  .progress svg {
-    display: block;
+    color: color-mix(in srgb, var(--track) 70%, var(--paper));
   }
 
   .progress-fill {
