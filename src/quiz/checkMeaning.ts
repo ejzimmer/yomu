@@ -1,7 +1,7 @@
-import { isJapanese } from 'wanakana'
+import { isJapanese, toHiragana, toKana } from 'wanakana'
 import type { Subject } from '../api/types'
 
-export type MeaningResult = 'correct' | 'incorrect' | 'not-english'
+export type MeaningResult = 'correct' | 'incorrect' | 'not-english' | 'reading-given'
 
 export function checkMeaning(answer: string, subject: Subject, synonyms: readonly string[] = []): MeaningResult {
   if (isJapanese(answer.replaceAll(/\s/gu, ''))) return 'not-english'
@@ -18,7 +18,13 @@ export function checkMeaning(answer: string, subject: Subject, synonyms: readonl
   ].map((meaning) => normalise(meaning))
 
   const isCloseEnough = (meaning: string) => getEditDistance(given, meaning) <= getAllowedTypos(meaning)
-  return accepted.some((meaning) => isCloseEnough(meaning)) ? 'correct' : 'incorrect'
+  if (accepted.some((meaning) => isCloseEnough(meaning))) return 'correct'
+  return isReadingInRomaji(answer, subject) ? 'reading-given' : 'incorrect'
+}
+
+function isReadingInRomaji(answer: string, subject: Subject) {
+  const given = toHiragana(toKana(answer.replaceAll(/\s/gu, '')))
+  return subject.readings?.some((reading) => toHiragana(reading.reading) === given) ?? false
 }
 
 function normalise(text: string) {
