@@ -14,7 +14,7 @@ export function StartSession({ count, noun, shortcutKey, onStart }: Props) {
   useKeyboardShortcut(shortcutKey, onStart, count > 0)
 
   return (
-    <div className="start-session">
+    <div className={`start-session ${noun}`}>
       <span className="count">{count}</span>
       <span className="label">{noun}</span>
       {count > 0 && (

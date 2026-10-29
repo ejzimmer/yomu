@@ -5,11 +5,23 @@
     gap: 16px;
   }
 
+  :scope.lessons {
+    --session-colour: var(--persimmon);
+  }
+
+  :scope.reviews {
+    --session-colour: var(--indigo);
+  }
+
   .count {
     font-family: var(--serif);
     font-weight: 700;
     font-size: 48px;
     line-height: 1;
+  }
+
+  :scope:has(.submit) .count {
+    color: var(--session-colour);
   }
 
   .label {
@@ -30,7 +42,7 @@
     padding: 0;
     border: none;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--ink) 75%, transparent);
+    background: var(--session-colour);
     color: var(--paper);
     cursor: pointer;
   }
