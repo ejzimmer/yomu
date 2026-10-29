@@ -8,7 +8,7 @@
   }
 
   .level {
-    font-family: var(--serif);
+    font-family: var(--display);
     font-weight: 700;
     font-size: 120px;
     line-height: 1;

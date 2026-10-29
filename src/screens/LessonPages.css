@@ -49,7 +49,7 @@
     border-radius: 6px;
     background: color-mix(in srgb, var(--type-colour) 15%, transparent);
     color: var(--type-colour);
-    font-family: var(--serif);
+    font-family: var(--display);
     font-size: 18px;
     font-weight: 700;
     cursor: pointer;
@@ -72,7 +72,7 @@
     justify-content: center;
     min-height: 200px;
     color: var(--type-colour);
-    font-family: var(--serif);
+    font-family: var(--display);
     font-size: clamp(64px, 18vw, 140px);
     font-weight: 700;
     line-height: 1.1;
@@ -96,7 +96,7 @@
 
   .answers {
     margin: 0;
-    font-family: var(--serif);
+    font-family: var(--display);
     font-size: 30px;
     font-weight: 700;
   }
@@ -129,7 +129,7 @@
     display: flex;
     gap: 12px;
     margin: 0;
-    font-family: var(--serif);
+    font-family: var(--display);
     font-size: 24px;
     color: var(--ink-soft);
   }
@@ -166,7 +166,7 @@
 
   .component-subjects span {
     min-width: 32px;
-    font-family: var(--serif);
+    font-family: var(--display);
     font-size: 22px;
     font-weight: 700;
     text-align: center;

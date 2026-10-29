@@ -13,6 +13,23 @@
     font-weight: 700;
     font-size: 18px;
   }
+
+  .actions {
+    display: flex;
+  }
+
+  .font-style {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .font-style.fancy {
+    font-family: var(--serif);
+  }
+
+  .font-style.plain {
+    font-family: var(--sans);
+  }
 }
 
 @scope (main.centre) {
