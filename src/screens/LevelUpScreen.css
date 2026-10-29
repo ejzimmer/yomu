@@ -2,23 +2,47 @@
   :scope {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 24px;
+    gap: 20px;
+    width: min(100%, 640px);
+  }
+
+  .scene {
+    position: relative;
+    animation: rise 0.6s ease-out both;
   }
 
   .congratulations {
+    position: absolute;
+    top: 5%;
+    left: 0;
+    right: 0;
     margin: 0;
+    color: #FFF6E8;
     font-family: var(--serif);
     font-weight: 700;
-    font-size: clamp(32px, 8vw, 56px);
-    animation: rise 0.6s ease-out both;
+    font-size: clamp(28px, 7vw, 48px);
+    text-align: center;
+    text-shadow: 0 2px 12px rgb(0 0 0 / 0.5);
+  }
+
+  .details {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: rise 0.6s 0.2s ease-out both;
   }
 
   .level {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    animation: rise 0.6s 0.2s ease-out both;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .number {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(56px, 14vw, 88px);
+    line-height: 1;
   }
 
   .label {
@@ -28,11 +52,11 @@
     text-transform: uppercase;
   }
 
-  .number {
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: clamp(96px, 30vw, 180px);
-    line-height: 1;
+  .progress {
+    flex: 1;
+    margin: 0;
+    color: var(--ink-soft);
+    text-align: right;
   }
 }
 

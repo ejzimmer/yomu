@@ -1,0 +1,142 @@
+@scope (.hanabi-scene) {
+  :scope {
+    --sky: #1D1F3A;
+    --sky-low: #3A2E52;
+    --bark: #3B2A26;
+    --petal: #F6C1D0;
+    --petal-centre: #D9607F;
+    --gold: #F2C14E;
+    --pink: #F08BB0;
+    --white: #FFF6E8;
+    --ground: #241B2E;
+
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    background: linear-gradient(var(--sky), var(--sky-low));
+  }
+
+  .hill {
+    fill: var(--ground);
+  }
+
+  .branch {
+    fill: none;
+    stroke: var(--bark);
+    stroke-linecap: round;
+  }
+
+  .petal {
+    fill: var(--petal);
+  }
+
+  .centre {
+    fill: var(--petal-centre);
+  }
+
+  .blossom {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .blossom.new {
+    animation: bloom 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+
+  .star {
+    fill: var(--white);
+    opacity: 0.5;
+  }
+
+  .burst {
+    --spark: var(--gold);
+
+    opacity: 0;
+    animation: burst 3.4s ease-out infinite;
+  }
+
+  .burst.pink {
+    --spark: var(--pink);
+  }
+
+  .burst.white {
+    --spark: var(--white);
+  }
+
+  .spark {
+    fill: var(--spark);
+  }
+
+  .trail {
+    stroke: var(--spark);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    opacity: 0.45;
+  }
+
+  .falling-petal {
+    fill: var(--petal);
+    opacity: 0;
+    animation: fall 9s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blossom.new {
+      animation: none;
+    }
+
+    .burst {
+      animation: none;
+      opacity: 0.6;
+    }
+
+    .falling-petal {
+      animation: none;
+    }
+  }
+}
+
+@keyframes bloom {
+  from {
+    transform: scale(0) rotate(-90deg);
+  }
+}
+
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: scale(0.1);
+  }
+
+  45% {
+    opacity: 1;
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1) translateY(6px);
+  }
+}
+
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translate(0, -10px) rotate(0deg);
+  }
+
+  10%,
+  85% {
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: translate(-30px, 200px) rotate(220deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(10px, 410px) rotate(420deg);
+  }
+}
