@@ -78,6 +78,12 @@
     padding: 0 32px 24px;
   }
 
+  .answer > form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
   label {
     text-align: center;
     font-size: 13px;
@@ -116,6 +122,12 @@
     gap: 32px;
     align-items: baseline;
     margin-top: 16px;
+  }
+
+  .reveal .answers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .correct {
@@ -218,8 +230,8 @@
     }
 
     .reveal {
-      flex-wrap: wrap;
-      gap: 8px 24px;
+      flex-direction: column;
+      gap: 16px;
     }
   }
 }

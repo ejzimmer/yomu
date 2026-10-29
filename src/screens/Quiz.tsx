@@ -1,5 +1,6 @@
 import './Quiz.css'
 import { useState, type ReactNode } from 'react'
+import type { WaniKaniClient } from '../api/client'
 import { getCharacters } from '../data/getCharacters'
 import type { StudyItem } from '../data/studyItem'
 import { answerCorrectly, answerWrongly, askNextQuestion, createSession, undoWrongAnswer, type SessionItem } from '../quiz/session'
@@ -9,14 +10,14 @@ import { SessionSummary } from './SessionSummary'
 
 interface Props {
   queue: readonly StudyItem[]
-  synonymsBySubject: ReadonlyMap<number, string[]>
+  client: WaniKaniClient
   aside?: ReactNode
   onItemComplete: (item: SessionItem) => void
   completedLabel: string
   onExit: () => void
 }
 
-export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, completedLabel, onExit }: Props) {
+export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onExit }: Props) {
   const [session, setSession] = useState(() => createSession(queue))
   const accuracy = session.totalAnswers ? Math.round((session.correctAnswers / session.totalAnswers) * 100) : 100
   const { question } = session
@@ -59,7 +60,7 @@ export function Quiz({ queue, synonymsBySubject, aside, onItemComplete, complete
         <AnswerForm
           key={session.questionNumber}
           question={question}
-          synonyms={synonymsBySubject.get(subject.id) ?? []}
+          client={client}
           isShowingAnswer={session.isShowingAnswer}
           onAnswer={answer}
           onRedo={() => setSession(undoWrongAnswer(session))}

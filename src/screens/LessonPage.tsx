@@ -1,11 +1,14 @@
 import type { ReactNode } from 'react'
+import type { WaniKaniClient } from '../api/client'
 import type { ContextSentence, Reading, Resource, Subject } from '../api/types'
 import { MarkedUpText } from '../components/MarkedUpText'
 import { getCharacters } from '../data/getCharacters'
+import { Synonyms } from './Synonyms'
 
 interface Props {
-  subject: Subject
+  subject: Resource<Subject>
   subjectsById: ReadonlyMap<number, Resource<Subject>>
+  client: WaniKaniClient
 }
 
 const READING_TYPES = [
@@ -15,7 +18,7 @@ const READING_TYPES = [
   { type: undefined, name: 'Readings', isNameShown: false },
 ] as const
 
-export function LessonPage({ subject, subjectsById }: Props) {
+export function LessonPage({ subject: { id: subjectId, data: subject }, subjectsById, client }: Props) {
   const componentSubjects = (subject.component_subject_ids ?? []).flatMap((id) => subjectsById.get(id) ?? [])
 
   return (
@@ -26,6 +29,7 @@ export function LessonPage({ subject, subjectsById }: Props) {
 
       <LessonSection title="Meaning">
         <Meanings subject={subject} />
+        <Synonyms subjectId={subjectId} client={client} />
         <MarkedUpText text={subject.meaning_mnemonic} />
       </LessonSection>
 

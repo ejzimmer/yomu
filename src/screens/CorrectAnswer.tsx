@@ -1,23 +1,30 @@
-import type { Subject } from '../api/types'
+import type { WaniKaniClient } from '../api/client'
+import type { Resource, Subject } from '../api/types'
 import { MarkedUpText } from '../components/MarkedUpText'
 import type { QuestionType } from '../quiz/session'
+import { Synonyms } from './Synonyms'
 
 interface Props {
-  subject: Subject
+  subject: Resource<Subject>
   type: QuestionType
+  client: WaniKaniClient
 }
 
-export function CorrectAnswer({ subject, type }: Props) {
+export function CorrectAnswer({ subject, type, client }: Props) {
+  const { data } = subject
   const answers =
     type === 'meaning'
-      ? subject.meanings.filter((m) => m.accepted_answer).map((m) => m.meaning)
-      : (subject.readings ?? []).filter((r) => r.accepted_answer).map((r) => r.reading)
-  const mnemonic = type === 'meaning' ? subject.meaning_mnemonic : subject.reading_mnemonic
+      ? data.meanings.filter((m) => m.accepted_answer).map((m) => m.meaning)
+      : (data.readings ?? []).filter((r) => r.accepted_answer).map((r) => r.reading)
+  const mnemonic = type === 'meaning' ? data.meaning_mnemonic : data.reading_mnemonic
 
   return (
     <div className="reveal">
-      <div className="correct" lang={type === 'reading' ? 'ja' : 'en'}>
-        {answers.join(', ')}
+      <div className="answers">
+        <div className="correct" lang={type === 'reading' ? 'ja' : 'en'}>
+          {answers.join(', ')}
+        </div>
+        {type === 'meaning' && <Synonyms subjectId={subject.id} client={client} />}
       </div>
       {mnemonic && <MarkedUpText text={mnemonic} />}
     </div>

@@ -1,5 +1,6 @@
 import './LessonPages.css'
 import { useState } from 'react'
+import type { WaniKaniClient } from '../api/client'
 import { IconButton } from '../components/IconButton'
 import { useKeyboardShortcut } from '../components/useKeyboardShortcut'
 import { ArrowIcon, BackIcon, CloseIcon } from '../icons'
@@ -9,11 +10,12 @@ import { LessonTabs } from './LessonTabs'
 
 interface Props {
   data: LessonData
+  client: WaniKaniClient
   onStartQuiz: () => void
   onExit: () => void
 }
 
-export function LessonPages({ data, onStartQuiz, onExit }: Props) {
+export function LessonPages({ data, client, onStartQuiz, onExit }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const currentItem = data.batch[currentIndex]
   const isLastPage = currentIndex === data.batch.length - 1
@@ -39,7 +41,7 @@ export function LessonPages({ data, onStartQuiz, onExit }: Props) {
         </IconButton>
       </div>
 
-      <LessonPage subject={currentItem.subject.data} subjectsById={data.subjectsById} />
+      <LessonPage subject={currentItem.subject} subjectsById={data.subjectsById} client={client} />
 
       <nav className="lesson-nav">
         <IconButton

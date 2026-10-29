@@ -32,7 +32,7 @@ export function ReviewSessionView({ data, client, onExit }: Props) {
   return (
     <Quiz
       queue={data.queue}
-      synonymsBySubject={data.synonymsBySubject}
+      client={client}
       aside={
         <SrsFeed entries={feed} onFaded={(id) => setFeed((entries) => entries.filter((entry) => entry.id !== id))} />
       }

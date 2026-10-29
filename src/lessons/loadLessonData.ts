@@ -1,6 +1,5 @@
 import type { Resource, Subject } from '../api/types'
 import { db } from '../data/db'
-import { getSynonymsBySubject } from '../data/getSynonymsBySubject'
 import type { StudyItem } from '../data/studyItem'
 import { buildLessonQueue } from './buildLessonQueue'
 import { countLessonsStartedToday } from './countLessonsStartedToday'
@@ -9,19 +8,14 @@ import { countLessonsLeftToday, getLessonBatch } from './getLessonBatch'
 export interface LessonData {
   batch: StudyItem[]
   subjectsById: Map<number, Resource<Subject>>
-  synonymsBySubject: Map<number, string[]>
 }
 
 export async function loadLessonData(): Promise<LessonData> {
-  const [{ user, queue, startedToday, subjectsById }, studyMaterials] = await Promise.all([
-    loadLessonQueue(),
-    db.studyMaterials.toArray(),
-  ])
+  const { user, queue, startedToday, subjectsById } = await loadLessonQueue()
 
   return {
     batch: user ? getLessonBatch(queue, user.preferences.lessons_batch_size, startedToday) : [],
     subjectsById,
-    synonymsBySubject: getSynonymsBySubject(studyMaterials),
   }
 }
 

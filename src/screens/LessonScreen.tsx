@@ -22,5 +22,5 @@ export function LessonScreen({ client, onExit }: Props) {
   if (!data) return <LoadingKanji />
   if (data.batch.length === 0) return <SessionSummary count={0} description="No lessons available" onExit={onExit} />
   if (isQuizzing) return <LessonQuiz data={data} client={client} onExit={onExit} />
-  return <LessonPages data={data} onStartQuiz={() => setIsQuizzing(true)} onExit={onExit} />
+  return <LessonPages data={data} client={client} onStartQuiz={() => setIsQuizzing(true)} onExit={onExit} />
 }
