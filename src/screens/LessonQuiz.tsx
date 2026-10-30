@@ -1,6 +1,6 @@
 import type { WaniKaniClient } from '../api/client'
 import type { LessonData } from '../lessons/loadLessonData'
-import { startAssignment } from '../lessons/startAssignment'
+import { queueLessonStart, sendPendingLessonStarts } from '../lessons/sendLessonStarts'
 import { Quiz } from './Quiz'
 
 interface Props {
@@ -14,7 +14,7 @@ export function LessonQuiz({ data, client, onExit }: Props) {
     <Quiz
       queue={data.batch}
       client={client}
-      onItemComplete={(item) => void startAssignment(client, item.assignment.id)}
+      onItemComplete={(item) => void queueLessonStart(item.assignment.id).then(() => sendPendingLessonStarts(client))}
       completedLabel="learned"
       onExit={onExit}
     />

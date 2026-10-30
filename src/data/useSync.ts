@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { WaniKaniClient } from '../api/client'
 import { ApiError } from '../api/errors'
+import { sendPendingLessonStarts } from '../lessons/sendLessonStarts'
 import { sendPendingReviews } from '../review/sendReviews'
 import { sync } from './sync'
 
@@ -10,8 +11,9 @@ export function useSync(client: WaniKaniClient, onUnauthorized: () => void) {
 
   const runSync = useCallback(
     () =>
-      // Send any reviews left over from last time before fetching, so the sync sees their results.
-      sendPendingReviews(client)
+      // Send any lesson starts and reviews left over from last time before fetching, so the sync sees their results.
+      sendPendingLessonStarts(client)
+        .then(() => sendPendingReviews(client))
         .then(() => sync(client))
         .then(() => setSyncError(null))
         .catch((error: unknown) => {

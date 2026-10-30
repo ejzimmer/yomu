@@ -30,6 +30,11 @@ export interface PendingReview {
   createdAt: string
 }
 
+export interface PendingLessonStart {
+  assignmentId: number
+  createdAt: string
+}
+
 export type CollectionName = 'subjects' | 'assignments' | 'reviewStatistics' | 'studyMaterials' | 'spacedRepetitionSystems'
 
 // A local copy of everything we read from WaniKani. Rows are stored exactly as
@@ -43,6 +48,7 @@ export const db = new Dexie('yomu') as Dexie & {
   syncState: EntityTable<SyncState, 'collection'>
   user: EntityTable<StoredUser, 'id'>
   pendingReviews: EntityTable<PendingReview, 'id'>
+  pendingLessonStarts: EntityTable<PendingLessonStart, 'assignmentId'>
 }
 
 db.version(1).stores({
@@ -57,6 +63,10 @@ db.version(1).stores({
 
 db.version(2).stores({
   pendingReviews: '++id',
+})
+
+db.version(3).stores({
+  pendingLessonStarts: 'assignmentId, createdAt',
 })
 
 export function clearDatabase() {
