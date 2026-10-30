@@ -72,7 +72,7 @@ export function Synonyms({ subjectId, client }: Props) {
       )}
       {isAdding ? (
         <form onSubmit={(event) => void add(event)}>
-          <label htmlFor={inputId}>Synonym</label>
+          <label htmlFor={inputId} className="visually-hidden">Synonym</label>
           <input
             id={inputId}
             // The user just asked for this box, so jumping straight to it is expected.
