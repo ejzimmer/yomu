@@ -13,7 +13,7 @@ export function LessonQuiz({ data, client, onExit }: Props) {
   return (
     <Quiz
       queue={data.batch}
-      synonymsBySubject={data.synonymsBySubject}
+      client={client}
       onItemComplete={(item) => void startAssignment(client, item.assignment.id)}
       completedLabel="learned"
       onExit={onExit}
