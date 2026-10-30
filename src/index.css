@@ -14,7 +14,12 @@
   --indigo: #2B4A78;
   --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   --sans: 'IBM Plex Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
+  --display: var(--serif);
   color-scheme: light;
+}
+
+:root[data-font-style='plain'] {
+  --display: var(--sans);
 }
 
 * {
