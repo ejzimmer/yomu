@@ -1,6 +1,5 @@
 import type { WaniKaniClient } from '../api/client'
 import type { Resource, Subject } from '../api/types'
-import { MarkedUpText } from '../components/MarkedUpText'
 import type { QuestionType } from '../quiz/session'
 import { Synonyms } from './Synonyms'
 
@@ -16,17 +15,13 @@ export function CorrectAnswer({ subject, type, client }: Props) {
     type === 'meaning'
       ? data.meanings.filter((m) => m.accepted_answer).map((m) => m.meaning)
       : (data.readings ?? []).filter((r) => r.accepted_answer).map((r) => r.reading)
-  const mnemonic = type === 'meaning' ? data.meaning_mnemonic : data.reading_mnemonic
 
   return (
     <div className="reveal">
-      <div className="answers">
-        <div className="correct" lang={type === 'reading' ? 'ja' : 'en'}>
-          {answers.join(', ')}
-        </div>
-        {type === 'meaning' && <Synonyms subjectId={subject.id} client={client} />}
+      <div className="correct" lang={type === 'reading' ? 'ja' : 'en'}>
+        {answers.join(', ')}
       </div>
-      {mnemonic && <MarkedUpText text={mnemonic} />}
+      {type === 'meaning' && <Synonyms subjectId={subject.id} client={client} />}
     </div>
   )
 }

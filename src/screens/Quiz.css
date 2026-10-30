@@ -119,30 +119,15 @@
 
   .reveal {
     display: flex;
-    gap: 32px;
-    align-items: baseline;
-    margin-top: 16px;
-  }
-
-  .reveal .answers {
-    display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 16px;
   }
 
   .correct {
     font-family: var(--serif);
     font-size: 34px;
     font-weight: 700;
-  }
-
-  .marked-up {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--ink-soft);
   }
 
   .feed {
@@ -227,11 +212,6 @@
     .answer {
       grid-row: 3;
       padding: 18px 0;
-    }
-
-    .reveal {
-      flex-direction: column;
-      gap: 16px;
     }
   }
 }
