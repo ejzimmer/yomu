@@ -13,7 +13,7 @@
   }
 
   .plain {
-    font-family: var(--sans);
+    font-family: var(--rounded);
   }
 
   input {

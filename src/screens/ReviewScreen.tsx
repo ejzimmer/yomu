@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { WaniKaniClient } from '../api/client'
 import { LoadingKanji } from '../components/LoadingKanji'
+import { preloadStudyFont } from '../data/preloadStudyFont'
 import { loadReviewData, type ReviewData } from '../review/loadReviewData'
 import { ReviewSessionView } from './ReviewSessionView'
 import { SessionSummary } from './SessionSummary'
@@ -16,6 +17,10 @@ export function ReviewScreen({ client, onExit }: Props) {
   useEffect(() => {
     void loadReviewData().then(setData)
   }, [])
+
+  useEffect(() => {
+    if (data) preloadStudyFont(data.queue)
+  }, [data])
 
   if (!data) return <LoadingKanji />
   if (data.queue.length === 0) return <SessionSummary count={0} description="No reviews due" onExit={onExit} />

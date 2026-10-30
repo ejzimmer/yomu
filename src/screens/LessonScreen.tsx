@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { WaniKaniClient } from '../api/client'
 import { LoadingKanji } from '../components/LoadingKanji'
+import { preloadStudyFont } from '../data/preloadStudyFont'
 import { loadLessonData, type LessonData } from '../lessons/loadLessonData'
 import { LessonPages } from './LessonPages'
 import { LessonQuiz } from './LessonQuiz'
@@ -18,6 +19,10 @@ export function LessonScreen({ client, onExit }: Props) {
   useEffect(() => {
     void loadLessonData().then(setData)
   }, [])
+
+  useEffect(() => {
+    if (data) preloadStudyFont(data.batch)
+  }, [data])
 
   if (!data) return <LoadingKanji />
   if (data.batch.length === 0) return <SessionSummary count={0} description="No lessons available" onExit={onExit} />
