@@ -1,62 +1,41 @@
 @scope (.level-up) to (.has-tooltip) {
   :scope {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: min(100%, 640px);
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    color: var(--paper);
   }
 
-  .scene {
-    position: relative;
-    animation: rise 0.6s ease-out both;
-  }
-
-  .congratulations {
+  .congratulations,
+  .level {
     position: absolute;
-    top: 5%;
     left: 0;
     right: 0;
     margin: 0;
-    color: #FFF6E8;
     font-family: var(--serif);
     font-weight: 700;
-    font-size: clamp(28px, 7vw, 48px);
+    line-height: 1;
     text-align: center;
-    text-shadow: 0 2px 12px rgb(0 0 0 / 0.5);
+    text-shadow: 0 2px 16px rgb(0 0 0 / 0.5);
   }
 
-  .details {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    animation: rise 0.6s 0.2s ease-out both;
+  .congratulations {
+    top: max(6vh, 24px);
+    font-size: clamp(32px, 8vw, 56px);
+    animation: rise 0.6s ease-out both;
+  }
+
+  .actions {
+    position: absolute;
+    right: max(24px, env(safe-area-inset-right, 0px));
+    bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    animation: rise 0.6s 0.4s ease-out both;
   }
 
   .level {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
-
-  .number {
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: clamp(56px, 14vw, 88px);
-    line-height: 1;
-  }
-
-  .label {
-    color: var(--ink-soft);
-    font-size: 14px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .progress {
-    flex: 1;
-    margin: 0;
-    color: var(--ink-soft);
-    text-align: right;
+    top: calc(max(6vh, 24px) + clamp(48px, 11vw, 80px));
+    font-size: clamp(64px, 16vw, 128px);
+    animation: rise 0.6s 0.2s ease-out both;
   }
 }
 
@@ -70,8 +49,8 @@
     padding: 0;
     border: none;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--ink) 75%, transparent);
-    color: var(--paper);
+    background: var(--paper);
+    color: var(--ink);
     cursor: pointer;
   }
 }
