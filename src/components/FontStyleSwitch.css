@@ -13,7 +13,7 @@
   }
 
   .plain {
-    font-family: var(--gothic);
+    font-family: var(--system);
   }
 
   input {
