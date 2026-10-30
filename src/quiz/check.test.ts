@@ -106,7 +106,7 @@ describe('checkMeaning', () => {
     expect(checkMeaning('more', toLeak)).toBe('incorrect')
   })
 
-  it('doesn’t treat romaji as a reading by kana alone when the question has none', () => {
+  it('doesn’t treat romaji as a reading when the question has no kana', () => {
     expect(checkMeaning('same', persimmon)).toBe('incorrect')
   })
 })
