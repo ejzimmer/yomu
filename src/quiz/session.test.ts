@@ -91,4 +91,19 @@ describe('review session', () => {
     session = askNextQuestion(answerWrongly(session))
     expect(session.question!.item.assignment.id).not.toBe(askedFirst)
   })
+
+  it('asks about several other items before coming back to the same item', () => {
+    let session = createSession(Array.from({ length: 10 }, (_, i) => makeItem(i + 1)))
+    const askedIds: number[] = []
+    for (let i = 0; i < 6; i++) {
+      askedIds.push(session.question!.item.assignment.id)
+      session = askNextQuestion(answerCorrectly(session))
+    }
+    expect(new Set(askedIds).size).toBe(6)
+  })
+
+  it('still finishes when only one item is left', () => {
+    const session = createSession([makeItem(1)])
+    expect(answerEverything(session).completed).toHaveLength(1)
+  })
 })

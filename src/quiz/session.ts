@@ -1,6 +1,7 @@
 import type { StudyItem } from '../data/studyItem'
 
 const ACTIVE_ITEMS = 10
+const MAX_RECENT_ITEMS = 5
 
 export type QuestionType = 'meaning' | 'reading'
 
@@ -21,6 +22,7 @@ export interface QuizSession {
   waiting: SessionItem[]
   completed: SessionItem[]
   question: Question | null
+  recentItemIds: number[]
   isShowingAnswer: boolean
   questionNumber: number
   correctAnswers: number
@@ -40,12 +42,13 @@ export function createSession(queue: readonly StudyItem[]): QuizSession {
     waiting: items.slice(ACTIVE_ITEMS),
     completed: [],
     question: null,
+    recentItemIds: [],
     isShowingAnswer: false,
     questionNumber: 1,
     correctAnswers: 0,
     totalAnswers: 0,
   }
-  return { ...session, question: pickQuestion(session.active, null) }
+  return { ...session, question: pickQuestion(session.active, [], null) }
 }
 
 export function answerCorrectly(session: QuizSession): QuizSession {
@@ -93,10 +96,12 @@ export function undoWrongAnswer(session: QuizSession): QuizSession {
 }
 
 export function askNextQuestion(session: QuizSession): QuizSession {
+  const recentItemIds = rememberAskedItem(session.recentItemIds, session.question)
   return {
     ...session,
+    recentItemIds,
     isShowingAnswer: false,
-    question: pickQuestion(session.active, session.question),
+    question: pickQuestion(session.active, recentItemIds, session.question),
     questionNumber: session.questionNumber + 1,
   }
 }
@@ -131,15 +136,30 @@ function hasReading({ subject }: StudyItem) {
   return (subject.data.readings?.length ?? 0) > 0
 }
 
-function pickQuestion(active: readonly SessionItem[], previous: Question | null): Question | null {
+function rememberAskedItem(recentItemIds: readonly number[], question: Question | null) {
+  if (!question) return [...recentItemIds]
+  const askedId = question.item.assignment.id
+  return [askedId, ...recentItemIds.filter((id) => id !== askedId)].slice(0, MAX_RECENT_ITEMS)
+}
+
+function pickQuestion(active: readonly SessionItem[], recentItemIds: readonly number[], previous: Question | null): Question | null {
   const questions = active.flatMap((item) => [
     ...(item.isMeaningDone ? [] : [{ item, type: 'meaning' as const }]),
     ...(item.isReadingDone ? [] : [{ item, type: 'reading' as const }]),
   ])
 
-  const isPrevious = (q: Question) =>
-    previous !== null && q.item.assignment.id === previous.item.assignment.id && q.type === previous.type
-  const choices = questions.length > 1 ? questions.filter((q) => !isPrevious(q)) : questions
-
+  const choices = avoidRecentItems(avoidPreviousQuestion(questions, previous), recentItemIds)
   return choices[Math.floor(Math.random() * choices.length)] ?? null
+}
+
+function avoidPreviousQuestion(questions: readonly Question[], previous: Question | null) {
+  if (!previous || questions.length <= 1) return questions
+  return questions.filter((q) => q.item.assignment.id !== previous.item.assignment.id || q.type !== previous.type)
+}
+
+function avoidRecentItems(questions: readonly Question[], recentItemIds: readonly number[]) {
+  const itemIds = new Set(questions.map((q) => q.item.assignment.id))
+  const recentInPlay = recentItemIds.filter((id) => itemIds.has(id))
+  const avoided = new Set(recentInPlay.slice(0, Math.floor(itemIds.size / 2)))
+  return questions.filter((q) => !avoided.has(q.item.assignment.id))
 }
