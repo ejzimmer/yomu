@@ -1,0 +1,95 @@
+@scope (.review-forecast) {
+  :scope {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: min(100%, 420px);
+  }
+
+  .next-day {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .count {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  .label {
+    color: var(--ink-soft);
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .days {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .day {
+    display: grid;
+    grid-template-columns: 3.5em 1fr 3.5em 3.5em;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0;
+  }
+
+  summary.day {
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary.day::-webkit-details-marker {
+    display: none;
+  }
+
+  .bar {
+    height: 18px;
+    color: var(--green);
+  }
+
+  .bar svg {
+    display: block;
+  }
+
+  .added {
+    color: var(--green);
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .total {
+    color: var(--ink-soft);
+    text-align: right;
+  }
+
+  .hours {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7em, 1fr));
+    gap: 4px 16px;
+    padding: 4px 0 12px 4.5em;
+    font-size: 14px;
+  }
+
+  .hours li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .time {
+    color: var(--ink-soft);
+  }
+}

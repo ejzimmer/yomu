@@ -2,6 +2,7 @@ import type { Assignment, Resource, Subject, User } from '../api/types'
 import { isSubjectAvailable } from '../data/availability'
 import { shuffle } from '../data/shuffle'
 import type { StudyItem } from '../data/studyItem'
+import { isReviewable } from './isReviewable'
 
 export function buildReviewQueue(
   assignments: readonly Resource<Assignment>[],
@@ -23,11 +24,5 @@ export function buildReviewQueue(
 }
 
 function isDue(assignment: Assignment, now: Temporal.Instant) {
-  return (
-    !assignment.hidden &&
-    assignment.burned_at === null &&
-    assignment.srs_stage > 0 &&
-    assignment.available_at !== null &&
-    Temporal.Instant.compare(assignment.available_at, now) <= 0
-  )
+  return isReviewable(assignment) && Temporal.Instant.compare(assignment.available_at, now) <= 0
 }
