@@ -78,25 +78,22 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 24px 0 40px;
-  }
-
-  /* Full-bleed band: the shadow paints the background out to both screen edges and the clip stops it spreading vertically. */
-  .answer > form[data-question='reading'] {
-    --ink: var(--paper);
-    --red: var(--red-on-night);
-
-    background: var(--night);
-    box-shadow: 0 0 0 100vmax var(--night);
-    clip-path: inset(0 -100vmax);
-    color: var(--paper);
   }
 
   label {
+    padding: 10px 0;
     text-align: center;
     font-size: 13px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+  }
+
+  /* Full-bleed band: the shadow paints the background out to both screen edges and the clip stops it spreading vertically. */
+  [data-question='reading'] label {
+    background: var(--ink);
+    box-shadow: 0 0 0 100vmax var(--ink);
+    clip-path: inset(0 -100vmax);
+    color: var(--paper);
   }
 
   .answer-row {
@@ -118,6 +115,10 @@
     background: color-mix(in srgb, var(--type-colour) 75%, transparent);
     color: var(--paper);
     cursor: pointer;
+  }
+
+  [data-question='reading'] .submit {
+    background: var(--ink);
   }
 
   /* Two classes, to beat IconButton's own colour */
@@ -219,7 +220,7 @@
 
     .answer {
       grid-row: 3;
-      padding: 0 0 18px;
+      padding: 18px 0;
     }
   }
 }
