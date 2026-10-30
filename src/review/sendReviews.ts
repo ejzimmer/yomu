@@ -1,5 +1,5 @@
 import type { WaniKaniClient } from '../api/client'
-import { ApiError } from '../api/errors'
+import { isRejectedForGood } from '../api/errors'
 import type { CreatedReview } from '../api/types'
 import { db, type PendingReview } from '../data/db'
 
@@ -51,10 +51,4 @@ async function sendReview(client: WaniKaniClient, review: PendingReview) {
     await db.pendingReviews.delete(review.id!)
     return true
   }
-}
-
-// WaniKani answers 4xx when a review can never be accepted (e.g. 422: not available for review any more),
-// so retrying can't help. 401 and 429 are the exceptions: they can succeed later.
-function isRejectedForGood(error: unknown) {
-  return error instanceof ApiError && error.status >= 400 && error.status < 500 && error.status !== 401 && error.status !== 429
 }

@@ -1,7 +1,8 @@
 import './Quiz.css'
 import { useState, type ReactNode } from 'react'
 import type { WaniKaniClient } from '../api/client'
-import { getCharacters } from '../data/getCharacters'
+import type { Subject } from '../api/types'
+import { SubjectCharacters } from '../components/SubjectCharacters'
 import type { StudyItem } from '../data/studyItem'
 import { answerCorrectly, answerWrongly, askNextQuestion, createSession, undoWrongAnswer, type SessionItem } from '../quiz/session'
 import { AnswerForm } from './AnswerForm'
@@ -29,7 +30,6 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onE
   }
 
   const { subject, assignment } = question.item
-  const characters = getCharacters(subject.data)
 
   function answer(isCorrect: boolean) {
     if (!isCorrect) {
@@ -53,8 +53,8 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onE
 
       <div className="layout">
         <div className="item" lang="ja">
-          <span style={{ fontSize: getCharactersFontSize(characters) }}>
-            {characters}
+          <span style={{ fontSize: getCharactersFontSize(subject.data) }}>
+            <SubjectCharacters subject={subject.data} />
           </span>
         </div>
         <AnswerForm
@@ -72,7 +72,8 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onE
   )
 }
 
-function getCharactersFontSize(characters: string) {
-  const widthShare = (86 / [...characters].length).toFixed(1)
+function getCharactersFontSize(subject: Subject) {
+  const characterCount = subject.characters === null ? 1 : [...subject.characters].length
+  const widthShare = (86 / characterCount).toFixed(1)
   return `max(40px, min(150px, ${widthShare}cqw))`
 }

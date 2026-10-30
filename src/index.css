@@ -60,3 +60,7 @@ button:focus-visible {
 [aria-disabled] {
   cursor: progress;
 }
+
+.character-image {
+  vertical-align: -0.12em;
+}
