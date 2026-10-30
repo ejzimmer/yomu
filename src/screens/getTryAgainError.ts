@@ -1,6 +1,7 @@
 import type { InputError } from '../components/ShakeInput'
 import type { UnmarkableAnswer } from '../quiz/checkAnswer'
 import { findMismatchedKana } from '../quiz/findMismatchedKana'
+import { findNonKana } from '../quiz/findNonKana'
 
 const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
   blank: 'Type an answer',
@@ -14,10 +15,17 @@ const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
 }
 
 export function getTryAgainError(result: UnmarkableAnswer, answer: string, characters: string | null): InputError {
-  const message = TRY_AGAIN_MESSAGES[result]
-  if (result !== 'kana-mismatch' || !characters) return { message, isMessageVisible: false }
+  return {
+    message: TRY_AGAIN_MESSAGES[result],
+    isMessageVisible: false,
+    wrongCharacterIndexes: findWrongCharacters(result, answer, characters),
+  }
+}
+
+function findWrongCharacters(result: UnmarkableAnswer, answer: string, characters: string | null) {
+  if (result === 'not-kana') return findNonKana(answer)
+  if (result !== 'kana-mismatch' || !characters) return
 
   const mismatchedIndexes = findMismatchedKana(answer, characters)
-  const wrongCharacterIndexes = mismatchedIndexes.length > 0 ? mismatchedIndexes : [...answer].map((_, index) => index)
-  return { message, isMessageVisible: false, wrongCharacterIndexes }
+  return mismatchedIndexes.length > 0 ? mismatchedIndexes : [...answer].map((_, index) => index)
 }
