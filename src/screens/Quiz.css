@@ -78,6 +78,18 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding: 24px 0 40px;
+  }
+
+  /* Full-bleed band: the shadow paints the background out to both screen edges and the clip stops it spreading vertically. */
+  .answer > form[data-question='reading'] {
+    --ink: var(--paper);
+    --red: var(--red-on-night);
+
+    background: var(--night);
+    box-shadow: 0 0 0 100vmax var(--night);
+    clip-path: inset(0 -100vmax);
+    color: var(--paper);
   }
 
   label {
@@ -207,7 +219,7 @@
 
     .answer {
       grid-row: 3;
-      padding: 18px 0;
+      padding: 0 0 18px;
     }
   }
 }

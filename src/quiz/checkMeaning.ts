@@ -1,5 +1,6 @@
-import { isJapanese, toHiragana, toKana } from 'wanakana'
+import { isJapanese, isKana, isKanji, toHiragana, toKana } from 'wanakana'
 import type { Subject } from '../api/types'
+import { matchesKanaInQuestion } from './matchesKanaInQuestion'
 
 export type MeaningResult = 'correct' | 'incorrect' | 'not-english' | 'reading-given'
 
@@ -23,8 +24,16 @@ export function checkMeaning(answer: string, subject: Subject, synonyms: readonl
 }
 
 function isReadingInRomaji(answer: string, subject: Subject) {
-  const given = toHiragana(toKana(answer.replaceAll(/\s/gu, '')))
-  return subject.readings?.some((reading) => toHiragana(reading.reading) === given) ?? false
+  const given = toHiragana(toKana(answer.toLowerCase().replaceAll(/\s/gu, '')))
+  if (!isKana(given)) return false
+  if (subject.readings?.some((reading) => toHiragana(reading.reading) === given)) return true
+  return hasKanjiAndKana(subject.characters) && matchesKanaInQuestion(given, subject.characters)
+}
+
+// Okurigana are what give a mistyped reading away: "nureru" for 漏れる still ends in れる.
+function hasKanjiAndKana(characters: string | null): characters is string {
+  const characterList = [...(characters ?? '')]
+  return characterList.some((character) => isKanji(character)) && characterList.some((character) => isKana(character))
 }
 
 function normalise(text: string) {
