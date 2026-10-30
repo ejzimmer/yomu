@@ -35,37 +35,40 @@
   .days {
     display: flex;
     flex-direction: column;
-    gap: 6px;
   }
 
   .day {
     display: grid;
-    grid-template-columns: 3.5em 1fr 3.5em 3.5em;
+    grid-template-columns: 3em 1fr 3em 3em;
     align-items: center;
     gap: 12px;
-    padding: 4px 0;
   }
 
-  summary.day {
-    cursor: pointer;
-    list-style: none;
+  .timeline {
+    position: relative;
+    height: 48px;
+    background:
+      linear-gradient(var(--track), var(--track)) center / 100% 1px no-repeat,
+      linear-gradient(var(--track), var(--track)) 25% center / 1px 7px no-repeat,
+      linear-gradient(var(--track), var(--track)) 50% center / 1px 7px no-repeat,
+      linear-gradient(var(--track), var(--track)) 75% center / 1px 7px no-repeat;
   }
 
-  summary.day::-webkit-details-marker {
-    display: none;
+  .spatter {
+    position: absolute;
+    top: 50%;
+    color: var(--indigo);
+    translate: -50% -50%;
+    line-height: 0;
   }
 
-  .bar {
-    height: 18px;
-    color: var(--green);
-  }
-
-  .bar svg {
-    display: block;
+  .spatter svg {
+    overflow: visible;
+    opacity: 0.88;
   }
 
   .added {
-    color: var(--green);
+    color: var(--indigo);
     font-weight: 700;
     text-align: right;
   }
@@ -73,23 +76,5 @@
   .total {
     color: var(--ink-soft);
     text-align: right;
-  }
-
-  .hours {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(7em, 1fr));
-    gap: 4px 16px;
-    padding: 4px 0 12px 4.5em;
-    font-size: 14px;
-  }
-
-  .hours li {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .time {
-    color: var(--ink-soft);
   }
 }
