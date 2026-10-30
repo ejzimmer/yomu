@@ -34,8 +34,8 @@ export function ShakeInput({ className, ref, onChange, ...inputProps }: Props) {
     },
   }), [])
 
-  function clearHighlightAndChange(event: ChangeEvent<HTMLInputElement>) {
-    if (wrongCharacterIndexes) setError(null)
+  function clearErrorAndChange(event: ChangeEvent<HTMLInputElement>) {
+    setError(null)
     onChange?.(event)
   }
 
@@ -46,7 +46,7 @@ export function ShakeInput({ className, ref, onChange, ...inputProps }: Props) {
         className={`${className ?? ''} ${getErrorClass(error)}`}
         aria-invalid={error ? true : undefined}
         aria-describedby={messageId}
-        onChange={clearHighlightAndChange}
+        onChange={clearErrorAndChange}
         {...inputProps}
       />
       {wrongCharacterIndexes && (
