@@ -1,0 +1,26 @@
+@scope (.brush-stroke) {
+  :scope {
+    container-type: size;
+    position: relative;
+    display: block;
+    height: 100%;
+  }
+
+  svg {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .head {
+    left: 0;
+    aspect-ratio: 60 / 40;
+  }
+
+  /* Starts where the head is taller than the body, so the body's square end is hidden inside it */
+  .body {
+    left: 60cqh;
+    width: max(0px, 100cqw - 60cqh);
+  }
+}
