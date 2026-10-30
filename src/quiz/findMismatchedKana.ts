@@ -8,7 +8,7 @@ interface Alignment {
 }
 
 // Each run of kanji in the question can stand for one or more kana in the answer,
-// so for 食べる, the た in たべた is wrong but the first た isn't.
+// so for 食べる, only the last た in たべた is wrong.
 export function findMismatchedKana(answer: string, characters: string): number[] {
   const answerKana = [...answer].map((character) => toHiragana(character))
   const tokens = tokeniseQuestion(characters)
