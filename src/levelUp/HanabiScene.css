@@ -37,6 +37,15 @@
     fill: var(--ground);
   }
 
+  .level {
+    fill: var(--white);
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 60px;
+    text-anchor: middle;
+    filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.6));
+  }
+
   .branch {
     fill: none;
     stroke: var(--bark);

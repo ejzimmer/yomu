@@ -21,6 +21,9 @@ export function HanabiScene({ level }: Props) {
       <svg className="garden" viewBox={VIEW_BOX}>
         <ellipse className="hill" cx={TREE_WIDTH / 2} cy={TREE_HEIGHT + 40} rx={TREE_WIDTH * 2} ry="90" />
         <SakuraTree level={level} />
+        <text className="level" x={TREE_WIDTH / 2} y={TREE_HEIGHT * 0.67}>
+          {level}
+        </text>
       </svg>
       <FallingPetals />
     </div>

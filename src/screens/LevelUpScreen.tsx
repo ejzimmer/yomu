@@ -18,10 +18,7 @@ export function LevelUpScreen({ level, onDismiss }: Props) {
       <p className="congratulations" lang="ja">
         おめでとう
       </p>
-      <p className="level">
-        <span className="visually-hidden">Level </span>
-        {level}
-      </p>
+      <p className="visually-hidden">Level {level}</p>
       <div className="actions">
         <IconButton className="submit" onClick={onDismiss} label="Done" aria-keyshortcuts="Enter">
           <ArrowIcon />
