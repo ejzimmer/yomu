@@ -7,8 +7,8 @@ interface Alignment {
   mismatchedIndexes: number[]
 }
 
-// Lines the answer up with the question's kana, letting each run of kanji stand for one or more kana,
-// and returns the positions in the answer that don't fit. For 食べる, たべた gives [2].
+// Each run of kanji in the question can stand for one or more kana in the answer,
+// so for 食べる, the た in たべた is wrong but the first た isn't.
 export function findMismatchedKana(answer: string, characters: string): number[] {
   const answerKana = [...answer].map((character) => toHiragana(character))
   const tokens = tokeniseQuestion(characters)
