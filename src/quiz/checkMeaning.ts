@@ -27,13 +27,14 @@ function isReadingInRomaji(answer: string, subject: Subject) {
   const given = toHiragana(toKana(answer.toLowerCase().replaceAll(/\s/gu, '')))
   if (!isKana(given)) return false
   if (subject.readings?.some((reading) => toHiragana(reading.reading) === given)) return true
-  return hasKanjiAndKana(subject.characters) && matchesKanaInQuestion(given, subject.characters)
+  return matchesOkurigana(given, subject.characters)
 }
 
-// Okurigana are what give a mistyped reading away: "nureru" for 漏れる still ends in れる.
-function hasKanjiAndKana(characters: string | null): characters is string {
-  const characterList = [...(characters ?? '')]
-  return characterList.some((character) => isKanji(character)) && characterList.some((character) => isKana(character))
+function matchesOkurigana(answer: string, characters: string | null) {
+  if (!characters) return false
+  const characterList = [...characters]
+  const hasOkurigana = characterList.some((character) => isKanji(character)) && characterList.some((character) => isKana(character))
+  return hasOkurigana && matchesKanaInQuestion(answer, characters)
 }
 
 function normalise(text: string) {
