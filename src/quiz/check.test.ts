@@ -38,6 +38,15 @@ const person = makeSubject({
   ],
 })
 
+const one = makeSubject({
+  characters: '一',
+  meanings: [{ meaning: 'One', primary: true, accepted_answer: true }],
+  readings: [
+    { reading: 'いち', primary: true, accepted_answer: true, type: 'onyomi' },
+    { reading: 'ひと', primary: false, accepted_answer: false, type: 'kunyomi' },
+  ],
+})
+
 const toEat = makeSubject({
   characters: '食べる',
   readings: [{ reading: 'たべる', primary: true, accepted_answer: true }],
@@ -78,6 +87,12 @@ describe('checkMeaning', () => {
   it('says an answer typed in Japanese isn’t English', () => {
     expect(checkMeaning('かき', persimmon)).toBe('not-english')
   })
+
+  it('asks again for the meaning when a reading is typed in romaji', () => {
+    expect(checkMeaning('ichi', one)).toBe('reading-given')
+    expect(checkMeaning('hito', one)).toBe('reading-given')
+    expect(checkMeaning('ni', one)).toBe('incorrect')
+  })
 })
 
 describe('checkReading', () => {
@@ -104,5 +119,11 @@ describe('checkReading', () => {
     expect(checkReading('たべれ', toEat)).toBe('kana-mismatch')
     expect(checkReading('おちゃ', tea)).toBe('correct')
     expect(checkReading('ちゃ', tea)).toBe('kana-mismatch')
+  })
+
+  it('asks again for the reading when a meaning is typed', () => {
+    expect(checkReading('おね', one)).toBe('meaning-given')
+    expect(checkReading('one', one)).toBe('meaning-given')
+    expect(checkReading('ふた', one)).toBe('incorrect')
   })
 })

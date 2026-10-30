@@ -16,6 +16,8 @@ const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
   'kana-mismatch': 'Keep the kana from the question',
   'onyomi-wanted': 'On’yomi wanted',
   'kunyomi-wanted': 'Kun’yomi wanted',
+  'reading-given': 'Meaning wanted, not reading',
+  'meaning-given': 'Reading wanted, not meaning',
 }
 
 interface Props {

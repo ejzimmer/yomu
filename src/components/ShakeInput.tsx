@@ -49,5 +49,5 @@ const SHAKE_KEYFRAMES = [
 function shake(input: HTMLInputElement | null) {
   if (!input) return
   input.focus()
-  input.animate(SHAKE_KEYFRAMES, { duration: 350 })
+  input.animate(SHAKE_KEYFRAMES, { duration: 200 })
 }
