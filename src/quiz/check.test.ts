@@ -93,6 +93,22 @@ describe('checkMeaning', () => {
     expect(checkMeaning('hito', one)).toBe('reading-given')
     expect(checkMeaning('ni', one)).toBe('incorrect')
   })
+
+  it('asks again for the meaning when romaji ends in the question’s kana', () => {
+    const toLeak = makeSubject({
+      characters: '漏れる',
+      meanings: [{ meaning: 'To Leak', primary: true, accepted_answer: true }],
+      readings: [{ reading: 'もれる', primary: true, accepted_answer: true }],
+    })
+    expect(checkMeaning('nureru', toLeak)).toBe('reading-given')
+    expect(checkMeaning('Moreru', toLeak)).toBe('reading-given')
+    expect(checkMeaning('to drip', toLeak)).toBe('incorrect')
+    expect(checkMeaning('more', toLeak)).toBe('incorrect')
+  })
+
+  it('doesn’t treat romaji as a reading when the question has no kana', () => {
+    expect(checkMeaning('same', persimmon)).toBe('incorrect')
+  })
 })
 
 describe('checkReading', () => {

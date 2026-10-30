@@ -74,7 +74,7 @@ export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo
 
   return (
     <div className="answer">
-      <form onSubmit={submit}>
+      <form data-question={type} onSubmit={submit}>
         <label htmlFor={inputId}>{type === 'meaning' ? 'Meaning' : 'Reading'}</label>
         <div className="answer-row">
           <ShakeInput
