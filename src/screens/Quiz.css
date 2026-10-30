@@ -60,7 +60,7 @@
 
   .item span {
     font-family: var(--display);
-    font-weight: 700;
+    font-weight: var(--display-weight);
     line-height: 1.1;
     text-align: center;
     overflow-wrap: anywhere;
@@ -138,7 +138,7 @@
   .correct {
     font-family: var(--display);
     font-size: 34px;
-    font-weight: 700;
+    font-weight: var(--display-weight);
   }
 
   .feed {
@@ -245,7 +245,7 @@
 
   .count {
     font-family: var(--display);
-    font-weight: 700;
+    font-weight: var(--display-weight);
     font-size: 120px;
     line-height: 1;
   }

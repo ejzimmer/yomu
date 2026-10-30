@@ -15,7 +15,7 @@
 
   .count {
     font-family: var(--display);
-    font-weight: 700;
+    font-weight: var(--display-weight);
     font-size: 48px;
     line-height: 1;
   }

@@ -51,7 +51,7 @@
     color: var(--type-colour);
     font-family: var(--display);
     font-size: 18px;
-    font-weight: 700;
+    font-weight: var(--display-weight);
     cursor: pointer;
   }
 
@@ -74,7 +74,7 @@
     color: var(--type-colour);
     font-family: var(--display);
     font-size: clamp(64px, 18vw, 140px);
-    font-weight: 700;
+    font-weight: var(--display-weight);
     line-height: 1.1;
     text-align: center;
   }
@@ -98,7 +98,7 @@
     margin: 0;
     font-family: var(--display);
     font-size: 30px;
-    font-weight: 700;
+    font-weight: var(--display-weight);
   }
 
   .alternatives {
@@ -168,7 +168,7 @@
     min-width: 32px;
     font-family: var(--display);
     font-size: 22px;
-    font-weight: 700;
+    font-weight: var(--display-weight);
     text-align: center;
     color: var(--type-colour);
   }
