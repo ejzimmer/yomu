@@ -14,14 +14,14 @@
   --indigo: #2B4A78;
   --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   --sans: 'IBM Plex Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
-  --rounded: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', var(--sans);
+  --gothic: 'Zen Kaku Gothic New', var(--sans);
   --display: var(--serif);
   --display-weight: 700;
   color-scheme: light;
 }
 
 :root[data-font-style='plain'] {
-  --display: var(--rounded);
+  --display: var(--gothic);
   --display-weight: 500;
 }
 
