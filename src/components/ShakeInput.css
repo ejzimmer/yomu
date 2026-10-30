@@ -32,6 +32,30 @@
     color: var(--red);
   }
 
+  input.highlighted {
+    color: transparent;
+    caret-color: var(--ink);
+  }
+
+  /* Sits exactly over the input, since text inside an input can't be coloured a character at a time */
+  .highlights {
+    position: absolute;
+    inset: 0;
+    padding: 8px 0 0;
+    border-bottom: 2px solid transparent;
+    color: var(--ink);
+    font-size: var(--input-font-size, 22px);
+    line-height: 1.2;
+    text-align: center;
+    white-space: pre;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .wrong {
+    color: var(--red);
+  }
+
   .message {
     position: absolute;
     top: 100%;

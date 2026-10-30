@@ -22,7 +22,7 @@ export function TokenScreen({ onSignedIn }: Props) {
 
     const value = token.trim()
     if (!value) {
-      inputRef.current?.setError('Enter your API token')
+      inputRef.current?.setError({ message: 'Enter your API token', isMessageVisible: true })
       return
     }
 
@@ -32,7 +32,7 @@ export function TokenScreen({ onSignedIn }: Props) {
       const user = await new WaniKaniClient(value).getUser()
       onSignedIn(value, user.data)
     } catch (e) {
-      inputRef.current?.setError(e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani')
+      inputRef.current?.setError({ message: e instanceof ApiError && e.status === 401 ? 'Invalid token' : 'Could not reach WaniKani', isMessageVisible: true })
     } finally {
       setIsLoading(false)
     }

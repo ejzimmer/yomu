@@ -1,24 +1,13 @@
 import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { flushSync } from 'react-dom'
 import type { WaniKaniClient } from '../api/client'
-import { IconButton } from '../components/IconButton'
 import { ShakeInput, type ShakeInputHandle } from '../components/ShakeInput'
-import { ArrowIcon, UndoIcon } from '../icons'
-import { checkAnswer, convertTypedKana, type UnmarkableAnswer } from '../quiz/checkAnswer'
+import { checkAnswer, convertTypedKana } from '../quiz/checkAnswer'
 import type { Question } from '../quiz/session'
 import { useSynonyms } from '../synonyms/useSynonyms'
+import { AnswerButtons } from './AnswerButtons'
 import { CorrectAnswer } from './CorrectAnswer'
-
-const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
-  blank: 'Type an answer',
-  'not-english': 'Answer in English',
-  'not-kana': 'Kana only',
-  'kana-mismatch': 'Keep the kana from the question',
-  'onyomi-wanted': 'On’yomi wanted',
-  'kunyomi-wanted': 'Kun’yomi wanted',
-  'reading-given': 'Meaning wanted, not reading',
-  'meaning-given': 'Reading wanted, not meaning',
-}
+import { getTryAgainError } from './getTryAgainError'
 
 interface Props {
   question: Question
@@ -51,7 +40,7 @@ export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo
     const result = checkAnswer(answer, type, item.subject.data, synonyms)
 
     if (result !== 'correct' && result !== 'incorrect') {
-      inputRef.current?.setError(TRY_AGAIN_MESSAGES[result])
+      inputRef.current?.setError(getTryAgainError(result, answer, item.subject.data.characters))
       return
     }
 
@@ -93,14 +82,7 @@ export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo
             onChange={(e) => setAnswer(type === 'reading' ? convertTypedKana(e.target.value) : e.target.value)}
             onKeyDown={redoOnBackspace}
           />
-          {isShowingAnswer && (
-            <IconButton className="icon-btn typo" type="button" onClick={redo} label="Typo, redo">
-              <UndoIcon />
-            </IconButton>
-          )}
-          <IconButton className="submit" type="submit" label={isShowingAnswer ? 'Next' : 'Submit'}>
-            <ArrowIcon />
-          </IconButton>
+          <AnswerButtons isShowingAnswer={isShowingAnswer} onRedo={redo} />
         </div>
       </form>
       {isShowingAnswer && <CorrectAnswer subject={item.subject} type={type} client={client} />}
