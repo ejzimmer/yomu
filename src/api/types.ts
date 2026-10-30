@@ -68,10 +68,17 @@ export interface ContextSentence {
   ja: string
 }
 
+export interface CharacterImage {
+  url: string
+  content_type: 'image/svg+xml' | 'image/png'
+  metadata: { inline_styles?: boolean; dimensions?: string }
+}
+
 export interface Subject {
   level: number
   slug: string
   characters: string | null
+  character_images?: CharacterImage[]
   meanings: Meaning[]
   auxiliary_meanings: AuxiliaryMeaning[]
   readings?: Reading[]

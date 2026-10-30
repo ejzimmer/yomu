@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { WaniKaniClient } from '../api/client'
 import type { ContextSentence, Reading, Resource, Subject } from '../api/types'
 import { MarkedUpText } from '../components/MarkedUpText'
-import { getCharacters } from '../data/getCharacters'
+import { SubjectCharacters } from '../components/SubjectCharacters'
 import { Synonyms } from './Synonyms'
 
 interface Props {
@@ -24,7 +24,7 @@ export function LessonPage({ subject: { id: subjectId, data: subject }, subjects
   return (
     <article className="lesson-page">
       <div className="lesson-item" lang="ja">
-        {getCharacters(subject)}
+        <SubjectCharacters subject={subject} />
       </div>
 
       <LessonSection title="Meaning">
@@ -105,7 +105,7 @@ function ComponentSubjects({ subjects }: { subjects: readonly Resource<Subject>[
     <ul className="component-subjects">
       {subjects.map((subject) => (
         <li key={subject.id} data-type={subject.object}>
-          <span lang="ja">{getCharacters(subject.data)}</span>
+          <span lang="ja"><SubjectCharacters subject={subject.data} /></span>
           {subject.data.meanings.find((meaning) => meaning.primary)?.meaning}
         </li>
       ))}

@@ -1,4 +1,4 @@
-import { getCharacters } from '../data/getCharacters'
+import { SubjectCharacters } from '../components/SubjectCharacters'
 import type { StudyItem } from '../data/studyItem'
 
 interface Props {
@@ -19,7 +19,7 @@ export function LessonTabs({ items, currentIndex, onSelect }: Props) {
             aria-current={index === currentIndex ? 'step' : undefined}
             onClick={() => onSelect(index)}
           >
-            {getCharacters(item.subject.data)}
+            <SubjectCharacters subject={item.subject.data} />
           </button>
         </li>
       ))}
