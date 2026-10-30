@@ -1,11 +1,12 @@
 import { isKana, toHiragana } from 'wanakana'
 import type { Subject } from '../api/types'
+import { convertToHiragana } from './convertToHiragana'
 import { matchesKanaInQuestion } from './matchesKanaInQuestion'
 
 export type ReadingResult = 'correct' | 'incorrect' | 'not-kana' | 'kana-mismatch' | 'onyomi-wanted' | 'kunyomi-wanted' | 'meaning-given'
 
 export function checkReading(answer: string, subject: Subject): ReadingResult {
-  const given = toHiragana(answer.trim())
+  const given = convertToHiragana(answer)
   if (!isKana(given)) return 'not-kana'
 
   const reading = subject.readings?.find((r) => toHiragana(r.reading) === given)
@@ -21,7 +22,7 @@ function isMeaningInKana(answer: string, subject: Subject) {
   return [
     ...subject.meanings.filter((m) => m.accepted_answer).map((m) => m.meaning),
     ...subject.auxiliary_meanings.filter((m) => m.type === 'whitelist').map((m) => m.meaning),
-  ].some((meaning) => toHiragana(meaning.toLowerCase().replaceAll(/[^a-z]/gu, '')) === answer)
+  ].some((meaning) => convertToHiragana(meaning) === answer)
 }
 
 function getWantedReadingType(subject: Subject) {

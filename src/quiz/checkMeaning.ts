@@ -1,5 +1,6 @@
 import { isJapanese, isKana, isKanji, toHiragana } from 'wanakana'
 import type { Subject } from '../api/types'
+import { convertToHiragana } from './convertToHiragana'
 import { matchesKanaInQuestion } from './matchesKanaInQuestion'
 
 export type MeaningResult = 'correct' | 'incorrect' | 'not-english' | 'reading-given'
@@ -24,7 +25,7 @@ export function checkMeaning(answer: string, subject: Subject, synonyms: readonl
 }
 
 function isReadingInRomaji(answer: string, subject: Subject) {
-  const given = toHiragana(answer.replaceAll(/\s/gu, ''))
+  const given = convertToHiragana(answer)
   if (!isKana(given)) return false
   if (subject.readings?.some((reading) => toHiragana(reading.reading) === given)) return true
   return matchesOkurigana(given, subject.characters)
