@@ -118,7 +118,9 @@
   }
 
   [data-question='reading'] .submit {
-    background: var(--ink);
+    border: 2px solid var(--type-colour);
+    background: transparent;
+    color: var(--type-colour);
   }
 
   /* Two classes, to beat IconButton's own colour */
