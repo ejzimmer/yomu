@@ -22,9 +22,8 @@ export function buildInkSpatter(seed: number, radius: number): InkSpatter {
 
 function drawBlob(random: () => number, radius: number) {
   const points = Array.from({ length: BLOB_POINTS }, (_, i) => {
-    const angle = ((i + random() * 0.5) / BLOB_POINTS) * Math.PI * 2
-    const lobe = random() < 0.12 ? 1.3 : 1
-    const distance = radius * (0.86 + random() * 0.22) * lobe
+    const angle = ((i + random() * 0.2) / BLOB_POINTS) * Math.PI * 2
+    const distance = radius * (0.94 + random() * 0.08)
     return { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance }
   })
   const at = (i: number) => points[(i + points.length) % points.length]
@@ -43,15 +42,15 @@ function formatPoint({ x, y }: { x: number; y: number }) {
 }
 
 function scatterDroplets(random: () => number, radius: number): Droplet[] {
-  const count = 3 + Math.floor(random() * 4)
+  const count = 2 + Math.floor(random() * 2)
   return Array.from({ length: count }, () => {
     const angle = random() * 360
-    const distance = radius * (1.15 + random() * 0.55)
+    const distance = radius * (1.25 + random() * 0.2)
     const width = Math.max(0.8, radius * (0.04 + random() * 0.08))
     return {
       x: round(Math.cos(toRadians(angle)) * distance),
       y: round(Math.sin(toRadians(angle)) * distance),
-      length: round(width * (1 + random() * 1.4)),
+      length: round(width * (1 + random() * 0.3)),
       width: round(width),
       angle: round(angle),
     }
