@@ -12,7 +12,11 @@ const STROKES = [
 const CYCLE_MS = 2400
 const DRAWING_SHARE = 0.75
 
-export function LoadingKanji() {
+interface Props {
+  size?: number
+}
+
+export function LoadingKanji({ size = 26 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
 
   useEffect(() => {
@@ -36,8 +40,8 @@ export function LoadingKanji() {
   return (
     <svg
       ref={svgRef}
-      width={26}
-      height={26}
+      width={size}
+      height={size}
       viewBox="0 0 100 100"
       fill="none"
       stroke="currentColor"

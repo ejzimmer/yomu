@@ -8,6 +8,7 @@ import { sync } from './sync'
 export function useSync(client: WaniKaniClient, onUnauthorized: () => void) {
   const [isSyncing, setIsSyncing] = useState(true)
   const [syncError, setSyncError] = useState<string | null>(null)
+  const [hasFinishedFirstSync, setHasFinishedFirstSync] = useState(false)
 
   const runSync = useCallback(
     () =>
@@ -20,7 +21,10 @@ export function useSync(client: WaniKaniClient, onUnauthorized: () => void) {
           if (error instanceof ApiError && error.status === 401) onUnauthorized()
           else setSyncError('Sync failed. Showing what was already saved.')
         })
-        .finally(() => setIsSyncing(false)),
+        .finally(() => {
+          setIsSyncing(false)
+          setHasFinishedFirstSync(true)
+        }),
     [client, onUnauthorized],
   )
 
@@ -33,5 +37,5 @@ export function useSync(client: WaniKaniClient, onUnauthorized: () => void) {
     void runSync()
   }
 
-  return { isSyncing, syncError, syncNow }
+  return { isSyncing, hasFinishedFirstSync, syncError, syncNow }
 }
