@@ -75,5 +75,5 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onE
 function getCharactersFontSize(subject: Subject) {
   const characterCount = subject.characters === null ? 1 : [...subject.characters].length
   const widthShare = (86 / characterCount).toFixed(1)
-  return `max(40px, min(150px, ${widthShare}cqw))`
+  return `min(150px, ${widthShare}cqw, 85cqh)`
 }
