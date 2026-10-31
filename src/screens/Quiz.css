@@ -8,6 +8,11 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    min-height: 0;
+  }
+
+  :scope:not(.summary) {
+    flex: 1;
   }
 
   :scope[data-type='radical'] {
@@ -44,17 +49,20 @@
   .layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 760px) minmax(0, 1fr);
-    grid-template-rows: auto auto;
+    grid-template-rows: minmax(0, 330px) auto;
+    align-content: start;
     column-gap: 40px;
+    flex: 1;
+    min-height: 0;
   }
 
   .item {
     grid-column: 2;
-    height: 330px;
     display: flex;
     align-items: center;
     justify-content: center;
-    container-type: inline-size;
+    overflow: hidden;
+    container-type: size;
     color: var(--type-colour);
   }
 
@@ -190,6 +198,7 @@
 
     .layout {
       grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: minmax(80px, 250px) auto auto;
     }
 
     .item,
@@ -197,10 +206,6 @@
     .feed {
       grid-column: 1;
       grid-row: auto;
-    }
-
-    .item {
-      height: 250px;
     }
 
     .feed {
