@@ -1,6 +1,7 @@
 import './ReviewForecast.css'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { InkSpatter } from '../components/InkSpatter'
+import { Tooltip } from '../components/Tooltip'
 import type { ForecastDay, ForecastHour } from '../review/buildReviewForecast'
 import { loadReviewForecast } from '../review/loadReviewForecast'
 
@@ -43,13 +44,16 @@ function ForecastDayRow({ day, busiestHourCount }: ForecastDayRowProps) {
       <ol className="timeline">
         {day.hours.map((hour) => (
           <li key={hour.start.toString()} className="spatter" style={{ left: `${getDayProgress(hour) * 100}%` }}>
-            <InkSpatter
-              seed={hour.start.epochMilliseconds}
-              radius={getSpatterRadius(hour.count, busiestHourCount)}
-            />
-            <span className="visually-hidden">
-              {hour.start.toLocaleString(undefined, { hour: 'numeric', minute: '2-digit' })}: +{hour.count}
-            </span>
+            <Tooltip text={describeHour(hour)}>
+              {(tooltipProps) => (
+                <button type="button" {...tooltipProps}>
+                  <InkSpatter
+                    seed={hour.start.epochMilliseconds}
+                    radius={getSpatterRadius(hour.count, busiestHourCount)}
+                  />
+                </button>
+              )}
+            </Tooltip>
           </li>
         ))}
       </ol>
@@ -57,6 +61,10 @@ function ForecastDayRow({ day, busiestHourCount }: ForecastDayRowProps) {
       <span className="total">{day.total}</span>
     </>
   )
+}
+
+function describeHour(hour: ForecastHour) {
+  return `${hour.start.toLocaleString(undefined, { hour: 'numeric', minute: '2-digit' })} · +${hour.count}`
 }
 
 function getDayProgress(hour: ForecastHour) {
