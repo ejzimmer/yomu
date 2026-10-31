@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import { WaniKaniClient } from '../api/client'
+import { LoadingYomu } from '../components/LoadingYomu'
 import { db } from '../data/db'
 import { useSync } from '../data/useSync'
 import { DebugScreen } from './DebugScreen'
@@ -16,7 +17,7 @@ interface Props {
 export function HomeScreen({ token, onUnauthorized }: Props) {
   // One client per token, so every request shares the same rate limiter.
   const client = useMemo(() => new WaniKaniClient(token), [token])
-  const { isSyncing, syncError, syncNow } = useSync(client, onUnauthorized)
+  const { isSyncing, hasFinishedFirstSync, syncError, syncNow } = useSync(client, onUnauthorized)
   const [activity, setActivity] = useState<'menu' | 'lessons' | 'reviews'>('menu')
   const user = useLiveQuery(() => db.user.get('me'))?.user
 
@@ -25,7 +26,7 @@ export function HomeScreen({ token, onUnauthorized }: Props) {
     syncNow()
   }
 
-  if (!user) return null
+  if (!user || !hasFinishedFirstSync) return <LoadingYomu />
 
   switch (activity) {
     case 'lessons':
