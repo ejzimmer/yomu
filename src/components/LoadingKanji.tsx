@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { WritingStrokes } from './WritingStrokes'
 
 // 永 ("eternity"), the classic brush-practice character: its five strokes
 // cover the basic stroke types. Drawn in stroke order.
@@ -9,50 +9,7 @@ const STROKES = [
   'M83 34 Q74 46 58 56',
   'M58 56 Q72 76 90 86',
 ]
-const CYCLE_MS = 2400
-const DRAWING_SHARE = 0.75
 
-interface Props {
-  size?: number
-}
-
-export function LoadingKanji({ size = 26 }: Props) {
-  const svgRef = useRef<SVGSVGElement>(null)
-
-  useEffect(() => {
-    const paths = svgRef.current?.querySelectorAll('path') ?? []
-    const strokeShare = DRAWING_SHARE / paths.length
-    const animations = [...paths].map((path, i) =>
-      path.animate(
-        [
-          { offset: 0, strokeDashoffset: 1, opacity: 1 },
-          { offset: i * strokeShare, strokeDashoffset: 1 },
-          { offset: (i + 1) * strokeShare, strokeDashoffset: 0 },
-          { offset: 0.9, strokeDashoffset: 0, opacity: 1 },
-          { offset: 1, strokeDashoffset: 0, opacity: 0 },
-        ],
-        { duration: CYCLE_MS, iterations: Infinity },
-      ),
-    )
-    return () => animations.forEach((animation) => animation.cancel())
-  }, [])
-
-  return (
-    <svg
-      ref={svgRef}
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {STROKES.map((d) => (
-        <path key={d} d={d} pathLength={1} strokeDasharray={1} strokeDashoffset={1} />
-      ))}
-    </svg>
-  )
+export function LoadingKanji() {
+  return <WritingStrokes characters={[STROKES]} characterSize={100} height={26} strokeWidth={8} cycleMs={2400} />
 }
