@@ -59,7 +59,23 @@
     top: 50%;
     color: var(--indigo);
     translate: -50% -50%;
-    line-height: 0;
+  }
+
+  .spatter button {
+    display: grid;
+    place-items: center;
+    min-width: 20px;
+    min-height: 20px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: default;
+  }
+
+  .spatter:hover,
+  .spatter:has(:focus-visible) {
+    z-index: 1;
   }
 
   .spatter svg {
