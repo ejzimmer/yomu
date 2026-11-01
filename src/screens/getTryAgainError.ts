@@ -12,12 +12,25 @@ const TRY_AGAIN_MESSAGES: Record<UnmarkableAnswer, string> = {
   'kunyomi-wanted': 'Kun’yomi wanted',
   'reading-given': 'Meaning wanted, not reading',
   'meaning-given': 'Reading wanted, not meaning',
+  'radical-meaning-given': 'That’s the radical meaning',
+  'kanji-meaning-given': 'That’s the kanji meaning',
+  'kanji-reading-given': 'That’s the kanji reading',
+  'vocabulary-meaning-given': 'That’s the vocabulary meaning',
+  'vocabulary-reading-given': 'That’s the vocabulary reading',
 }
+
+const VISIBLE_MESSAGES: ReadonlySet<UnmarkableAnswer> = new Set([
+  'radical-meaning-given',
+  'kanji-meaning-given',
+  'kanji-reading-given',
+  'vocabulary-meaning-given',
+  'vocabulary-reading-given',
+])
 
 export function getTryAgainError(result: UnmarkableAnswer, answer: string, characters: string | null): InputError {
   return {
     message: TRY_AGAIN_MESSAGES[result],
-    isMessageVisible: false,
+    isMessageVisible: VISIBLE_MESSAGES.has(result),
     wrongCharacterIndexes: findWrongCharacters(result, answer, characters),
   }
 }
