@@ -1,16 +1,28 @@
 import { toKana } from 'wanakana'
-import type { Subject } from '../api/types'
+import type { Resource, Subject } from '../api/types'
 import { checkMeaning, type MeaningResult } from './checkMeaning'
 import { checkReading, type ReadingResult } from './checkReading'
+import { findLookalikeAnswer, type LookalikeAnswer } from './findLookalikeAnswer'
 import type { QuestionType } from './session'
 
-export type AnswerResult = 'blank' | MeaningResult | ReadingResult
+export type AnswerResult = 'blank' | MeaningResult | ReadingResult | LookalikeAnswer
 
 export type UnmarkableAnswer = Exclude<AnswerResult, 'correct' | 'incorrect'>
 
-export function checkAnswer(answer: string, type: QuestionType, subject: Subject, synonyms: readonly string[]): AnswerResult {
+const WRONG_FOR_THIS_SUBJECT: ReadonlySet<AnswerResult> = new Set(['incorrect', 'onyomi-wanted', 'kunyomi-wanted'])
+
+export function checkAnswer(
+  answer: string,
+  type: QuestionType,
+  subject: Subject,
+  synonyms: readonly string[],
+  lookalikes: readonly Resource<Subject>[] = [],
+): AnswerResult {
   if (!answer.trim()) return 'blank'
-  return type === 'meaning' ? checkMeaning(answer, subject, synonyms) : checkReading(answer, subject)
+
+  const result = type === 'meaning' ? checkMeaning(answer, subject, synonyms) : checkReading(answer, subject)
+  if (!WRONG_FOR_THIS_SUBJECT.has(result)) return result
+  return findLookalikeAnswer(answer, type, lookalikes) ?? result
 }
 
 // Converts romaji to kana as it's typed, leaving a trailing "n" until the next letter decides it.
