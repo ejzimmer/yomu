@@ -31,4 +31,9 @@ describe('findMismatchedKana', () => {
   it('finds nothing to mark when kana are only missing', () => {
     expect(findMismatchedKana('たべ', '食べる')).toEqual([])
   })
+
+  it('ignores the 〜 in the question', () => {
+    expect(findMismatchedKana('わが', '我が〜')).toEqual([])
+    expect(findMismatchedKana('わの', '我が〜')).toEqual([1])
+  })
 })
