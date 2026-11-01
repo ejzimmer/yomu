@@ -57,6 +57,11 @@ const tea = makeSubject({
   readings: [{ reading: 'おちゃ', primary: true, accepted_answer: true }],
 })
 
+const our = makeSubject({
+  characters: '我が〜',
+  readings: [{ reading: 'わが', primary: true, accepted_answer: true }],
+})
+
 describe('checkMeaning', () => {
   it('accepts an accepted meaning, ignoring case and spacing', () => {
     expect(checkMeaning('  persimmon ', persimmon)).toBe('correct')
@@ -123,6 +128,12 @@ describe('checkReading', () => {
 
   it('marks other kana wrong', () => {
     expect(checkReading('じつ', person)).toBe('incorrect')
+  })
+
+  it('doesn’t ask for the 〜 that marks where a word attaches', () => {
+    expect(checkReading('わが', our)).toBe('correct')
+    expect(checkReading('わが〜', our)).toBe('correct')
+    expect(checkReading('われが', our)).toBe('incorrect')
   })
 
   it('converts romaji, and says an answer that won’t convert isn’t kana', () => {

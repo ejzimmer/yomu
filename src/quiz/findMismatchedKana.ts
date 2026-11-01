@@ -1,4 +1,5 @@
 import { isKanji, toHiragana } from 'wanakana'
+import { removeIgnoredCharacters } from './convertToHiragana'
 
 type Token = { kind: 'kanji' } | { kind: 'kana'; kana: string }
 
@@ -51,7 +52,7 @@ export function findMismatchedKana(answer: string, characters: string): number[]
 
 function tokeniseQuestion(characters: string): Token[] {
   const tokens: Token[] = []
-  for (const character of characters) {
+  for (const character of removeIgnoredCharacters(characters)) {
     if (!isKanji(character)) tokens.push({ kind: 'kana', kana: toHiragana(character) })
     else if (tokens.at(-1)?.kind !== 'kanji') tokens.push({ kind: 'kanji' })
   }
