@@ -190,7 +190,7 @@
     rotate: 180deg;
   }
 
-  /* Phones: the feed becomes a single row under the character, never on top of it. */
+  /* Phones: the feed becomes a single row under the answer, never on top of the character. */
   @container (max-width: 700px) {
     :scope {
       --input-font-size: 26px;
@@ -209,8 +209,7 @@
     }
 
     .feed {
-      order: -1;
-      grid-row: 2;
+      grid-row: 3;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 14px;
@@ -226,7 +225,7 @@
     }
 
     .answer {
-      grid-row: 3;
+      grid-row: 2;
       padding: 18px 0;
     }
   }
