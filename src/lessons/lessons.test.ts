@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Assignment, Preferences, Resource, Subject, User } from '../api/types'
 import { buildLessonQueue } from './buildLessonQueue'
 import { countLessonsStartedToday } from './countLessonsStartedToday'
-import { getLessonBatch, MAX_LESSONS_PER_DAY } from './getLessonBatch'
+import { getLessonBatches, MAX_LESSONS_PER_DAY } from './getLessonBatches'
 
 const makeSubject = (id: number, level: number, lessonPosition: number, hiddenAt: string | null = null) =>
   ({ id, data: { level, lesson_position: lessonPosition, hidden_at: hiddenAt } }) as Resource<Subject>
@@ -58,16 +58,16 @@ describe('buildLessonQueue', () => {
   })
 })
 
-describe('getLessonBatch', () => {
+describe('getLessonBatches', () => {
   const queue = Array.from({ length: 20 }, (_, i) => ({ assignment: makeAssignment(i, 1), subject: makeSubject(1, 1, 0) }))
 
-  it('takes one batch from the front of the queue', () => {
-    expect(getLessonBatch(queue, 5, 0)).toEqual(queue.slice(0, 5))
+  it('splits the day’s lessons into batches from the front of the queue', () => {
+    expect(getLessonBatches(queue, 5, 0)).toEqual([queue.slice(0, 5), queue.slice(5, 10), queue.slice(10, 15)])
   })
 
   it('stops at the daily limit', () => {
-    expect(getLessonBatch(queue, 5, MAX_LESSONS_PER_DAY - 2)).toHaveLength(2)
-    expect(getLessonBatch(queue, 5, MAX_LESSONS_PER_DAY)).toHaveLength(0)
+    expect(getLessonBatches(queue, 5, MAX_LESSONS_PER_DAY - 7)).toEqual([queue.slice(0, 5), queue.slice(5, 7)])
+    expect(getLessonBatches(queue, 5, MAX_LESSONS_PER_DAY)).toEqual([])
   })
 })
 

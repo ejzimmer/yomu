@@ -14,6 +14,7 @@ interface Props {
 
 export function LessonScreen({ client, onExit }: Props) {
   const [data, setData] = useState<LessonData | null>(null)
+  const [batchIndex, setBatchIndex] = useState(0)
   const [isQuizzing, setIsQuizzing] = useState(false)
 
   useEffect(() => {
@@ -21,11 +22,32 @@ export function LessonScreen({ client, onExit }: Props) {
   }, [])
 
   useEffect(() => {
-    if (data) preloadStudyFont(data.batch)
+    if (data) preloadStudyFont(data.batches.flat())
   }, [data])
 
   if (!data) return <LoadingKanji />
-  if (data.batch.length === 0) return <SessionSummary count={0} description="No lessons available" onExit={onExit} />
-  if (isQuizzing) return <LessonQuiz data={data} client={client} onExit={onExit} />
-  return <LessonPages data={data} client={client} onStartQuiz={() => setIsQuizzing(true)} onExit={onExit} />
+
+  const batch = data.batches[batchIndex]
+  if (!batch) return <SessionSummary count={0} description="No lessons available" onExit={onExit} />
+
+  const hasNextBatch = batchIndex < data.batches.length - 1
+
+  function startNextBatch() {
+    setBatchIndex(batchIndex + 1)
+    setIsQuizzing(false)
+  }
+
+  if (isQuizzing) {
+    return <LessonQuiz batch={batch} client={client} onFinish={hasNextBatch ? startNextBatch : undefined} onExit={onExit} />
+  }
+  return (
+    <LessonPages
+      key={batchIndex}
+      batch={batch}
+      subjectsById={data.subjectsById}
+      client={client}
+      onStartQuiz={() => setIsQuizzing(true)}
+      onExit={onExit}
+    />
+  )
 }

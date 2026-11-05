@@ -1,24 +1,26 @@
 import './LessonPages.css'
 import { useState } from 'react'
 import type { WaniKaniClient } from '../api/client'
+import type { Resource, Subject } from '../api/types'
 import { IconButton } from '../components/IconButton'
 import { useKeyboardShortcut } from '../components/useKeyboardShortcut'
+import type { StudyItem } from '../data/studyItem'
 import { ArrowIcon, BackIcon, CloseIcon } from '../icons'
-import type { LessonData } from '../lessons/loadLessonData'
 import { LessonPage } from './LessonPage'
 import { LessonTabs } from './LessonTabs'
 
 interface Props {
-  data: LessonData
+  batch: readonly StudyItem[]
+  subjectsById: ReadonlyMap<number, Resource<Subject>>
   client: WaniKaniClient
   onStartQuiz: () => void
   onExit: () => void
 }
 
-export function LessonPages({ data, client, onStartQuiz, onExit }: Props) {
+export function LessonPages({ batch, subjectsById, client, onStartQuiz, onExit }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const currentItem = data.batch[currentIndex]
-  const isLastPage = currentIndex === data.batch.length - 1
+  const currentItem = batch[currentIndex]
+  const isLastPage = currentIndex === batch.length - 1
 
   function goBack() {
     setCurrentIndex(currentIndex - 1)
@@ -35,13 +37,13 @@ export function LessonPages({ data, client, onStartQuiz, onExit }: Props) {
   return (
     <div className="lesson" data-type={currentItem.assignment.data.subject_type}>
       <div className="lesson-bar">
-        <LessonTabs items={data.batch} currentIndex={currentIndex} onSelect={setCurrentIndex} />
+        <LessonTabs items={batch} currentIndex={currentIndex} onSelect={setCurrentIndex} />
         <IconButton className="icon-btn" onClick={onExit} label="End lessons" tooltipAlign="end">
           <CloseIcon />
         </IconButton>
       </div>
 
-      <LessonPage subject={currentItem.subject} subjectsById={data.subjectsById} client={client} />
+      <LessonPage subject={currentItem.subject} subjectsById={subjectsById} client={client} />
 
       <nav className="lesson-nav">
         <IconButton

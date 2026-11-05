@@ -15,10 +15,11 @@ interface Props {
   aside?: ReactNode
   onItemComplete: (item: SessionItem) => void
   completedLabel: string
+  onFinish?: () => void
   onExit: () => void
 }
 
-export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onExit }: Props) {
+export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onFinish, onExit }: Props) {
   const [session, setSession] = useState(() => createSession(queue))
   const accuracy = session.totalAnswers ? Math.round((session.correctAnswers / session.totalAnswers) * 100) : 100
   const { question } = session
@@ -39,7 +40,9 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onE
 
     const answered = answerCorrectly(session)
     if (answered.completed.length > session.completed.length) onItemComplete(answered.completed.at(-1)!)
-    setSession(askNextQuestion(answered))
+    const next = askNextQuestion(answered)
+    setSession(next)
+    if (!next.question) onFinish?.()
   }
 
   return (
