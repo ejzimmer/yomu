@@ -3,10 +3,10 @@ import { db } from '../data/db'
 import type { StudyItem } from '../data/studyItem'
 import { buildLessonQueue } from './buildLessonQueue'
 import { countLessonsStartedToday } from './countLessonsStartedToday'
-import { countLessonsLeftToday, getLessonBatch } from './getLessonBatch'
+import { countLessonsLeftToday, getLessonBatches } from './getLessonBatches'
 
 export interface LessonData {
-  batch: StudyItem[]
+  batches: StudyItem[][]
   subjectsById: Map<number, Resource<Subject>>
 }
 
@@ -14,7 +14,7 @@ export async function loadLessonData(): Promise<LessonData> {
   const { user, queue, startedToday, subjectsById } = await loadLessonQueue()
 
   return {
-    batch: user ? getLessonBatch(queue, user.preferences.lessons_batch_size, startedToday) : [],
+    batches: user ? getLessonBatches(queue, user.preferences.lessons_batch_size, startedToday) : [],
     subjectsById,
   }
 }
