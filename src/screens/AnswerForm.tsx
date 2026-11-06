@@ -2,9 +2,9 @@ import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'rea
 import { flushSync } from 'react-dom'
 import type { WaniKaniClient } from '../api/client'
 import { ShakeInput, type ShakeInputHandle } from '../components/ShakeInput'
-import { checkAnswer, convertTypedKana } from '../quiz/checkAnswer'
+import { convertTypedKana } from '../quiz/checkAnswer'
 import type { Question } from '../quiz/session'
-import { useSynonyms } from '../synonyms/useSynonyms'
+import { useCheckAnswer } from '../quiz/useCheckAnswer'
 import { AnswerButtons } from './AnswerButtons'
 import { CorrectAnswer } from './CorrectAnswer'
 import { getTryAgainError } from './getTryAgainError'
@@ -23,7 +23,7 @@ export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo
   const inputId = useId()
   const inputRef = useRef<ShakeInputHandle>(null)
   const { type, item } = question
-  const synonyms = useSynonyms(item.subject.id)
+  const checkAnswer = useCheckAnswer(item.subject)
 
   function focusInput() {
     inputRef.current?.focus()
@@ -37,7 +37,7 @@ export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo
       return
     }
 
-    const result = checkAnswer(answer, type, item.subject.data, synonyms)
+    const result = checkAnswer(answer, type)
 
     if (result !== 'correct' && result !== 'incorrect') {
       inputRef.current?.setError(getTryAgainError(result, answer, item.subject.data.characters))
