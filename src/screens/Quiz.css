@@ -41,7 +41,8 @@
   }
 
   .status .wrap-up[aria-pressed='true'] {
-    color: var(--persimmon);
+    color: var(--indigo);
+    font-family: inherit;
   }
 
   .progress {

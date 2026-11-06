@@ -11,10 +11,12 @@ interface Props {
 }
 
 export function SessionStatus({ remaining, accuracy, progress, wrapUp, onExit }: Props) {
+  const isWrappingUp = wrapUp?.isWrappingUp ?? false
+
   return (
     <>
       <div className="status">
-        <span>
+        <span className={isWrappingUp ? 'visually-hidden' : undefined}>
           <span className="visually-hidden">Remaining </span>
           {remaining}
         </span>
@@ -23,9 +25,9 @@ export function SessionStatus({ remaining, accuracy, progress, wrapUp, onExit }:
           {accuracy}%
         </span>
         {wrapUp && (
-          <IconButton className="icon-btn wrap-up" onClick={wrapUp.onToggle} label="Wrap up" aria-pressed={wrapUp.isWrappingUp}>
+          <IconButton className="icon-btn wrap-up" onClick={wrapUp.onToggle} label="Wrap up" aria-pressed={isWrappingUp}>
             <ArrowIcon />
-            <span lang="ja">終わり</span>
+            {isWrappingUp ? <span>{remaining}</span> : <span lang="ja">終わり</span>}
           </IconButton>
         )}
         <IconButton className="icon-btn" onClick={onExit} label="End session" tooltipAlign="end">
