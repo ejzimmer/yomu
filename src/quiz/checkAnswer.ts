@@ -14,15 +14,15 @@ const WRONG_FOR_THIS_SUBJECT: ReadonlySet<AnswerResult> = new Set(['incorrect', 
 export function checkAnswer(
   answer: string,
   type: QuestionType,
-  subject: Subject,
+  subject: Resource<Subject>,
   synonyms: readonly string[],
   lookalikes: readonly Resource<Subject>[] = [],
 ): AnswerResult {
   if (!answer.trim()) return 'blank'
 
-  const result = type === 'meaning' ? checkMeaning(answer, subject, synonyms) : checkReading(answer, subject)
+  const result = type === 'meaning' ? checkMeaning(answer, subject.data, synonyms) : checkReading(answer, subject.data)
   if (!WRONG_FOR_THIS_SUBJECT.has(result)) return result
-  return findLookalikeAnswer(answer, type, lookalikes) ?? result
+  return findLookalikeAnswer(answer, type, subject, lookalikes) ?? result
 }
 
 // Converts romaji to kana as it's typed, leaving a trailing "n" until the next letter decides it.

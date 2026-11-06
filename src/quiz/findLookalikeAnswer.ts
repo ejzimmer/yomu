@@ -4,22 +4,27 @@ import { checkReading } from './checkReading'
 import type { QuestionType } from './session'
 
 export type LookalikeAnswer =
-  | 'radical-meaning-given'
-  | 'kanji-meaning-given'
-  | 'kanji-reading-given'
-  | 'vocabulary-meaning-given'
-  | 'vocabulary-reading-given'
+  | 'radical-meaning-wanted'
+  | 'kanji-meaning-wanted'
+  | 'kanji-reading-wanted'
+  | 'vocabulary-meaning-wanted'
+  | 'vocabulary-reading-wanted'
 
-export function findLookalikeAnswer(answer: string, type: QuestionType, lookalikes: readonly Resource<Subject>[]): LookalikeAnswer | null {
-  const answered = lookalikes.find(({ data }) =>
+export function findLookalikeAnswer(
+  answer: string,
+  type: QuestionType,
+  subject: Resource<Subject>,
+  lookalikes: readonly Resource<Subject>[],
+): LookalikeAnswer | null {
+  const isLookalikeAnswer = lookalikes.some(({ data }) =>
     type === 'meaning' ? checkMeaning(answer, data) === 'correct' : checkReading(answer, data) === 'correct',
   )
-  return answered ? getLookalikeAnswer(answered.object, type) : null
+  return isLookalikeAnswer ? getWantedAnswer(subject.object, type) : null
 }
 
-function getLookalikeAnswer(object: string, type: QuestionType): LookalikeAnswer | null {
-  if (object === 'radical' && type === 'meaning') return 'radical-meaning-given'
-  if (object === 'kanji') return `kanji-${type}-given`
-  if (object === 'vocabulary') return `vocabulary-${type}-given`
+function getWantedAnswer(object: string, type: QuestionType): LookalikeAnswer | null {
+  if (object === 'radical' && type === 'meaning') return 'radical-meaning-wanted'
+  if (object === 'kanji') return `kanji-${type}-wanted`
+  if (object === 'vocabulary') return `vocabulary-${type}-wanted`
   return null
 }

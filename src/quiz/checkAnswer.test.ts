@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import type { Resource, Subject } from '../api/types'
 import { checkAnswer } from './checkAnswer'
 
-const person = {
+const makeResource = (object: string, data: Subject) => ({ id: 1, object, url: '', data_updated_at: null, data }) as Resource<Subject>
+
+const person = makeResource('kanji', {
   characters: '人',
   meanings: [{ meaning: 'Person', primary: true, accepted_answer: true }],
   auxiliary_meanings: [],
@@ -10,7 +12,7 @@ const person = {
     { reading: 'じん', primary: true, accepted_answer: true, type: 'onyomi' },
     { reading: 'ひと', primary: false, accepted_answer: false, type: 'kunyomi' },
   ],
-} as unknown as Subject
+} as unknown as Subject)
 
 describe('checkAnswer', () => {
   it('marks answers right or wrong', () => {
@@ -28,7 +30,7 @@ describe('checkAnswer', () => {
   })
 
   describe('when the answer belongs to a lookalike subject', () => {
-    const mountain = {
+    const mountainData = {
       characters: '山',
       meanings: [{ meaning: 'Mountain', primary: true, accepted_answer: true }],
       auxiliary_meanings: [],
@@ -38,8 +40,7 @@ describe('checkAnswer', () => {
       ],
     } as unknown as Subject
 
-    const makeLookalike = (object: string, data: Partial<Subject>) =>
-      ({ id: 2, object, url: '', data_updated_at: null, data: { ...mountain, ...data } }) as Resource<Subject>
+    const makeLookalike = (object: string, data: Partial<Subject>) => makeResource(object, { ...mountainData, ...data })
 
     const mountainVocabulary = makeLookalike('vocabulary', {
       readings: [{ reading: 'やま', primary: true, accepted_answer: true }],
@@ -50,18 +51,19 @@ describe('checkAnswer', () => {
     })
     const mountainKanji = makeLookalike('kanji', {})
 
-    it('says which subject the answer was for', () => {
-      expect(checkAnswer('peak', 'meaning', mountain, [], [mountainRadical])).toBe('radical-meaning-given')
-      expect(checkAnswer('yama', 'reading', mountain, [], [mountainVocabulary])).toBe('vocabulary-reading-given')
-      expect(checkAnswer('san', 'reading', mountainVocabulary.data, [], [mountainKanji])).toBe('kanji-reading-given')
+    it('says which subject’s answer is wanted', () => {
+      expect(checkAnswer('peak', 'meaning', mountainKanji, [], [mountainRadical])).toBe('kanji-meaning-wanted')
+      expect(checkAnswer('yama', 'reading', mountainKanji, [], [mountainVocabulary])).toBe('kanji-reading-wanted')
+      expect(checkAnswer('san', 'reading', mountainVocabulary, [], [mountainKanji])).toBe('vocabulary-reading-wanted')
+      expect(checkAnswer('mountain', 'meaning', mountainRadical, [], [mountainKanji])).toBe('radical-meaning-wanted')
     })
 
     it('marks answers that are right for this subject too as correct', () => {
-      expect(checkAnswer('mountain', 'meaning', mountainVocabulary.data, [], [mountainKanji])).toBe('correct')
+      expect(checkAnswer('mountain', 'meaning', mountainVocabulary, [], [mountainKanji])).toBe('correct')
     })
 
     it('marks answers that fit no subject as incorrect', () => {
-      expect(checkAnswer('river', 'meaning', mountain, [], [mountainRadical, mountainVocabulary])).toBe('incorrect')
+      expect(checkAnswer('river', 'meaning', mountainKanji, [], [mountainRadical, mountainVocabulary])).toBe('incorrect')
     })
   })
 })

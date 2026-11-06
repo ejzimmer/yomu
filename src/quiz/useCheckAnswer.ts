@@ -7,5 +7,5 @@ import { useLookalikeSubjects } from './useLookalikeSubjects'
 export function useCheckAnswer(subject: Resource<Subject>) {
   const synonyms = useSynonyms(subject.id)
   const lookalikes = useLookalikeSubjects(subject)
-  return (answer: string, type: QuestionType) => checkAnswer(answer, type, subject.data, synonyms, lookalikes)
+  return (answer: string, type: QuestionType) => checkAnswer(answer, type, subject, synonyms, lookalikes)
 }
