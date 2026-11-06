@@ -1,12 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Assignment, Resource, Subject } from '../api/types'
 import type { StudyItem } from '../data/studyItem'
-import { answerCorrectly, answerWrongly, askNextQuestion, createSession, undoWrongAnswer, type QuizSession } from './session'
+import {
+  answerCorrectly,
+  answerWrongly,
+  askNextQuestion,
+  countRemainingItems,
+  createSession,
+  startWrapUp,
+  stopWrapUp,
+  undoWrongAnswer,
+  type QuizSession,
+} from './session'
 
 const makeItem = (id: number, hasReading = true): StudyItem => ({
   assignment: { id, data: { subject_id: id } } as Resource<Assignment>,
   subject: { id, data: { readings: hasReading ? [{ reading: 'a' }] : [] } } as unknown as Resource<Subject>,
 })
+
+const makeItems = (count: number) => Array.from({ length: count }, (_, i) => makeItem(i + 1))
+const getIds = (items: readonly StudyItem[]) => items.map((item) => item.assignment.id).toSorted()
 
 function answerEverything(session: QuizSession) {
   let current = session
@@ -105,5 +118,38 @@ describe('review session', () => {
   it('still finishes when only one item is left', () => {
     const session = createSession([makeItem(1)])
     expect(answerEverything(session).completed).toHaveLength(1)
+  })
+
+  describe('wrapping up', () => {
+    it('finishes only the started items and the current one', () => {
+      let session = createSession(makeItems(12))
+      const started = session.question!.item.assignment.id
+      session = askNextQuestion(answerCorrectly(session))
+      const current = session.question!.item.assignment.id
+
+      session = answerEverything(startWrapUp(session))
+      expect(getIds(session.completed)).toEqual([started, current].toSorted())
+    })
+
+    it('keeps items with only wrong answers', () => {
+      let session = createSession(makeItems(3))
+      const answeredWrongly = session.question!.item.assignment.id
+      session = askNextQuestion(answerWrongly(session))
+      session = answerEverything(startWrapUp(session))
+      expect(getIds(session.completed)).toContain(answeredWrongly)
+      expect(session.completed).toHaveLength(2)
+    })
+
+    it('doesn’t count unstarted items as remaining', () => {
+      const session = startWrapUp(createSession(makeItems(12)))
+      expect(countRemainingItems(session)).toBe(1)
+    })
+
+    it('goes back to the whole queue when stopped', () => {
+      const session = stopWrapUp(startWrapUp(createSession(makeItems(12))))
+      expect(session.active).toHaveLength(10)
+      expect(countRemainingItems(session)).toBe(12)
+      expect(answerEverything(session).completed).toHaveLength(12)
+    })
   })
 })

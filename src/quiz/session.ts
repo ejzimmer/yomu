@@ -25,6 +25,7 @@ export interface QuizSession {
   recentItemIds: number[]
   isShowingAnswer: boolean
   questionNumber: number
+  isWrappingUp: boolean
   correctAnswers: number
   totalAnswers: number
 }
@@ -45,6 +46,7 @@ export function createSession(queue: readonly StudyItem[]): QuizSession {
     recentItemIds: [],
     isShowingAnswer: false,
     questionNumber: 1,
+    isWrappingUp: false,
     correctAnswers: 0,
     totalAnswers: 0,
   }
@@ -106,6 +108,30 @@ export function askNextQuestion(session: QuizSession): QuizSession {
   }
 }
 
+export function startWrapUp(session: QuizSession): QuizSession {
+  const currentItem = session.question?.item
+  const isInWrapUp = (item: SessionItem) => item === currentItem || isStarted(item)
+  return {
+    ...session,
+    active: session.active.filter(isInWrapUp),
+    waiting: [...session.active.filter((item) => !isInWrapUp(item)), ...session.waiting],
+    isWrappingUp: true,
+  }
+}
+
+export function stopWrapUp(session: QuizSession): QuizSession {
+  return { ...session, ...fillActiveItems(session.active, session.waiting), isWrappingUp: false }
+}
+
+export function countRemainingItems(session: QuizSession): number {
+  return session.active.length + (session.isWrappingUp ? 0 : session.waiting.length)
+}
+
+function isStarted(item: SessionItem) {
+  const isAnyQuestionDone = item.isMeaningDone || (hasReading(item) && item.isReadingDone)
+  return isAnyQuestionDone || item.incorrectMeaningAnswers + item.incorrectReadingAnswers > 0
+}
+
 function markQuestionDone({ item, type }: Question): SessionItem {
   return type === 'meaning' ? { ...item, isMeaningDone: true } : { ...item, isReadingDone: true }
 }
@@ -121,15 +147,15 @@ function replaceItem(session: QuizSession, oldItem: SessionItem, newItem: Sessio
 }
 
 function completeItem(session: QuizSession, oldItem: SessionItem, completedItem: SessionItem): QuizSession {
-  const [nextItem, ...waiting] = session.waiting
   const otherItems = session.active.filter((item) => item !== oldItem)
+  const items = session.isWrappingUp ? { active: otherItems, waiting: session.waiting } : fillActiveItems(otherItems, session.waiting)
 
-  return {
-    ...session,
-    active: nextItem ? [...otherItems, nextItem] : otherItems,
-    waiting,
-    completed: [...session.completed, completedItem],
-  }
+  return { ...session, ...items, completed: [...session.completed, completedItem] }
+}
+
+function fillActiveItems(active: readonly SessionItem[], waiting: readonly SessionItem[]) {
+  const freeSlots = Math.max(ACTIVE_ITEMS - active.length, 0)
+  return { active: [...active, ...waiting.slice(0, freeSlots)], waiting: waiting.slice(freeSlots) }
 }
 
 function hasReading({ subject }: StudyItem) {

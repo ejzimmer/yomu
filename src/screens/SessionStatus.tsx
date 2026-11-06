@@ -1,15 +1,16 @@
 import { BrushStroke } from '../components/BrushStroke'
 import { IconButton } from '../components/IconButton'
-import { CloseIcon } from '../icons'
+import { CloseIcon, WrapUpIcon } from '../icons'
 
 interface Props {
   remaining: number
   accuracy: number
   progress: number
+  wrapUp?: { isWrappingUp: boolean; onToggle: () => void }
   onExit: () => void
 }
 
-export function SessionStatus({ remaining, accuracy, progress, onExit }: Props) {
+export function SessionStatus({ remaining, accuracy, progress, wrapUp, onExit }: Props) {
   return (
     <>
       <div className="status">
@@ -21,6 +22,11 @@ export function SessionStatus({ remaining, accuracy, progress, onExit }: Props) 
           <span className="visually-hidden">Correct </span>
           {accuracy}%
         </span>
+        {wrapUp && (
+          <IconButton className="icon-btn wrap-up" onClick={wrapUp.onToggle} label="Wrap up" aria-pressed={wrapUp.isWrappingUp}>
+            <WrapUpIcon />
+          </IconButton>
+        )}
         <IconButton className="icon-btn" onClick={onExit} label="End session" tooltipAlign="end">
           <CloseIcon />
         </IconButton>

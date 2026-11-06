@@ -32,6 +32,10 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .wrap-up[aria-pressed='true'] {
+    color: var(--persimmon);
+  }
+
   .progress {
     position: relative;
     height: 22px;
