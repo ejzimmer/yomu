@@ -4,7 +4,17 @@ import type { WaniKaniClient } from '../api/client'
 import type { Subject } from '../api/types'
 import { SubjectCharacters } from '../components/SubjectCharacters'
 import type { StudyItem } from '../data/studyItem'
-import { answerCorrectly, answerWrongly, askNextQuestion, createSession, undoWrongAnswer, type SessionItem } from '../quiz/session'
+import {
+  answerCorrectly,
+  answerWrongly,
+  askNextQuestion,
+  countRemainingItems,
+  createSession,
+  startWrapUp,
+  stopWrapUp,
+  undoWrongAnswer,
+  type SessionItem,
+} from '../quiz/session'
 import { AnswerForm } from './AnswerForm'
 import { SessionStatus } from './SessionStatus'
 import { SessionSummary } from './SessionSummary'
@@ -15,14 +25,16 @@ interface Props {
   aside?: ReactNode
   onItemComplete: (item: SessionItem) => void
   completedLabel: string
+  canWrapUp?: boolean
   onFinish?: () => void
   onExit: () => void
 }
 
-export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onFinish, onExit }: Props) {
+export function Quiz({ queue, client, aside, onItemComplete, completedLabel, canWrapUp = false, onFinish, onExit }: Props) {
   const [session, setSession] = useState(() => createSession(queue))
   const accuracy = session.totalAnswers ? Math.round((session.correctAnswers / session.totalAnswers) * 100) : 100
   const { question } = session
+  const remaining = countRemainingItems(session)
 
   if (!question) {
     return (
@@ -45,12 +57,17 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, onF
     if (!next.question) onFinish?.()
   }
 
+  function toggleWrapUp() {
+    setSession(session.isWrappingUp ? stopWrapUp(session) : startWrapUp(session))
+  }
+
   return (
     <div className="quiz" data-type={assignment.data.subject_type}>
       <SessionStatus
-        remaining={session.active.length + session.waiting.length}
+        remaining={remaining}
         accuracy={accuracy}
-        progress={session.completed.length / queue.length}
+        progress={session.completed.length / (session.completed.length + remaining)}
+        wrapUp={canWrapUp ? { isWrappingUp: session.isWrappingUp, onToggle: toggleWrapUp } : undefined}
         onExit={onExit}
       />
 

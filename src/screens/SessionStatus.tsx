@@ -1,19 +1,22 @@
 import { BrushStroke } from '../components/BrushStroke'
 import { IconButton } from '../components/IconButton'
-import { CloseIcon } from '../icons'
+import { ArrowIcon, CloseIcon } from '../icons'
 
 interface Props {
   remaining: number
   accuracy: number
   progress: number
+  wrapUp?: { isWrappingUp: boolean; onToggle: () => void }
   onExit: () => void
 }
 
-export function SessionStatus({ remaining, accuracy, progress, onExit }: Props) {
+export function SessionStatus({ remaining, accuracy, progress, wrapUp, onExit }: Props) {
+  const isWrappingUp = wrapUp?.isWrappingUp ?? false
+
   return (
     <>
       <div className="status">
-        <span>
+        <span className={isWrappingUp ? 'visually-hidden' : undefined}>
           <span className="visually-hidden">Remaining </span>
           {remaining}
         </span>
@@ -21,6 +24,12 @@ export function SessionStatus({ remaining, accuracy, progress, onExit }: Props) 
           <span className="visually-hidden">Correct </span>
           {accuracy}%
         </span>
+        {wrapUp && (
+          <IconButton className="icon-btn wrap-up" onClick={wrapUp.onToggle} label="Wrap up" aria-pressed={isWrappingUp}>
+            <ArrowIcon />
+            {isWrappingUp ? <span>{remaining}</span> : <span lang="ja">終わり</span>}
+          </IconButton>
+        )}
         <IconButton className="icon-btn" onClick={onExit} label="End session" tooltipAlign="end">
           <CloseIcon />
         </IconButton>

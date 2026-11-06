@@ -32,6 +32,19 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .status .wrap-up {
+    width: auto;
+    gap: 4px;
+    padding-inline: 8px;
+    font: inherit;
+    font-family: var(--display);
+  }
+
+  .status .wrap-up[aria-pressed='true'] {
+    color: var(--indigo);
+    font-family: inherit;
+  }
+
   .progress {
     position: relative;
     height: 22px;
