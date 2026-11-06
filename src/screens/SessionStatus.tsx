@@ -1,6 +1,6 @@
 import { BrushStroke } from '../components/BrushStroke'
 import { IconButton } from '../components/IconButton'
-import { CloseIcon, WrapUpIcon } from '../icons'
+import { ArrowIcon, CloseIcon } from '../icons'
 
 interface Props {
   remaining: number
@@ -24,7 +24,8 @@ export function SessionStatus({ remaining, accuracy, progress, wrapUp, onExit }:
         </span>
         {wrapUp && (
           <IconButton className="icon-btn wrap-up" onClick={wrapUp.onToggle} label="Wrap up" aria-pressed={wrapUp.isWrappingUp}>
-            <WrapUpIcon />
+            <ArrowIcon />
+            <span lang="ja">終わり</span>
           </IconButton>
         )}
         <IconButton className="icon-btn" onClick={onExit} label="End session" tooltipAlign="end">

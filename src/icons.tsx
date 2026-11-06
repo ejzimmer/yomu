@@ -19,10 +19,6 @@ export const CloseIcon = () => (
   <svg {...common}><path d="M6 6l12 12" /><path d="M18 6L6 18" /></svg>
 )
 
-export const WrapUpIcon = () => (
-  <svg {...common}><path d="M5 21V4" /><path d="M5 4h12l-3 4 3 4H5" /></svg>
-)
-
 export const UndoIcon = () => (
   <svg {...common}><path d="M9 14L4 9l5-5" /><path d="M4 9h11a5 5 0 0 1 0 10h-3" /></svg>
 )

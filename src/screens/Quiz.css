@@ -32,7 +32,15 @@
     font-variant-numeric: tabular-nums;
   }
 
-  .wrap-up[aria-pressed='true'] {
+  .status .wrap-up {
+    width: auto;
+    gap: 4px;
+    padding-inline: 8px;
+    font: inherit;
+    font-family: var(--display);
+  }
+
+  .status .wrap-up[aria-pressed='true'] {
     color: var(--persimmon);
   }
 
