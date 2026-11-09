@@ -29,9 +29,14 @@
     right: 0;
   }
 
-  :scope:hover .tooltip,
   :scope:has(:focus-visible) .tooltip {
     opacity: 1;
+  }
+
+  @media (hover: hover) {
+    :scope:hover .tooltip {
+      opacity: 1;
+    }
   }
 
   :scope[data-dismissed] .tooltip {
