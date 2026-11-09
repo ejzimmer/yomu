@@ -1,0 +1,21 @@
+@scope (.sign-out-confirm) {
+  :scope {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: none;
+    align-items: center;
+    animation: sign-out-confirm-reveal 150ms ease-out;
+  }
+
+  .icon-btn.confirm {
+    color: var(--red);
+  }
+}
+
+@keyframes sign-out-confirm-reveal {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
