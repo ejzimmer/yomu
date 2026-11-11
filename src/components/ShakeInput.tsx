@@ -1,5 +1,6 @@
 import './ShakeInput.css'
 import { useId, useImperativeHandle, useRef, useState, type ChangeEvent, type ComponentProps, type Ref } from 'react'
+import { CompositionTracker } from './CompositionTracker'
 
 export interface InputError {
   message: string
@@ -10,6 +11,7 @@ export interface InputError {
 export interface ShakeInputHandle {
   focus: () => void
   setError: (error: InputError | null) => void
+  isConfirmingText: (time: number) => boolean
 }
 
 type Props = Omit<ComponentProps<'input'>, 'ref'> & {
@@ -20,6 +22,7 @@ export function ShakeInput({ className, ref, onChange, ...inputProps }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<InputError | null>(null)
+  const [compositionTracker] = useState(() => new CompositionTracker())
   const messageId = useId()
   const wrongCharacterIndexes = error?.wrongCharacterIndexes
 
@@ -32,7 +35,8 @@ export function ShakeInput({ className, ref, onChange, ...inputProps }: Props) {
         shake(containerRef.current)
       }
     },
-  }), [])
+    isConfirmingText: (time) => compositionTracker.isConfirmingText(time),
+  }), [compositionTracker])
 
   function clearErrorAndChange(event: ChangeEvent<HTMLInputElement>) {
     setError(null)
@@ -47,6 +51,8 @@ export function ShakeInput({ className, ref, onChange, ...inputProps }: Props) {
         aria-invalid={error ? true : undefined}
         aria-describedby={messageId}
         onChange={clearErrorAndChange}
+        onCompositionStart={() => compositionTracker.recordStart()}
+        onCompositionEnd={(event) => compositionTracker.recordEnd(event.timeStamp)}
         {...inputProps}
       />
       {wrongCharacterIndexes && (
