@@ -31,6 +31,7 @@ export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo
 
   function submit(event: FormEvent) {
     event.preventDefault()
+    if (inputRef.current?.isConfirmingText(event.timeStamp)) return
 
     if (isShowingAnswer) {
       onNext()
