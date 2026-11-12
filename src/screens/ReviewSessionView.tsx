@@ -42,6 +42,7 @@ export function ReviewSessionView({ data, client, onExit }: Props) {
       }}
       completedLabel="reviewed"
       canWrapUp
+      canLimitTime
       onExit={onExit}
     />
   )

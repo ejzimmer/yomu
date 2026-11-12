@@ -32,6 +32,27 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .status .limited-time {
+    width: auto;
+    gap: 4px;
+    padding-inline: 8px;
+    font: inherit;
+  }
+
+  .status .limited-time[aria-pressed='true'] {
+    color: var(--indigo);
+  }
+
+  .status .exit {
+    border-radius: 999px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .status .exit.safe-to-stop {
+    background: var(--indigo);
+    color: var(--paper);
+  }
+
   .status .wrap-up {
     width: auto;
     gap: 4px;
