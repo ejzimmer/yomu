@@ -40,5 +40,5 @@ export const HourglassIcon = () => (
 )
 
 export const TickIcon = () => (
-  <svg {...common}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+  <svg {...common}><path d="M5.5 13.5L10 18.5L18.5 4.5" /></svg>
 )
