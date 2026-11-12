@@ -1,6 +1,7 @@
 import type { StudyItem } from '../data/studyItem'
 
 const ACTIVE_ITEMS = 10
+const LIMITED_TIME_ITEMS = 3
 const MAX_RECENT_ITEMS = 5
 
 export type QuestionType = 'meaning' | 'reading'
@@ -26,6 +27,7 @@ export interface QuizSession {
   isShowingAnswer: boolean
   questionNumber: number
   isWrappingUp: boolean
+  isLimitedTime: boolean
   correctAnswers: number
   totalAnswers: number
 }
@@ -47,6 +49,7 @@ export function createSession(queue: readonly StudyItem[]): QuizSession {
     isShowingAnswer: false,
     questionNumber: 1,
     isWrappingUp: false,
+    isLimitedTime: false,
     correctAnswers: 0,
     totalAnswers: 0,
   }
@@ -109,22 +112,38 @@ export function askNextQuestion(session: QuizSession): QuizSession {
 }
 
 export function startWrapUp(session: QuizSession): QuizSession {
-  const currentItem = session.question?.item
-  const isInWrapUp = (item: SessionItem) => item === currentItem || isStarted(item)
-  return {
-    ...session,
-    active: session.active.filter(isInWrapUp),
-    waiting: [...session.active.filter((item) => !isInWrapUp(item)), ...session.waiting],
-    isWrappingUp: true,
-  }
+  return { ...session, ...keepOnlyStartedItems(session), isWrappingUp: true }
 }
 
 export function stopWrapUp(session: QuizSession): QuizSession {
-  return { ...session, ...fillActiveItems(session.active, session.waiting), isWrappingUp: false }
+  return refillActiveItems({ ...session, isWrappingUp: false })
+}
+
+export function startLimitedTime(session: QuizSession): QuizSession {
+  const items = keepOnlyStartedItems(session)
+  const batch = session.isWrappingUp ? items : fillActiveItems(items.active, items.waiting, LIMITED_TIME_ITEMS)
+  return { ...session, ...batch, isLimitedTime: true }
+}
+
+export function stopLimitedTime(session: QuizSession): QuizSession {
+  return refillActiveItems({ ...session, isLimitedTime: false })
 }
 
 export function countRemainingItems(session: QuizSession): number {
   return session.active.length + (session.isWrappingUp ? 0 : session.waiting.length)
+}
+
+export function isSafeToStop(session: QuizSession): boolean {
+  return !session.active.some(isStarted)
+}
+
+function keepOnlyStartedItems(session: QuizSession) {
+  const currentItem = session.question?.item
+  const isKept = (item: SessionItem) => item === currentItem || isStarted(item)
+  return {
+    active: session.active.filter(isKept),
+    waiting: [...session.active.filter((item) => !isKept(item)), ...session.waiting],
+  }
 }
 
 function isStarted(item: SessionItem) {
@@ -147,14 +166,20 @@ function replaceItem(session: QuizSession, oldItem: SessionItem, newItem: Sessio
 }
 
 function completeItem(session: QuizSession, oldItem: SessionItem, completedItem: SessionItem): QuizSession {
-  const otherItems = session.active.filter((item) => item !== oldItem)
-  const items = session.isWrappingUp ? { active: otherItems, waiting: session.waiting } : fillActiveItems(otherItems, session.waiting)
-
-  return { ...session, ...items, completed: [...session.completed, completedItem] }
+  const active = session.active.filter((item) => item !== oldItem)
+  return refillActiveItems({ ...session, active, completed: [...session.completed, completedItem] })
 }
 
-function fillActiveItems(active: readonly SessionItem[], waiting: readonly SessionItem[]) {
-  const freeSlots = Math.max(ACTIVE_ITEMS - active.length, 0)
+function refillActiveItems(session: QuizSession): QuizSession {
+  if (session.isWrappingUp) return session
+  if (session.isLimitedTime && session.active.length > 0) return session
+
+  const size = session.isLimitedTime ? LIMITED_TIME_ITEMS : ACTIVE_ITEMS
+  return { ...session, ...fillActiveItems(session.active, session.waiting, size) }
+}
+
+function fillActiveItems(active: readonly SessionItem[], waiting: readonly SessionItem[], size: number) {
+  const freeSlots = Math.max(size - active.length, 0)
   return { active: [...active, ...waiting.slice(0, freeSlots)], waiting: waiting.slice(freeSlots) }
 }
 

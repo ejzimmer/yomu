@@ -7,7 +7,10 @@ import {
   askNextQuestion,
   countRemainingItems,
   createSession,
+  isSafeToStop,
+  startLimitedTime,
   startWrapUp,
+  stopLimitedTime,
   stopWrapUp,
   undoWrongAnswer,
   type QuizSession,
@@ -20,6 +23,12 @@ const makeItem = (id: number, hasReading = true): StudyItem => ({
 
 const makeItems = (count: number) => Array.from({ length: count }, (_, i) => makeItem(i + 1))
 const getIds = (items: readonly StudyItem[]) => items.map((item) => item.assignment.id).toSorted()
+
+function isSameBatchOrNewBatch({ before, after }: { before: number[]; after: number[] }) {
+  const isSameBatch = after.every((id) => before.includes(id))
+  const isNewBatch = after.every((id) => !before.includes(id))
+  return isSameBatch || isNewBatch
+}
 
 function answerEverything(session: QuizSession) {
   let current = session
@@ -149,6 +158,67 @@ describe('review session', () => {
       const session = stopWrapUp(startWrapUp(createSession(makeItems(12))))
       expect(session.active).toHaveLength(10)
       expect(countRemainingItems(session)).toBe(12)
+      expect(answerEverything(session).completed).toHaveLength(12)
+    })
+  })
+
+  describe('limited time', () => {
+    it('keeps the current item in play with two new ones', () => {
+      const session = createSession(makeItems(12))
+      const current = session.question!.item.assignment.id
+      const limited = startLimitedTime(session)
+      expect(limited.active).toHaveLength(3)
+      expect(getIds(limited.active)).toContain(current)
+      expect(countRemainingItems(limited)).toBe(12)
+    })
+
+    it('keeps every started item in play, even more than three', () => {
+      let session = createSession(makeItems(12))
+      for (let i = 0; i < 4; i++) session = askNextQuestion(answerWrongly(session))
+      const started = session.active.filter((item) => item.incorrectMeaningAnswers + item.incorrectReadingAnswers > 0)
+      expect(startLimitedTime(session).active).toHaveLength(Math.max(started.length + 1, 3))
+    })
+
+    it('finishes all three items before taking the next three', () => {
+      let session = startLimitedTime(createSession(makeItems(7)))
+      const changes: { before: number[]; after: number[] }[] = []
+      while (session.question) {
+        const before = getIds(session.active)
+        session = askNextQuestion(answerCorrectly(session))
+        changes.push({ before, after: getIds(session.active) })
+      }
+
+      expect(changes.every((change) => isSameBatchOrNewBatch(change))).toBe(true)
+      expect(Math.max(...changes.map(({ after }) => after.length))).toBe(3)
+      expect(session.completed).toHaveLength(7)
+    })
+
+    it('is safe to stop only when no item in play is started', () => {
+      let session = startLimitedTime(createSession(makeItems(6)))
+      expect(isSafeToStop(session)).toBe(true)
+      const safeQuestions: boolean[] = []
+      while (session.question) {
+        session = askNextQuestion(answerCorrectly(session))
+        safeQuestions.push(isSafeToStop(session))
+      }
+      expect(safeQuestions.filter(Boolean)).toHaveLength(2)
+      expect(safeQuestions.at(5)).toBe(true)
+    })
+
+    it('isn’t safe to stop after a wrong answer', () => {
+      const session = answerWrongly(startLimitedTime(createSession(makeItems(6))))
+      expect(isSafeToStop(session)).toBe(false)
+    })
+
+    it('doesn’t take new items while wrapping up', () => {
+      const session = startLimitedTime(startWrapUp(createSession(makeItems(12))))
+      expect(session.active).toHaveLength(1)
+      expect(answerEverything(session).completed).toHaveLength(1)
+    })
+
+    it('goes back to ten items in play when stopped', () => {
+      const session = stopLimitedTime(startLimitedTime(createSession(makeItems(12))))
+      expect(session.active).toHaveLength(10)
       expect(answerEverything(session).completed).toHaveLength(12)
     })
   })

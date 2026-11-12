@@ -34,3 +34,11 @@ export const BackIcon = () => (
 export const PlusIcon = () => (
   <svg {...common}><path d="M12 5v14" /><path d="M5 12h14" /></svg>
 )
+
+export const HourglassIcon = () => (
+  <svg {...common}><path d="M6 3h12" /><path d="M6 21h12" /><path d="M7 3c0 5 5 6 5 9s-5 4-5 9" /><path d="M17 3c0 5-5 6-5 9s5 4 5 9" /></svg>
+)
+
+export const TickIcon = () => (
+  <svg {...common}><path d="M5.5 13.5L10 18.5L18.5 4.5" /></svg>
+)

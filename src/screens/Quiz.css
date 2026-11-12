@@ -32,6 +32,23 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .status .limited-time {
+    width: auto;
+    gap: 4px;
+    padding-inline: 8px;
+    font: inherit;
+  }
+
+  .status .countdown {
+    display: inline-flex;
+    justify-content: center;
+    width: 22px;
+  }
+
+  .status .limited-time[aria-pressed='true'] {
+    color: var(--indigo);
+  }
+
   .status .wrap-up {
     width: auto;
     gap: 4px;

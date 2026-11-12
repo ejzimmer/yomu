@@ -10,7 +10,10 @@ import {
   askNextQuestion,
   countRemainingItems,
   createSession,
+  isSafeToStop,
+  startLimitedTime,
   startWrapUp,
+  stopLimitedTime,
   stopWrapUp,
   undoWrongAnswer,
   type SessionItem,
@@ -26,11 +29,12 @@ interface Props {
   onItemComplete: (item: SessionItem) => void
   completedLabel: string
   canWrapUp?: boolean
+  canLimitTime?: boolean
   onFinish?: () => void
   onExit: () => void
 }
 
-export function Quiz({ queue, client, aside, onItemComplete, completedLabel, canWrapUp = false, onFinish, onExit }: Props) {
+export function Quiz({ queue, client, aside, onItemComplete, completedLabel, canWrapUp = false, canLimitTime = false, onFinish, onExit }: Props) {
   const [session, setSession] = useState(() => createSession(queue))
   const accuracy = session.totalAnswers ? Math.round((session.correctAnswers / session.totalAnswers) * 100) : 100
   const { question } = session
@@ -61,6 +65,17 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, can
     setSession(session.isWrappingUp ? stopWrapUp(session) : startWrapUp(session))
   }
 
+  function toggleLimitedTime() {
+    setSession(session.isLimitedTime ? stopLimitedTime(session) : startLimitedTime(session))
+  }
+
+  const limitedTime = {
+    isLimitedTime: session.isLimitedTime,
+    itemsInPlay: session.active.length,
+    isSafeToStop: isSafeToStop(session),
+    onToggle: toggleLimitedTime,
+  }
+
   return (
     <div className="quiz" data-type={assignment.data.subject_type}>
       <SessionStatus
@@ -68,6 +83,7 @@ export function Quiz({ queue, client, aside, onItemComplete, completedLabel, can
         accuracy={accuracy}
         progress={session.completed.length / (session.completed.length + remaining)}
         wrapUp={canWrapUp ? { isWrappingUp: session.isWrappingUp, onToggle: toggleWrapUp } : undefined}
+        limitedTime={canLimitTime ? limitedTime : undefined}
         onExit={onExit}
       />
 
