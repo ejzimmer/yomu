@@ -38,3 +38,7 @@ export const PlusIcon = () => (
 export const HourglassIcon = () => (
   <svg {...common}><path d="M6 3h12" /><path d="M6 21h12" /><path d="M7 3c0 5 5 6 5 9s-5 4-5 9" /><path d="M17 3c0 5-5 6-5 9s5 4 5 9" /></svg>
 )
+
+export const TickIcon = () => (
+  <svg {...common}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+)

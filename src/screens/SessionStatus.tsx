@@ -1,6 +1,6 @@
 import { BrushStroke } from '../components/BrushStroke'
 import { IconButton } from '../components/IconButton'
-import { ArrowIcon, CloseIcon, HourglassIcon } from '../icons'
+import { ArrowIcon, CloseIcon, HourglassIcon, TickIcon } from '../icons'
 
 interface Props {
   remaining: number
@@ -30,12 +30,7 @@ export function SessionStatus({ remaining, accuracy, progress, wrapUp, limitedTi
         {limitedTime && (
           <IconButton className="icon-btn limited-time" onClick={limitedTime.onToggle} label="Limited time" aria-pressed={isLimitedTime}>
             <HourglassIcon />
-            {isLimitedTime && !isWrappingUp && (
-              <span>
-                <span className="visually-hidden">In play </span>
-                {limitedTime.itemsInPlay}
-              </span>
-            )}
+            {isLimitedTime && !isWrappingUp && <BatchCountdown itemsInPlay={limitedTime.itemsInPlay} isSafeToStop={isSafeToStop} />}
           </IconButton>
         )}
         {wrapUp && (
@@ -44,12 +39,7 @@ export function SessionStatus({ remaining, accuracy, progress, wrapUp, limitedTi
             {isWrappingUp ? <span>{remaining}</span> : <span lang="ja">終わり</span>}
           </IconButton>
         )}
-        <IconButton
-          className={isSafeToStop ? 'icon-btn exit safe-to-stop' : 'icon-btn exit'}
-          onClick={onExit}
-          label={isSafeToStop ? 'End session, nothing half done' : 'End session'}
-          tooltipAlign="end"
-        >
+        <IconButton className="icon-btn" onClick={onExit} label="End session" tooltipAlign="end">
           <CloseIcon />
         </IconButton>
       </div>
@@ -62,5 +52,23 @@ export function SessionStatus({ remaining, accuracy, progress, wrapUp, limitedTi
         )}
       </div>
     </>
+  )
+}
+
+function BatchCountdown({ itemsInPlay, isSafeToStop }: { itemsInPlay: number; isSafeToStop: boolean }) {
+  if (isSafeToStop) {
+    return (
+      <span className="countdown">
+        <TickIcon />
+        <span className="visually-hidden">Safe to stop</span>
+      </span>
+    )
+  }
+
+  return (
+    <span className="countdown">
+      <span className="visually-hidden">Left before you can stop </span>
+      {itemsInPlay}
+    </span>
   )
 }

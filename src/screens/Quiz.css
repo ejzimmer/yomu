@@ -39,18 +39,14 @@
     font: inherit;
   }
 
+  .status .countdown {
+    display: inline-flex;
+    justify-content: center;
+    width: 22px;
+  }
+
   .status .limited-time[aria-pressed='true'] {
     color: var(--indigo);
-  }
-
-  .status .exit {
-    border-radius: 999px;
-    transition: background-color 0.3s, color 0.3s;
-  }
-
-  .status .exit.safe-to-stop {
-    background: var(--indigo);
-    color: var(--paper);
   }
 
   .status .wrap-up {
