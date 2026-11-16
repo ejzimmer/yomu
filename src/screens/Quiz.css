@@ -1,6 +1,8 @@
 @scope (.quiz) to (.shake-input) {
   :scope {
+    --type-light: var(--vocab-light);
     --type-colour: var(--vocab);
+    --type-dark: var(--vocab-dark);
     --input-font-size: 30px;
 
     container-type: inline-size;
@@ -16,11 +18,15 @@
   }
 
   :scope[data-type='radical'] {
+    --type-light: var(--radical-light);
     --type-colour: var(--radical);
+    --type-dark: var(--radical-dark);
   }
 
   :scope[data-type='kanji'] {
+    --type-light: var(--kanji-light);
     --type-colour: var(--kanji);
+    --type-dark: var(--kanji-dark);
   }
 
   .status {
@@ -64,44 +70,35 @@
 
   .progress {
     position: relative;
-    height: 22px;
-    margin-bottom: 8px;
-    color: color-mix(in srgb, var(--track) 70%, var(--paper));
+    height: 14px;
+    margin: 6px 0 20px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: hsl(0 0% 100% / 0.55);
+    box-shadow: inset 0 1px 3px hsl(210 40% 40% / 0.25);
+    overflow: hidden;
   }
 
   .progress-fill {
     position: absolute;
     inset: 0 auto 0 0;
-    color: var(--ink);
+    border-radius: 999px;
+    background: linear-gradient(var(--type-light), var(--type-colour) 50%, var(--type-dark));
     transition: width 0.3s;
   }
 
   .layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 760px) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 330px) auto;
+    grid-template-rows: minmax(0, 380px) auto;
     align-content: start;
     column-gap: 40px;
     flex: 1;
     min-height: 0;
   }
 
-  .item {
+  .question-card {
     grid-column: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    container-type: size;
-    color: var(--type-colour);
-  }
-
-  .item span {
-    font-family: var(--display);
-    font-weight: var(--display-weight);
-    line-height: 1.1;
-    text-align: center;
-    overflow-wrap: anywhere;
   }
 
   .answer {
@@ -109,29 +106,13 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 0 32px 24px;
+    padding: 24px 32px;
   }
 
   .answer > form {
     display: flex;
     flex-direction: column;
     gap: 16px;
-  }
-
-  label {
-    padding: 10px 0;
-    text-align: center;
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  /* Full-bleed band: the shadow paints the background out to both screen edges and the clip stops it spreading vertically. */
-  [data-question='reading'] label {
-    background: var(--ink);
-    box-shadow: 0 0 0 100vmax var(--ink);
-    clip-path: inset(0 -100vmax);
-    color: var(--paper);
   }
 
   .answer-row {
@@ -148,17 +129,16 @@
     width: 56px;
     height: 56px;
     padding: 0;
-    border: none;
+    border: 3px solid white;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--type-colour) 75%, transparent);
-    color: var(--paper);
+    background: linear-gradient(hsl(0 0% 100% / 0.4), hsl(0 0% 100% / 0.1) 50%, transparent 50%), var(--type-colour);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--type-dark) 35%, transparent);
+    color: white;
     cursor: pointer;
   }
 
-  [data-question='reading'] .submit {
-    border: 2px solid var(--type-colour);
-    background: transparent;
-    color: var(--type-colour);
+  .submit svg {
+    stroke-width: 3;
   }
 
   /* Two classes, to beat IconButton's own colour */
@@ -174,6 +154,7 @@
   }
 
   .correct {
+    color: var(--type-dark);
     font-family: var(--display);
     font-size: 34px;
     font-weight: var(--display-weight);
@@ -228,10 +209,10 @@
 
     .layout {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: minmax(80px, 250px) auto auto;
+      grid-template-rows: minmax(120px, 300px) auto auto;
     }
 
-    .item,
+    .question-card,
     .answer,
     .feed {
       grid-column: 1;
@@ -264,7 +245,8 @@
 /* After a wrong answer the box turns red and stays put: it's showing a result, not an input error. */
 @scope (.answer-row) {
   input[aria-invalid='true'] {
-    border-bottom-color: var(--red);
+    border-color: var(--red);
+    background: hsl(340 100% 97% / 0.85);
     color: var(--red);
   }
 }
@@ -298,11 +280,16 @@
     width: 56px;
     height: 56px;
     padding: 0;
-    border: none;
+    border: 3px solid white;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--ink) 75%, transparent);
-    color: var(--paper);
+    background: linear-gradient(hsl(0 0% 100% / 0.4), hsl(0 0% 100% / 0.1) 50%, transparent 50%), var(--vocab);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--vocab-dark) 35%, transparent);
+    color: white;
     cursor: pointer;
+  }
+
+  .submit svg {
+    stroke-width: 3;
   }
 }
 

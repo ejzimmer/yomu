@@ -1,17 +1,26 @@
 
 :root {
-  --paper: #E6DECD;
-  --track: #CFC3AA;
-  --ink: #1B1A17;
-  --ink-soft: #4A463F;
-  --red: #B5452B;
+  --paper: white;
+  --sky: hsl(199 72% 70%);
+  --glass: hsl(0 0% 100% / 0.7);
+  --glass-edge: hsl(199 60% 75%);
+  --track: hsl(199 50% 86%);
+  --ink: hsl(0 0% 20%);
+  --ink-soft: hsl(215 25% 30%);
+  --red: #e0245e;
   --green: #36A152;
   --down: #D6472A;
-  --radical: #1E7FC4;
-  --kanji: #D0307F;
-  --vocab: #8034C4;
-  --persimmon: #C2622D;
-  --indigo: #2B4A78;
+  --radical-light: #9ee3ff;
+  --radical: #00aaff;
+  --radical-dark: #0068b8;
+  --kanji-light: #ffa3dc;
+  --kanji: #ff00aa;
+  --kanji-dark: #b3007a;
+  --vocab-light: #dcadff;
+  --vocab: #aa00ff;
+  --vocab-dark: #6c00a8;
+  --night: #1a2a52;
+  --indigo: var(--radical-dark);
   --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   --sans: 'IBM Plex Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
   --system: system-ui, 'Hiragino Sans', 'Yu Gothic UI', 'Noto Sans CJK JP', sans-serif;
@@ -41,7 +50,7 @@ body,
 
 body {
   margin: 0;
-  background: var(--paper);
+  background: linear-gradient(white, var(--sky)) fixed;
   color: var(--ink);
   font-family: var(--sans);
 }

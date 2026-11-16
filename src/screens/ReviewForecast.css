@@ -13,7 +13,7 @@
   }
 
   .count {
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-weight: 700;
     font-size: 32px;
     line-height: 1;
@@ -46,22 +46,23 @@
 
   .timeline {
     position: relative;
-    height: 48px;
+    --tick: hsl(199 60% 72%);
+
+    height: 64px;
     background:
-      linear-gradient(var(--track), var(--track)) center / 100% 1px no-repeat,
-      linear-gradient(var(--track), var(--track)) 25% center / 1px 7px no-repeat,
-      linear-gradient(var(--track), var(--track)) 50% center / 1px 7px no-repeat,
-      linear-gradient(var(--track), var(--track)) 75% center / 1px 7px no-repeat;
+      linear-gradient(var(--tick), var(--tick)) center / 100% 1px no-repeat,
+      linear-gradient(var(--tick), var(--tick)) 25% center / 1px 7px no-repeat,
+      linear-gradient(var(--tick), var(--tick)) 50% center / 1px 7px no-repeat,
+      linear-gradient(var(--tick), var(--tick)) 75% center / 1px 7px no-repeat;
   }
 
-  .spatter {
+  .cluster {
     position: absolute;
     top: 50%;
-    color: var(--indigo);
-    translate: -50% -50%;
+    translate: -50% -78%;
   }
 
-  .spatter button {
+  .cluster button {
     display: grid;
     place-items: center;
     min-width: 20px;
@@ -73,14 +74,13 @@
     cursor: default;
   }
 
-  .spatter:hover,
-  .spatter:has(:focus-visible) {
+  .cluster:hover,
+  .cluster:has(:focus-visible) {
     z-index: 1;
   }
 
-  .spatter svg {
+  .cluster svg {
     overflow: visible;
-    opacity: 0.88;
   }
 
   .added {

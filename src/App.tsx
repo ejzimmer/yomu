@@ -2,6 +2,7 @@ import './App.css'
 import { useCallback, useLayoutEffect, useState } from 'react'
 import type { User } from './api/types'
 import { FontStyleSwitch } from './components/FontStyleSwitch'
+import { GemDefs } from './components/GemDefs'
 import { SignOutButton } from './components/SignOutButton'
 import { clearDatabase, db } from './data/db'
 import { applyFontStyle, type FontStyle, getFontStyle, saveFontStyle } from './fontStyle'
@@ -34,6 +35,7 @@ export default function App() {
 
   return (
     <>
+      <GemDefs />
       <header className="bar">
         <div className="name">読む</div>
         <div className="actions">

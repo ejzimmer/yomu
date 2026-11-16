@@ -1,6 +1,7 @@
 @scope (.lesson) to (.has-tooltip) {
   :scope {
     --type-colour: var(--vocab);
+    --type-dark: var(--vocab-dark);
 
     align-self: stretch;
     display: flex;
@@ -13,16 +14,19 @@
   :scope[data-type='radical'],
   [data-type='radical'] {
     --type-colour: var(--radical);
+    --type-dark: var(--radical-dark);
   }
 
   :scope[data-type='kanji'],
   [data-type='kanji'] {
     --type-colour: var(--kanji);
+    --type-dark: var(--kanji-dark);
   }
 
   [data-type='vocabulary'],
   [data-type='kana_vocabulary'] {
     --type-colour: var(--vocab);
+    --type-dark: var(--vocab-dark);
   }
 
   .lesson-bar {
@@ -45,10 +49,10 @@
     min-width: 40px;
     height: 40px;
     padding: 0 8px;
-    border: 2px solid transparent;
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--type-colour) 15%, transparent);
-    color: var(--type-colour);
+    border: 1px solid color-mix(in srgb, var(--type-colour) 30%, white);
+    border-radius: 999px;
+    background: hsl(0 0% 100% / 0.75);
+    color: var(--type-dark);
     font-family: var(--display);
     font-size: 18px;
     font-weight: var(--display-weight);
@@ -56,22 +60,35 @@
   }
 
   .lesson-tabs button[aria-current='step'] {
-    border-color: var(--type-colour);
+    border: 2px solid var(--type-colour);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--type-colour) 30%, transparent);
   }
 
   .lesson-page {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 14px;
     padding-bottom: 24px;
   }
 
   .lesson-item {
+    --card-radius: 20px;
+
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 200px;
-    color: var(--type-colour);
+    margin-top: 12px;
+    padding-top: var(--card-radius);
+    border: 1px solid color-mix(in srgb, var(--type-colour) 30%, white);
+    border-radius: var(--card-radius);
+    background:
+      linear-gradient(var(--type-colour), var(--type-colour)) top / 100% var(--card-radius) no-repeat,
+      hsl(0 0% 100% / 0.78);
+    background-clip: padding-box;
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--type-colour) 22%, transparent);
+    overflow: hidden;
+    color: var(--type-dark);
     font-family: var(--display);
     font-size: clamp(64px, 18vw, 140px);
     font-weight: var(--display-weight);
@@ -83,12 +100,16 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding: 14px 18px 16px;
+    border: 1px solid hsl(199 60% 85%);
+    border-radius: 16px;
+    background: hsl(0 0% 100% / 0.6);
   }
 
   h2 {
     margin: 0;
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ink-soft);
@@ -96,6 +117,7 @@
 
   .answers {
     margin: 0;
+    color: var(--type-dark);
     font-family: var(--display);
     font-size: 30px;
     font-weight: var(--display-weight);
@@ -159,8 +181,9 @@
     align-items: center;
     gap: 8px;
     padding: 4px 12px 4px 4px;
-    border-radius: 6px;
-    background: color-mix(in srgb, var(--type-colour) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--type-colour) 30%, white);
+    border-radius: 999px;
+    background: hsl(0 0% 100% / 0.8);
     font-size: 14px;
   }
 
@@ -199,7 +222,11 @@
     display: flex;
     justify-content: space-between;
     padding: 12px 0 max(16px, env(safe-area-inset-bottom, 0px));
-    background: var(--paper);
+    pointer-events: none;
+  }
+
+  .lesson-nav button {
+    pointer-events: auto;
   }
 }
 
@@ -227,7 +254,13 @@
   }
 
   .next {
-    background: color-mix(in srgb, var(--type-colour) 75%, transparent);
-    color: var(--paper);
+    border: 3px solid white;
+    background: linear-gradient(hsl(0 0% 100% / 0.4), hsl(0 0% 100% / 0.1) 50%, transparent 50%), var(--type-colour);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--type-dark) 35%, transparent);
+    color: white;
+  }
+
+  .next svg {
+    stroke-width: 3;
   }
 }

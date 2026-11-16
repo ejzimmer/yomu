@@ -1,7 +1,6 @@
 import './StartSession.css'
-import { IconButton } from '../components/IconButton'
+import { HexagonGem } from '../components/HexagonGem'
 import { useKeyboardShortcut } from '../components/useKeyboardShortcut'
-import { ArrowIcon } from '../icons'
 
 interface Props {
   count: number
@@ -10,18 +9,30 @@ interface Props {
   onStart: () => void
 }
 
+const GEM_TYPES = { lessons: 'kanji', reviews: 'radical' } as const
+
 export function StartSession({ count, noun, shortcutKey, onStart }: Props) {
   useKeyboardShortcut(shortcutKey, onStart, count > 0)
 
+  if (count === 0) {
+    return (
+      <div className="start-session">
+        <HexagonGem gemType="empty" label={count} />
+        <span className="label">
+          <span className="visually-hidden">{count} </span>
+          {noun}
+        </span>
+      </div>
+    )
+  }
+
   return (
-    <div className={`start-session ${noun}`}>
-      <span className="count">{count}</span>
-      <span className="label">{noun}</span>
-      {count > 0 && (
-        <IconButton className="submit" onClick={onStart} label={`Start ${noun}`} aria-keyshortcuts={shortcutKey}>
-          <ArrowIcon />
-        </IconButton>
-      )}
-    </div>
+    <button type="button" className="start-session" onClick={onStart} aria-keyshortcuts={shortcutKey}>
+      <HexagonGem gemType={GEM_TYPES[noun]} label={count} />
+      <span className="label">
+        <span className="visually-hidden">Start {count} </span>
+        {noun}
+      </span>
+    </button>
   )
 }

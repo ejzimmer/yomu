@@ -1,12 +1,10 @@
 import './ReviewForecast.css'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { InkSpatter } from '../components/InkSpatter'
+import { CrystalCluster } from '../components/CrystalCluster'
 import { Tooltip } from '../components/Tooltip'
 import type { ForecastDay, ForecastHour } from '../review/buildReviewForecast'
 import { loadReviewForecast } from '../review/loadReviewForecast'
 
-const SMALLEST_SPATTER_RADIUS = 3
-const LARGEST_SPATTER_RADIUS = 18
 const HOURS_PER_DAY = 24
 
 export function ReviewForecast() {
@@ -43,14 +41,11 @@ function ForecastDayRow({ day, busiestHourCount }: ForecastDayRowProps) {
       <span className="weekday">{day.date.toLocaleString(undefined, { weekday: 'short' })}</span>
       <ol className="timeline">
         {day.hours.map((hour) => (
-          <li key={hour.start.toString()} className="spatter" style={{ left: `${getDayProgress(hour) * 100}%` }}>
+          <li key={hour.start.toString()} className="cluster" style={{ left: `${getDayProgress(hour) * 100}%` }}>
             <Tooltip text={describeHour(hour)}>
               {(tooltipProps) => (
                 <button type="button" {...tooltipProps}>
-                  <InkSpatter
-                    seed={hour.start.epochMilliseconds}
-                    radius={getSpatterRadius(hour.count, busiestHourCount)}
-                  />
+                  <CrystalCluster seed={hour.start.epochMilliseconds} count={hour.count} busiestCount={busiestHourCount} />
                 </button>
               )}
             </Tooltip>
@@ -71,7 +66,3 @@ function getDayProgress(hour: ForecastHour) {
   return (hour.start.hour + 0.5) / HOURS_PER_DAY
 }
 
-// Scales the area, not the radius, with the count, because the eye reads a blot's size by its area.
-function getSpatterRadius(count: number, busiestHourCount: number) {
-  return Math.max(SMALLEST_SPATTER_RADIUS, LARGEST_SPATTER_RADIUS * Math.sqrt(count / busiestHourCount))
-}

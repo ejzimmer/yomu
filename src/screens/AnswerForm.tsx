@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { flushSync } from 'react-dom'
 import type { WaniKaniClient } from '../api/client'
 import { ShakeInput, type ShakeInputHandle } from '../components/ShakeInput'
@@ -10,6 +10,7 @@ import { CorrectAnswer } from './CorrectAnswer'
 import { getTryAgainError } from './getTryAgainError'
 
 interface Props {
+  inputId: string
   question: Question
   client: WaniKaniClient
   isShowingAnswer: boolean
@@ -18,9 +19,8 @@ interface Props {
   onNext: () => void
 }
 
-export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo, onNext }: Props) {
+export function AnswerForm({ inputId, question, client, isShowingAnswer, onAnswer, onRedo, onNext }: Props) {
   const [answer, setAnswer] = useState('')
-  const inputId = useId()
   const inputRef = useRef<ShakeInputHandle>(null)
   const { type, item } = question
   const checkAnswer = useCheckAnswer(item.subject)
@@ -65,7 +65,6 @@ export function AnswerForm({ question, client, isShowingAnswer, onAnswer, onRedo
   return (
     <div className="answer">
       <form data-question={type} onSubmit={submit}>
-        <label htmlFor={inputId}>{type === 'meaning' ? 'Meaning' : 'Reading'}</label>
         <div className="answer-row">
           <ShakeInput
             ref={inputRef}

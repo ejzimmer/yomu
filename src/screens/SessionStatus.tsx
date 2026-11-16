@@ -1,4 +1,3 @@
-import { BrushStroke } from '../components/BrushStroke'
 import { IconButton } from '../components/IconButton'
 import { ArrowIcon, CloseIcon, HourglassIcon, TickIcon } from '../icons'
 
@@ -44,12 +43,7 @@ export function SessionStatus({ remaining, accuracy, progress, wrapUp, limitedTi
         </IconButton>
       </div>
       <div className="progress">
-        <BrushStroke />
-        {progress > 0 && (
-          <div className="progress-fill" style={{ width: `${progress * 100}%` }}>
-            <BrushStroke />
-          </div>
-        )}
+        {progress > 0 && <div className="progress-fill" style={{ width: `${progress * 100}%` }} />}
       </div>
     </>
   )
